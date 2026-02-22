@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import type { Poll } from "@/data/polls";
 import { CountryBreakdown } from "./CountryBreakdown";
+import { useAuth } from "@/contexts/AuthContext";
 import { ChevronDown, ChevronUp, TrendingUp, Users } from "lucide-react";
+import { toast } from "sonner";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
@@ -25,8 +28,20 @@ const optionTextColors = [
 ];
 
 export function PollCard({ poll }: { poll: Poll }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [voted, setVoted] = useState<string | null>(null);
   const [showCountries, setShowCountries] = useState(false);
+
+  const handleVote = (optionId: string) => {
+    if (!user) {
+      toast.error("Sign in to cast your vote", {
+        action: { label: "Sign In", onClick: () => navigate("/auth") },
+      });
+      return;
+    }
+    setVoted(optionId);
+  };
 
   const totalVotes = voted
     ? poll.totalVotes + 1
@@ -77,7 +92,7 @@ export function PollCard({ poll }: { poll: Poll }) {
               index={i}
               voted={voted}
               percentage={getPercentage(option)}
-              onVote={() => setVoted(option.id)}
+              onVote={() => handleVote(option.id)}
             />
           ))}
         </div>
