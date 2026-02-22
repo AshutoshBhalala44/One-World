@@ -1,12 +1,6 @@
-import { Globe, LogOut, User } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Globe } from "lucide-react";
 
 export function Header() {
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -22,32 +16,6 @@ export function Header() {
           <span className="text-sm text-muted-foreground hidden sm:block">
             The world's voice, unfiltered.
           </span>
-          {user ? (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">
-                  {user.user_metadata?.phone || user.phone || "User"}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={signOut}
-                title="Sign out"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/auth")}
-            >
-              Sign In
-            </Button>
-          )}
         </nav>
       </div>
     </header>
