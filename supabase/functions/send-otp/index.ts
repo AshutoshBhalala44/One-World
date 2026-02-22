@@ -22,7 +22,6 @@ serve(async (req) => {
       );
     }
 
-    // Validate phone format (E.164)
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(phone)) {
       return new Response(
@@ -35,12 +34,11 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Clean up expired OTPs
     await supabase.rpc("cleanup_expired_otps");
 
     // Generate 6-digit OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min expiry
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     // Invalidate previous codes for this phone
     await supabase
@@ -62,36 +60,11 @@ serve(async (req) => {
       );
     }
 
-    // Send via Twilio
-    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID")!;
-    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN")!;
-    const fromPhone = Deno.env.get("TWILIO_PHONE_NUMBER")!;
-
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    const twilioResponse = await fetch(twilioUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-      },
-      body: new URLSearchParams({
-        To: phone,
-        From: fromPhone,
-        Body: `Your One World verification code is: ${code}. It expires in 5 minutes.`,
-      }),
-    });
-
-    if (!twilioResponse.ok) {
-      const twilioError = await twilioResponse.text();
-      console.error("Twilio error:", twilioError);
-      return new Response(
-        JSON.stringify({ error: "Failed to send verification code" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Skip SMS sending - no verification required
+    console.log(`OTP for ${phone}: ${code}`);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Verification code sent" }),
+      JSON.stringify({ success: true, message: "Verification code generated", code }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
