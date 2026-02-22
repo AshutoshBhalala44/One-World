@@ -6,22 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { CountryCodePicker, defaultCountry, type Country } from "@/components/CountryCodePicker";
 
 type Step = "phone" | "otp";
 
 const Auth = () => {
   const [step, setStep] = useState<Step>("phone");
-  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState<Country>(defaultCountry);
+  const [localPhone, setLocalPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
+  const fullPhone = `${country.dial}${localPhone.replace(/\D/g, "")}`;
+
   const handleSendOtp = async () => {
-    if (!phone.startsWith("+") || phone.length < 8) {
-      toast.error("Enter a valid phone number with country code (e.g., +1234567890)");
+    if (localPhone.replace(/\D/g, "").length < 4) {
+      toast.error("Enter a valid phone number");
       return;
     }
+    const phone = fullPhone;
 
     setLoading(true);
     try {
@@ -51,7 +56,7 @@ const Auth = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("verify-otp", {
-        body: { phone, code },
+        body: { phone: fullPhone, code },
       });
 
       if (error) throw error;
@@ -164,23 +169,23 @@ const Auth = () => {
                     <label className="text-sm font-medium text-foreground mb-1.5 block">
                       Phone Number
                     </label>
-                    <Input
-                      type="tel"
-                      placeholder="+1 234 567 8900"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/[^\d+\s-]/g, ""))}
-                      onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
-                      className="text-lg h-12"
-                      autoFocus
-                    />
-                    <p className="text-xs text-muted-foreground mt-1.5">
-                      Include your country code (e.g., +1 for US)
-                    </p>
+                    <div className="flex">
+                      <CountryCodePicker selected={country} onSelect={setCountry} />
+                      <Input
+                        type="tel"
+                        placeholder="234 567 8900"
+                        value={localPhone}
+                        onChange={(e) => setLocalPhone(e.target.value.replace(/[^\d\s-]/g, ""))}
+                        onKeyDown={(e) => e.key === "Enter" && handleSendOtp()}
+                        className="text-lg h-12 rounded-l-none"
+                        autoFocus
+                      />
+                    </div>
                   </div>
 
                   <Button
                     onClick={handleSendOtp}
-                    disabled={loading || phone.length < 8}
+                    disabled={loading || localPhone.replace(/\D/g, "").length < 4}
                     className="w-full h-12 text-base font-semibold"
                   >
                     {loading ? (
@@ -210,7 +215,7 @@ const Auth = () => {
                   </h2>
                   <p className="text-muted-foreground text-sm">
                     Enter the 6-digit code sent to{" "}
-                    <span className="font-medium text-foreground">{phone}</span>
+                    <span className="font-medium text-foreground">{fullPhone}</span>
                   </p>
                 </div>
 
