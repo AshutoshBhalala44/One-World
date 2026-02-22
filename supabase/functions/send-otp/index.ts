@@ -1,0 +1,104 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { phone } = await req.json();
+
+    if (!phone || typeof phone !== "string") {
+      return new Response(
+        JSON.stringify({ error: "Phone number is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate phone format (E.164)
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(phone)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid phone number format. Use E.164 format (e.g., +1234567890)" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Clean up expired OTPs
+    await supabase.rpc("cleanup_expired_otps");
+
+    // Generate 6-digit OTP
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min expiry
+
+    // Invalidate previous codes for this phone
+    await supabase
+      .from("otp_codes")
+      .delete()
+      .eq("phone", phone)
+      .eq("verified", false);
+
+    // Store OTP
+    const { error: insertError } = await supabase
+      .from("otp_codes")
+      .insert({ phone, code, expires_at: expiresAt });
+
+    if (insertError) {
+      console.error("Failed to store OTP:", insertError);
+      return new Response(
+        JSON.stringify({ error: "Failed to generate verification code" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Send via Twilio
+    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID")!;
+    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN")!;
+    const fromPhone = Deno.env.get("TWILIO_PHONE_NUMBER")!;
+
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    const twilioResponse = await fetch(twilioUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
+      },
+      body: new URLSearchParams({
+        To: phone,
+        From: fromPhone,
+        Body: `Your One World verification code is: ${code}. It expires in 5 minutes.`,
+      }),
+    });
+
+    if (!twilioResponse.ok) {
+      const twilioError = await twilioResponse.text();
+      console.error("Twilio error:", twilioError);
+      return new Response(
+        JSON.stringify({ error: "Failed to send verification code" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, message: "Verification code sent" }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("send-otp error:", error);
+    return new Response(
+      JSON.stringify({ error: "Internal server error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});
