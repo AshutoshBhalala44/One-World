@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Globe, Phone, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import { Globe, Phone, ArrowRight, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -132,7 +132,14 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative">
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-5 left-5 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </button>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
