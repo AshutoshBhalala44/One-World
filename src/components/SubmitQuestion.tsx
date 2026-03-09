@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Send, Loader2, Plus, X, Lightbulb } from "lucide-react";
+import { Send, Loader2, Plus, X, Lightbulb, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { categories } from "@/data/polls";
 
@@ -17,6 +17,7 @@ export function SubmitQuestion() {
   const [options, setOptions] = useState(["", ""]);
   const [category, setCategory] = useState("general");
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   if (!user) {
     return (
@@ -45,6 +46,31 @@ export function SubmitQuestion() {
     const newOptions = [...options];
     newOptions[index] = value;
     setOptions(newOptions);
+  }
+
+  async function handleGenerate() {
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("suggest-poll", {
+        body: { category },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      if (data?.question) {
+        setQuestion(data.question);
+      }
+      if (data?.options && Array.isArray(data.options)) {
+        setOptions(data.options.slice(0, 4));
+      }
+
+      toast.success("AI suggestion generated!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate suggestion");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -93,30 +119,33 @@ export function SubmitQuestion() {
       className="max-w-2xl mx-auto"
     >
       <div className="rounded-xl bg-card shadow-card border border-border p-6 sm:p-8">
-        <div className="mb-6">
-          <h3 className="font-display text-xl font-bold text-foreground mb-1">
-            Suggest a Poll Question
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Submit your question and we'll consider it for a future daily poll.
-          </p>
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <h3 className="font-display text-xl font-bold text-foreground mb-1">
+              Suggest a Poll Question
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Submit your question or let AI generate one for you.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleGenerate}
+            disabled={generating}
+            className="flex-shrink-0 gap-1.5"
+          >
+            {generating ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
+            {generating ? "Generating…" : "AI Suggest"}
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Your Question
-            </label>
-            <Textarea
-              placeholder="e.g., Should the voting age be lowered to 16?"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              maxLength={500}
-              className="resize-none"
-              rows={3}
-            />
-          </div>
-
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">
               Category
@@ -137,6 +166,20 @@ export function SubmitQuestion() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">
+              Your Question
+            </label>
+            <Textarea
+              placeholder="e.g., Should the voting age be lowered to 16?"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              maxLength={500}
+              className="resize-none"
+              rows={3}
+            />
           </div>
 
           <div>
