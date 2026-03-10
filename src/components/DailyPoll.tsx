@@ -50,11 +50,24 @@ export function DailyPoll() {
     try {
       const today = new Date().toISOString().split("T")[0];
 
-      const { data: pollData } = await supabase
+      // Try today's poll first, then fall back to the most recent poll
+      let { data: pollData } = await supabase
         .from("polls")
         .select("*")
         .eq("active_date", today)
-        .single();
+        .maybeSingle();
+
+      if (!pollData) {
+        const { data: latestPoll } = await supabase
+          .from("polls")
+          .select("*")
+          .lte("active_date", today)
+          .order("active_date", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        pollData = latestPoll;
+      }
 
       if (!pollData) {
         setLoading(false);
