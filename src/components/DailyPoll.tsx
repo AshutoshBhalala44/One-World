@@ -267,6 +267,12 @@ export function DailyPoll() {
             );
           })}
         </div>
+
+        {userVote && (
+          <CountryBreakdownChart
+            options={options.map((o) => ({ id: o.id, label: o.label }))}
+          />
+        )}
       </div>
     </motion.div>
   );
