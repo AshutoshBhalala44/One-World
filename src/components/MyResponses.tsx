@@ -37,13 +37,35 @@ export function MyResponses() {
         .select(`
           id,
           created_at,
+          poll_id,
           poll:polls(question, category, active_date),
           option:poll_options(label)
         `)
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
 
-      setResponses((data as any) || []);
+      const votes = (data as any) || [];
+
+      // Fetch poll options for each unique poll
+      const pollIds = [...new Set(votes.map((v: any) => v.poll_id))];
+      const { data: allOptions } = await supabase
+        .from("poll_options")
+        .select("id, label, poll_id, sort_order")
+        .in("poll_id", pollIds)
+        .order("sort_order", { ascending: true });
+
+      const optionsByPoll = (allOptions || []).reduce((acc: any, opt: any) => {
+        if (!acc[opt.poll_id]) acc[opt.poll_id] = [];
+        acc[opt.poll_id].push({ id: opt.id, label: opt.label });
+        return acc;
+      }, {} as Record<string, { id: string; label: string }[]>);
+
+      setResponses(
+        votes.map((v: any) => ({
+          ...v,
+          pollOptions: optionsByPoll[v.poll_id] || [],
+        }))
+      );
     } catch (err) {
       console.error("Error fetching responses:", err);
     } finally {
