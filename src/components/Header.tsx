@@ -1,7 +1,8 @@
-import { Globe, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import logo from "@/assets/logo-option-5.png";
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -11,9 +12,7 @@ export function Header() {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-navy flex items-center justify-center">
-            <Globe className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="One World logo" className="w-9 h-9 rounded-lg object-cover" />
           <span className="font-display text-xl font-bold text-foreground tracking-tight">
             One World
           </span>

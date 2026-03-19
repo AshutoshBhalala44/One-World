@@ -148,9 +148,7 @@ const Auth = () => {
       >
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-navy flex items-center justify-center">
-            <Globe className="w-6 h-6 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="One World logo" className="w-10 h-10 rounded-lg object-cover" />
           <span className="font-display text-2xl font-bold text-foreground tracking-tight">
             One World
           </span>
