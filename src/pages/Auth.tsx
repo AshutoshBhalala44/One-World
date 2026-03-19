@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Globe, Phone, ArrowRight, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
+import { Phone, ArrowRight, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
+import logo from "@/assets/logo-option-5.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -147,9 +148,7 @@ const Auth = () => {
       >
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-8">
-          <div className="w-10 h-10 rounded-lg bg-navy flex items-center justify-center">
-            <Globe className="w-6 h-6 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="One World logo" className="w-10 h-10 rounded-lg object-cover" />
           <span className="font-display text-2xl font-bold text-foreground tracking-tight">
             One World
           </span>
