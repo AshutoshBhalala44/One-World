@@ -130,6 +130,9 @@ export function MyResponses() {
             <div className="w-3 h-3 rounded-full bg-navy" />
             {response.option?.label}
           </div>
+          {response.pollOptions && response.pollOptions.length > 0 && (
+            <CountryBreakdownChart options={response.pollOptions} />
+          )}
         </motion.div>
       ))}
     </div>
