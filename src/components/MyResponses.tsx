@@ -4,12 +4,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, History } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { CountryBreakdownChart } from "./CountryBreakdownChart";
 
 interface VoteWithPoll {
   id: string;
   created_at: string;
+  poll_id: string;
   poll: { question: string; category: string; active_date: string };
   option: { label: string };
+  pollOptions?: { id: string; label: string }[];
 }
 
 export function MyResponses() {
