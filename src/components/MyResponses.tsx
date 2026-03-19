@@ -51,7 +51,7 @@ export function MyResponses() {
       const { data: allOptions } = await supabase
         .from("poll_options")
         .select("id, label, poll_id, sort_order")
-        .in("poll_id", pollIds)
+        .in("poll_id", pollIds as string[])
         .order("sort_order", { ascending: true });
 
       const optionsByPoll = (allOptions || []).reduce((acc: any, opt: any) => {
