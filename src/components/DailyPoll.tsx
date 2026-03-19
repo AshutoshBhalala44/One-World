@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Users, Loader2 } from "lucide-react";
+import { CountryBreakdownChart } from "./CountryBreakdownChart";
 import { toast } from "sonner";
 
 interface PollOption {
@@ -266,6 +267,12 @@ export function DailyPoll() {
             );
           })}
         </div>
+
+        {userVote && (
+          <CountryBreakdownChart
+            options={options.map((o) => ({ id: o.id, label: o.label }))}
+          />
+        )}
       </div>
     </motion.div>
   );
