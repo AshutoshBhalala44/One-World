@@ -56,6 +56,7 @@ export function DailyPoll() {
         .from("polls")
         .select("*")
         .eq("active_date", today)
+        .neq("status" as any, "rejected")
         .maybeSingle();
 
       if (!pollData) {
