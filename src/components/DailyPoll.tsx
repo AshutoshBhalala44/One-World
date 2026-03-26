@@ -60,11 +60,11 @@ export function DailyPoll() {
         .maybeSingle();
 
       if (!pollData) {
-        const { data: latestPoll } = await supabase
+        const { data: latestPoll } = await (supabase
           .from("polls")
           .select("*")
-          .lte("active_date", today)
-          .neq("status" as any, "rejected")
+          .lte("active_date", today) as any)
+          .neq("status", "rejected")
           .order("active_date", { ascending: false })
           .limit(1)
           .maybeSingle();
