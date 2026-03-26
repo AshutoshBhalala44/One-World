@@ -283,6 +283,63 @@ export default function Admin() {
     fetchAdmins();
   }
 
+  async function handleCreatePoll() {
+    if (!newQuestion.trim()) {
+      toast.error("Please enter a question");
+      return;
+    }
+    const validOptions = newOptions.filter((o) => o.trim());
+    if (validOptions.length < 2) {
+      toast.error("Please provide at least 2 options");
+      return;
+    }
+    if (!newDate) {
+      toast.error("Please select a date");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const { data: newPoll, error: pollErr } = await supabase
+        .from("polls")
+        .insert({
+          question: newQuestion.trim(),
+          category: newCategory,
+          active_date: newDate,
+          status: "approved",
+          needs_review: false,
+        } as any)
+        .select("id")
+        .single();
+
+      if (pollErr) throw pollErr;
+
+      const optionRows = validOptions.map((label, idx) => ({
+        poll_id: (newPoll as any).id,
+        label: label.trim(),
+        sort_order: idx,
+      }));
+
+      const { error: optErr } = await supabase
+        .from("poll_options")
+        .insert(optionRows);
+
+      if (optErr) throw optErr;
+
+      toast.success("Poll created successfully");
+      setShowCreateForm(false);
+      setNewQuestion("");
+      setNewCategory("general");
+      setNewOptions(["", "", "", ""]);
+      setNewDate(new Date().toISOString().split("T")[0]);
+      fetchPolls();
+    } catch (err: any) {
+      toast.error("Failed to create poll: " + (err.message || "Unknown error"));
+    } finally {
+      setCreating(false);
+    }
+  }
+
   async function handleGenerateNow() {
     setGenerating(true);
     try {
