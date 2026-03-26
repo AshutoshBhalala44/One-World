@@ -7,6 +7,7 @@ import logo from "@/assets/logo-option-5.png";
 
 export function Header() {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
 
   return (
