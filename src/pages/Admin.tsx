@@ -18,6 +18,7 @@ import {
   UserPlus,
   UserMinus,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
