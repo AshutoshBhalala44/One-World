@@ -411,19 +411,29 @@ export default function Admin() {
               Manage polls, review AI-generated content, and administer users.
             </p>
           </div>
-          <Button
-            onClick={handleGenerateNow}
-            disabled={generating}
-            variant="outline"
-            size="sm"
-          >
-            {generating ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            ) : (
-              <RefreshCw className="w-4 h-4 mr-2" />
-            )}
-            Generate Poll Now
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              size="sm"
+              variant={showCreateForm ? "secondary" : "default"}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {showCreateForm ? "Cancel" : "Create Poll"}
+            </Button>
+            <Button
+              onClick={handleGenerateNow}
+              disabled={generating}
+              variant="outline"
+              size="sm"
+            >
+              {generating ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              AI Generate
+            </Button>
+          </div>
         </div>
 
         {reviewPolls.length > 0 && (
