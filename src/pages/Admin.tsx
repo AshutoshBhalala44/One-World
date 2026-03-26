@@ -64,6 +64,7 @@ export default function Admin() {
   const [newCategory, setNewCategory] = useState("general");
   const [newOptions, setNewOptions] = useState(["", "", "", ""]);
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [creating, setCreating] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(new Date());
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
