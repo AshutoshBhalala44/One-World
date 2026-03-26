@@ -31,6 +31,18 @@ export function Header() {
                   {user.user_metadata?.phone || user.phone || "User"}
                 </span>
               </div>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/admin")}
+                  title="Admin Dashboard"
+                  className="gap-1.5"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span className="hidden sm:inline text-xs">Admin</span>
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
