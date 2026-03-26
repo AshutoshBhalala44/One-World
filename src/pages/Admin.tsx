@@ -436,7 +436,102 @@ export default function Admin() {
           </div>
         </div>
 
-        {reviewPolls.length > 0 && (
+        {showCreateForm && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 rounded-xl border border-border bg-card p-5"
+          >
+            <h3 className="font-semibold text-foreground mb-4">Create New Poll</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Question
+                </label>
+                <input
+                  value={newQuestion}
+                  onChange={(e) => setNewQuestion(e.target.value)}
+                  placeholder="What do you think about...?"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50"
+                  maxLength={200}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                    Category
+                  </label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
+                  >
+                    {["general", "technology", "politics", "environment", "society", "economy", "health", "culture", "science", "education"].map((c) => (
+                      <option key={c} value={c}>
+                        {c.charAt(0).toUpperCase() + c.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                    Active Date
+                  </label>
+                  <input
+                    type="date"
+                    value={newDate}
+                    onChange={(e) => setNewDate(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Options (2–4)
+                </label>
+                <div className="space-y-2">
+                  {newOptions.map((opt, i) => (
+                    <input
+                      key={i}
+                      value={opt}
+                      onChange={(e) => {
+                        const updated = [...newOptions];
+                        updated[i] = e.target.value;
+                        setNewOptions(updated);
+                      }}
+                      placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`}
+                      className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground"
+                      maxLength={100}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCreateForm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleCreatePoll}
+                  disabled={creating}
+                >
+                  {creating ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : null}
+                  Create Poll
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
