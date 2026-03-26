@@ -64,6 +64,7 @@ export function DailyPoll() {
           .from("polls")
           .select("*")
           .lte("active_date", today)
+          .neq("status" as any, "rejected")
           .order("active_date", { ascending: false })
           .limit(1)
           .maybeSingle();
