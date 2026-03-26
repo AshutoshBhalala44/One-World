@@ -18,6 +18,7 @@ import {
   UserPlus,
   UserMinus,
   RefreshCw,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -55,7 +56,12 @@ export default function Admin() {
   const [newAdminPhone, setNewAdminPhone] = useState("");
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [generating, setGenerating] = useState(false);
-
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newCategory, setNewCategory] = useState("general");
+  const [newOptions, setNewOptions] = useState(["", "", "", ""]);
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [creating, setCreating] = useState(false);
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
@@ -277,6 +283,63 @@ export default function Admin() {
     fetchAdmins();
   }
 
+  async function handleCreatePoll() {
+    if (!newQuestion.trim()) {
+      toast.error("Please enter a question");
+      return;
+    }
+    const validOptions = newOptions.filter((o) => o.trim());
+    if (validOptions.length < 2) {
+      toast.error("Please provide at least 2 options");
+      return;
+    }
+    if (!newDate) {
+      toast.error("Please select a date");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const { data: newPoll, error: pollErr } = await supabase
+        .from("polls")
+        .insert({
+          question: newQuestion.trim(),
+          category: newCategory,
+          active_date: newDate,
+          status: "approved",
+          needs_review: false,
+        } as any)
+        .select("id")
+        .single();
+
+      if (pollErr) throw pollErr;
+
+      const optionRows = validOptions.map((label, idx) => ({
+        poll_id: (newPoll as any).id,
+        label: label.trim(),
+        sort_order: idx,
+      }));
+
+      const { error: optErr } = await supabase
+        .from("poll_options")
+        .insert(optionRows);
+
+      if (optErr) throw optErr;
+
+      toast.success("Poll created successfully");
+      setShowCreateForm(false);
+      setNewQuestion("");
+      setNewCategory("general");
+      setNewOptions(["", "", "", ""]);
+      setNewDate(new Date().toISOString().split("T")[0]);
+      fetchPolls();
+    } catch (err: any) {
+      toast.error("Failed to create poll: " + (err.message || "Unknown error"));
+    } finally {
+      setCreating(false);
+    }
+  }
+
   async function handleGenerateNow() {
     setGenerating(true);
     try {
@@ -348,20 +411,126 @@ export default function Admin() {
               Manage polls, review AI-generated content, and administer users.
             </p>
           </div>
-          <Button
-            onClick={handleGenerateNow}
-            disabled={generating}
-            variant="outline"
-            size="sm"
-          >
-            {generating ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            ) : (
-              <RefreshCw className="w-4 h-4 mr-2" />
-            )}
-            Generate Poll Now
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              size="sm"
+              variant={showCreateForm ? "secondary" : "default"}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {showCreateForm ? "Cancel" : "Create Poll"}
+            </Button>
+            <Button
+              onClick={handleGenerateNow}
+              disabled={generating}
+              variant="outline"
+              size="sm"
+            >
+              {generating ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <RefreshCw className="w-4 h-4 mr-2" />
+              )}
+              AI Generate
+            </Button>
+          </div>
         </div>
+
+        {showCreateForm && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 rounded-xl border border-border bg-card p-5"
+          >
+            <h3 className="font-semibold text-foreground mb-4">Create New Poll</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Question
+                </label>
+                <input
+                  value={newQuestion}
+                  onChange={(e) => setNewQuestion(e.target.value)}
+                  placeholder="What do you think about...?"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50"
+                  maxLength={200}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                    Category
+                  </label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
+                  >
+                    {["general", "technology", "politics", "environment", "society", "economy", "health", "culture", "science", "education"].map((c) => (
+                      <option key={c} value={c}>
+                        {c.charAt(0).toUpperCase() + c.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                    Active Date
+                  </label>
+                  <input
+                    type="date"
+                    value={newDate}
+                    onChange={(e) => setNewDate(e.target.value)}
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                  Options (2–4)
+                </label>
+                <div className="space-y-2">
+                  {newOptions.map((opt, i) => (
+                    <input
+                      key={i}
+                      value={opt}
+                      onChange={(e) => {
+                        const updated = [...newOptions];
+                        updated[i] = e.target.value;
+                        setNewOptions(updated);
+                      }}
+                      placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`}
+                      className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground"
+                      maxLength={100}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCreateForm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleCreatePoll}
+                  disabled={creating}
+                >
+                  {creating ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : null}
+                  Create Poll
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {reviewPolls.length > 0 && (
           <motion.div
