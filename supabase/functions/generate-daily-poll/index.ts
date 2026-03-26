@@ -159,10 +159,10 @@ Generate a new daily poll question with 4 options. The question should be about 
       throw new Error("Invalid poll data from AI: " + JSON.stringify(pollData));
     }
 
-    // Insert the poll
+    // Insert the poll as auto-approved but flagged for review
     const { data: newPoll, error: pollError } = await supabase
       .from("polls")
-      .insert({ question, category, active_date: todayCST })
+      .insert({ question, category, active_date: todayCST, status: 'approved', needs_review: true })
       .select("id")
       .single();
 

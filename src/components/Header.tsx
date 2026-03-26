@@ -1,11 +1,13 @@
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-option-5.png";
 
 export function Header() {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
 
   return (
@@ -29,6 +31,18 @@ export function Header() {
                   {user.user_metadata?.phone || user.phone || "User"}
                 </span>
               </div>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/admin")}
+                  title="Admin Dashboard"
+                  className="gap-1.5"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span className="hidden sm:inline text-xs">Admin</span>
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="icon"
