@@ -19,7 +19,10 @@ import {
   UserMinus,
   RefreshCw,
   Plus,
+  CalendarIcon,
 } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -62,6 +65,7 @@ export default function Admin() {
   const [newOptions, setNewOptions] = useState(["", "", "", ""]);
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [creating, setCreating] = useState(false);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(new Date());
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
@@ -555,6 +559,7 @@ export default function Admin() {
         <Tabs defaultValue="polls" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="polls">📊 Polls</TabsTrigger>
+            <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
           </TabsList>
 
@@ -713,6 +718,164 @@ export default function Admin() {
                 })}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="schedule">
+            {(() => {
+              const pollDates = polls.reduce((acc, p) => {
+                acc[p.active_date] = (acc[p.active_date] || 0) + 1;
+                return acc;
+              }, {} as Record<string, number>);
+
+              const selectedDateStr = selectedCalendarDate
+                ? format(selectedCalendarDate, "yyyy-MM-dd")
+                : null;
+
+              const pollsForDate = selectedDateStr
+                ? polls.filter((p) => p.active_date === selectedDateStr)
+                : [];
+
+              const scheduledDates = Object.keys(pollDates).map(
+                (d) => new Date(d + "T00:00:00")
+              );
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4" />
+                      Poll Calendar
+                    </h3>
+                    <Calendar
+                      mode="single"
+                      selected={selectedCalendarDate}
+                      onSelect={setSelectedCalendarDate}
+                      className="p-3 pointer-events-auto"
+                      modifiers={{ scheduled: scheduledDates }}
+                      modifiersClassNames={{
+                        scheduled: "bg-primary/20 text-primary font-bold",
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2 px-1">
+                      Highlighted dates have scheduled polls.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <h3 className="font-semibold text-foreground mb-3">
+                      {selectedDateStr
+                        ? format(selectedCalendarDate!, "MMMM d, yyyy")
+                        : "Select a date"}
+                    </h3>
+
+                    {selectedDateStr && pollsForDate.length === 0 && (
+                      <div className="text-center py-8">
+                        <p className="text-sm text-muted-foreground mb-3">
+                          No polls scheduled for this date.
+                        </p>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setNewDate(selectedDateStr);
+                            setShowCreateForm(true);
+                            // Scroll to top where form is
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create Poll for This Date
+                        </Button>
+                      </div>
+                    )}
+
+                    {pollsForDate.length > 0 && (
+                      <div className="space-y-3">
+                        {pollsForDate.map((poll) => (
+                          <div
+                            key={poll.id}
+                            className={`rounded-lg border p-3 ${
+                              poll.status === "rejected"
+                                ? "border-destructive/30 bg-destructive/5 opacity-60"
+                                : poll.needs_review
+                                ? "border-accent/40 bg-accent/5"
+                                : "border-border bg-background"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                {poll.category}
+                              </span>
+                              {poll.needs_review && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-semibold uppercase">
+                                  Needs Review
+                                </span>
+                              )}
+                              {poll.status === "approved" && !poll.needs_review && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold uppercase">
+                                  Approved
+                                </span>
+                              )}
+                              {poll.status === "rejected" && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-destructive/20 text-destructive font-semibold uppercase">
+                                  Rejected
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="font-semibold text-foreground text-sm">
+                              {poll.question}
+                            </h4>
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {poll.options.map((opt) => (
+                                <span
+                                  key={opt.id}
+                                  className="text-xs px-2 py-0.5 rounded-md bg-secondary text-muted-foreground"
+                                >
+                                  {opt.label}
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex gap-1 mt-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 text-xs"
+                                onClick={() => startEdit(poll)}
+                              >
+                                <Pencil className="w-3 h-3 mr-1" />
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDelete(poll.id)}
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full mt-2"
+                          onClick={() => {
+                            setNewDate(selectedDateStr);
+                            setShowCreateForm(true);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Another Poll
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="admins">
