@@ -52,11 +52,11 @@ export function DailyPoll() {
       const today = new Date().toISOString().split("T")[0];
 
       // Try today's poll first, then fall back to the most recent poll
-      let { data: pollData } = await supabase
+      let { data: pollData } = await (supabase
         .from("polls")
         .select("*")
-        .eq("active_date", today)
-        .neq("status" as any, "rejected")
+        .eq("active_date", today) as any)
+        .neq("status", "rejected")
         .maybeSingle();
 
       if (!pollData) {
