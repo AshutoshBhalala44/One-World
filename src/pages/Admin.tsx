@@ -56,7 +56,12 @@ export default function Admin() {
   const [newAdminPhone, setNewAdminPhone] = useState("");
   const [addingAdmin, setAddingAdmin] = useState(false);
   const [generating, setGenerating] = useState(false);
-
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [newCategory, setNewCategory] = useState("general");
+  const [newOptions, setNewOptions] = useState(["", "", "", ""]);
+  const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [creating, setCreating] = useState(false);
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
