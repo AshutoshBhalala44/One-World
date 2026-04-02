@@ -3,7 +3,7 @@ import heroImage from "@/assets/hero-globe.jpg";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-hero-gradient text-primary-foreground">
+    <section className="relative overflow-hidden bg-hero-gradient text-[hsl(45,100%,96%)]">
       {/* Background image */}
       <div className="absolute inset-0 opacity-30">
         <img
