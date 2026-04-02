@@ -117,7 +117,7 @@ export function DailyPoll() {
 
   async function handleVote(optionId: string) {
     if (!user) {
-      toast.error("Sign in to cast your vote", {
+      toast.error("Sign in to respond", {
         action: { label: "Sign In", onClick: () => navigate("/auth") },
       });
       return;
