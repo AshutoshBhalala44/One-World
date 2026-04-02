@@ -100,7 +100,7 @@ export function MyResponses() {
     return (
       <div className="text-center py-20 text-muted-foreground">
         <History className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
-        <p className="text-lg">No responses yet. Vote on today's poll!</p>
+        <p className="text-lg">No responses yet. Take on today's challenge!</p>
       </div>
     );
   }

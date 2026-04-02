@@ -17,7 +17,7 @@ const Index = () => {
         <Tabs defaultValue="today" className="w-full">
           <TabsList className="mb-8 w-full sm:w-auto">
             <TabsTrigger value="today" className="flex-1 sm:flex-none">
-              🗳️ Today's Poll
+              🗳️ Today's Challenge
             </TabsTrigger>
             <TabsTrigger value="responses" className="flex-1 sm:flex-none">
               📋 My Responses
@@ -43,7 +43,7 @@ const Index = () => {
 
       <footer className="border-t border-border py-8 mt-10">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>One World — Transparent global polling. Every voice matters.</p>
+          <p>One World — Transparent global challenges. Every voice matters.</p>
         </div>
       </footer>
     </div>
