@@ -92,6 +92,28 @@
     --border: 222 30% 18%;
     --input: 222 30% 18%;
     --ring: 40 95% 55%;
+
+    --sidebar-background: 222 50% 8%;
+    --sidebar-foreground: 220 20% 90%;
+    --sidebar-primary: 40 95% 55%;
+    --sidebar-primary-foreground: 222 70% 10%;
+    --sidebar-accent: 222 30% 14%;
+    --sidebar-accent-foreground: 220 20% 90%;
+    --sidebar-border: 222 30% 16%;
+    --sidebar-ring: 40 95% 55%;
+
+    --gold: 40 95% 55%;
+    --gold-light: 42 100% 65%;
+    --navy: 222 40% 30%;
+    --navy-light: 222 30% 40%;
+    --navy-deep: 222 70% 6%;
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(222 70% 6%) 0%, hsl(222 50% 12%) 50%, hsl(222 40% 20%) 100%);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2), 0 4px 12px hsl(0 0% 0% / 0.15);
+    --shadow-card-hover: 0 4px 16px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.2);
+    --shadow-gold: 0 4px 20px hsl(40 95% 55% / 0.2);
   }
 }
 

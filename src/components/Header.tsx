@@ -2,6 +2,7 @@ import { LogOut, User, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-option-5.png";
 
@@ -19,7 +20,8 @@ export function Header() {
             One World
           </span>
         </button>
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-2">
+          <ThemeToggle />
           <span className="text-sm text-muted-foreground hidden sm:block">
             The world's voice, unfiltered.
           </span>
