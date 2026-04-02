@@ -30,18 +30,30 @@ serve(async (req) => {
     const cstDate = new Date(now.getTime() + cstOffset * 60 * 1000);
     const todayCST = cstDate.toISOString().split("T")[0];
 
-    // Check if a poll already exists for today
-    const { data: existingPoll } = await supabase
-      .from("polls")
-      .select("id")
-      .eq("active_date", todayCST)
-      .maybeSingle();
+    const addDaysToDateString = (dateString: string, days: number) => {
+      const [year, month, day] = dateString.split("-").map(Number);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      date.setUTCDate(date.getUTCDate() + days);
+      return date.toISOString().split("T")[0];
+    };
 
-    if (existingPoll) {
-      return new Response(
-        JSON.stringify({ message: "Poll already exists for today", date: todayCST }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Find the next unscheduled date, starting with today if it's still open
+    const { data: scheduledPolls, error: scheduledPollsError } = await supabase
+      .from("polls")
+      .select("active_date")
+      .gte("active_date", todayCST)
+      .order("active_date", { ascending: true })
+      .limit(90);
+
+    if (scheduledPollsError) {
+      throw new Error("Failed to read scheduled polls: " + scheduledPollsError.message);
+    }
+
+    const occupiedDates = new Set((scheduledPolls || []).map((poll) => poll.active_date));
+    let targetDate = todayCST;
+
+    while (occupiedDates.has(targetDate)) {
+      targetDate = addDaysToDateString(targetDate, 1);
     }
 
     // Fetch recent polls to avoid repetition
@@ -70,6 +82,7 @@ Rules:
 Categories to choose from: general, technology, politics, environment, society, economy, health, culture, science, education`;
 
     const userPrompt = `Today's date is ${todayCST}.
+Schedule this new poll for ${targetDate}.
 
 Here are the most recent polls (avoid similar topics):
 ${recentQuestions || "No recent polls yet."}
@@ -162,7 +175,7 @@ Generate a new daily poll question with 4 options. The question should be about 
     // Insert the poll as auto-approved but flagged for review
     const { data: newPoll, error: pollError } = await supabase
       .from("polls")
-      .insert({ question, category, active_date: todayCST, status: 'approved', needs_review: true })
+      .insert({ question, category, active_date: targetDate, status: 'approved', needs_review: true })
       .select("id")
       .single();
 
@@ -181,12 +194,12 @@ Generate a new daily poll question with 4 options. The question should be about 
 
     if (optError) throw new Error("Failed to insert options: " + optError.message);
 
-    console.log(`Generated poll for ${todayCST}: "${question}" [${category}]`);
+    console.log(`Generated poll for ${targetDate}: "${question}" [${category}]`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        date: todayCST,
+        date: targetDate,
         question,
         category,
         options,

@@ -355,10 +355,10 @@ export default function Admin() {
 
       const data = resp.data;
       if (data?.success) {
-        toast.success(`Generated: "${data.question}"`);
+        toast.success(`Generated ${data.date}: "${data.question}"`);
         fetchPolls();
       } else {
-        toast.info(data?.message || "Poll may already exist for today");
+        toast.info(data?.message || "No open poll date was available");
       }
     } catch (err) {
       toast.error("Failed to generate poll");
