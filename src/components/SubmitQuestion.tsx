@@ -122,7 +122,7 @@ export function SubmitQuestion() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h3 className="font-display text-xl font-bold text-foreground mb-1">
-              Suggest a Poll Question
+              Suggest a Challenge Question
             </h3>
             <p className="text-sm text-muted-foreground">
               Submit your question or let AI generate one for you.

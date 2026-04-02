@@ -17,7 +17,7 @@ const Index = () => {
         <Tabs defaultValue="today" className="w-full">
           <TabsList className="mb-8 w-full sm:w-auto">
             <TabsTrigger value="today" className="flex-1 sm:flex-none">
-              🗳️ Today's Poll
+              🗳️ Today's Challenge
             </TabsTrigger>
             <TabsTrigger value="responses" className="flex-1 sm:flex-none">
               📋 My Responses
