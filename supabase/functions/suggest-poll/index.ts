@@ -24,11 +24,11 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a challenge question generator for "One World", a global opinion platform. Generate engaging, thought-provoking challenge questions that people worldwide would want to respond to. Questions should be neutral, non-biased, and invite diverse perspectives.`,
+            content: `You are a poll question generator for "One World", a global polling platform. Generate engaging, thought-provoking poll questions that people worldwide would want to vote on. Questions should be neutral, non-biased, and invite diverse perspectives.`,
           },
           {
             role: "user",
-            content: `Generate a single challenge question${category && category !== "general" ? ` about ${category}` : ""} with exactly 4 answer options. The question should be timely, globally relevant, and spark discussion.`,
+            content: `Generate a single poll question${category && category !== "general" ? ` about ${category}` : ""} with exactly 4 answer options. The question should be timely, globally relevant, and spark discussion.`,
           },
         ],
         tools: [

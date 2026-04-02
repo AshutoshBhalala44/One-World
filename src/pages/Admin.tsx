@@ -109,7 +109,7 @@ export default function Admin() {
       );
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load challenges");
+      toast.error("Failed to load polls");
     } finally {
       setLoadingPolls(false);
     }
@@ -156,10 +156,10 @@ export default function Admin() {
       .eq("id", pollId);
 
     if (error) {
-      toast.error("Failed to approve challenge");
+      toast.error("Failed to approve poll");
       return;
     }
-    toast.success("Challenge approved");
+    toast.success("Poll approved");
     fetchPolls();
   }
 
@@ -170,25 +170,25 @@ export default function Admin() {
       .eq("id", pollId);
 
     if (error) {
-      toast.error("Failed to reject challenge");
+      toast.error("Failed to reject poll");
       return;
     }
-    toast.success("Challenge rejected — it won't appear to users");
+    toast.success("Poll rejected — it won't appear to users");
     fetchPolls();
   }
 
   async function handleDelete(pollId: string) {
-    if (!confirm("Delete this challenge permanently?")) return;
+    if (!confirm("Delete this poll permanently?")) return;
 
     // Delete options first, then poll
     await supabase.from("poll_options").delete().eq("poll_id", pollId);
     const { error } = await supabase.from("polls").delete().eq("id", pollId);
 
     if (error) {
-      toast.error("Failed to delete challenge");
+      toast.error("Failed to delete poll");
       return;
     }
-    toast.success("Challenge deleted");
+    toast.success("Poll deleted");
     fetchPolls();
   }
 
@@ -219,7 +219,7 @@ export default function Admin() {
       }
     }
 
-    toast.success("Challenge updated");
+    toast.success("Poll updated");
     setEditingPoll(null);
     fetchPolls();
   }
@@ -330,7 +330,7 @@ export default function Admin() {
 
       if (optErr) throw optErr;
 
-      toast.success("Challenge created successfully");
+      toast.success("Poll created successfully");
       setShowCreateForm(false);
       setNewQuestion("");
       setNewCategory("general");
@@ -338,7 +338,7 @@ export default function Admin() {
       setNewDate(new Date().toISOString().split("T")[0]);
       fetchPolls();
     } catch (err: any) {
-      toast.error("Failed to create challenge: " + (err.message || "Unknown error"));
+      toast.error("Failed to create poll: " + (err.message || "Unknown error"));
     } finally {
       setCreating(false);
     }
@@ -361,7 +361,7 @@ export default function Admin() {
         toast.info(data?.message || "No open poll date was available");
       }
     } catch (err) {
-      toast.error("Failed to generate challenge");
+      toast.error("Failed to generate poll");
       console.error(err);
     } finally {
       setGenerating(false);
@@ -412,7 +412,7 @@ export default function Admin() {
               Admin Dashboard
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Manage challenges, review AI-generated content, and administer users.
+              Manage polls, review AI-generated content, and administer users.
             </p>
           </div>
           <div className="flex gap-2">
@@ -422,7 +422,7 @@ export default function Admin() {
               variant={showCreateForm ? "secondary" : "default"}
             >
               <Plus className="w-4 h-4 mr-2" />
-              {showCreateForm ? "Cancel" : "Create Challenge"}
+              {showCreateForm ? "Cancel" : "Create Poll"}
             </Button>
             <Button
               onClick={handleGenerateNow}
@@ -446,7 +446,7 @@ export default function Admin() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6 rounded-xl border border-border bg-card p-5"
           >
-            <h3 className="font-semibold text-foreground mb-4">Create New Challenge</h3>
+            <h3 className="font-semibold text-foreground mb-4">Create New Poll</h3>
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">
@@ -529,7 +529,7 @@ export default function Admin() {
                   {creating ? (
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   ) : null}
-                  Create Challenge
+                  Create Poll
                 </Button>
               </div>
             </div>
@@ -545,12 +545,12 @@ export default function Admin() {
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-5 h-5 text-accent" />
               <h3 className="font-semibold text-foreground">
-                {reviewPolls.length} challenge{reviewPolls.length > 1 ? "s" : ""}{" "}
+                {reviewPolls.length} poll{reviewPolls.length > 1 ? "s" : ""}{" "}
                 pending review
               </h3>
             </div>
             <p className="text-sm text-muted-foreground">
-              These AI-generated challenges went live automatically but haven't been
+              These AI-generated polls went live automatically but haven't been
               reviewed yet.
             </p>
           </motion.div>
@@ -558,7 +558,7 @@ export default function Admin() {
 
         <Tabs defaultValue="polls" className="w-full">
           <TabsList className="mb-6">
-            <TabsTrigger value="polls">📊 Challenges</TabsTrigger>
+            <TabsTrigger value="polls">📊 Polls</TabsTrigger>
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
           </TabsList>
@@ -744,7 +744,7 @@ export default function Admin() {
                   <div className="rounded-xl border border-border bg-card p-4">
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <CalendarIcon className="w-4 h-4" />
-                      Challenge Calendar
+                      Poll Calendar
                     </h3>
                     <Calendar
                       mode="single"
@@ -757,7 +757,7 @@ export default function Admin() {
                       }}
                     />
                     <p className="text-xs text-muted-foreground mt-2 px-1">
-                      Highlighted dates have scheduled challenges.
+                      Highlighted dates have scheduled polls.
                     </p>
                   </div>
 
@@ -771,7 +771,7 @@ export default function Admin() {
                     {selectedDateStr && pollsForDate.length === 0 && (
                       <div className="text-center py-8">
                         <p className="text-sm text-muted-foreground mb-3">
-                          No challenges scheduled for this date.
+                          No polls scheduled for this date.
                         </p>
                         <Button
                           size="sm"
@@ -783,7 +783,7 @@ export default function Admin() {
                           }}
                         >
                           <Plus className="w-4 h-4 mr-2" />
-                          Create Challenge for This Date
+                          Create Poll for This Date
                         </Button>
                       </div>
                     )}
@@ -868,7 +868,7 @@ export default function Admin() {
                           }}
                         >
                           <Plus className="w-4 h-4 mr-2" />
-                          Add Another Challenge
+                          Add Another Poll
                         </Button>
                       </div>
                     )}

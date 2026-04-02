@@ -68,8 +68,8 @@ serve(async (req) => {
       .join("\n");
 
     // Call Lovable AI to generate a poll
-    const systemPrompt = `You are a challenge question generator for a global opinion platform called "One World". 
-Your job is to create ONE thought-provoking, timely challenge question about current societal issues, trends, or debates.
+    const systemPrompt = `You are a poll question generator for a global opinion platform called "One World". 
+Your job is to create ONE thought-provoking, timely poll question about current societal issues, trends, or debates.
 
 Rules:
 - The question should be relevant to what people around the world are currently discussing or facing.

@@ -117,7 +117,7 @@ export function DailyPoll() {
 
   async function handleVote(optionId: string) {
     if (!user) {
-      toast.error("Sign in to respond", {
+      toast.error("Sign in to cast your vote", {
         action: { label: "Sign In", onClick: () => navigate("/auth") },
       });
       return;
@@ -146,7 +146,7 @@ export function DailyPoll() {
       setVoteCounts((counts as any) || []);
     } catch (err: any) {
       if (err.code === "23505") {
-        toast.error("You've already responded to this challenge");
+        toast.error("You've already voted on this poll");
       } else {
         toast.error("Failed to cast vote");
       }
@@ -166,7 +166,7 @@ export function DailyPoll() {
   if (!poll) {
     return (
       <div className="text-center py-20 text-muted-foreground">
-        <p className="text-lg">No challenge available today. Check back tomorrow!</p>
+        <p className="text-lg">No poll available today. Check back tomorrow!</p>
       </div>
     );
   }
@@ -189,7 +189,7 @@ export function DailyPoll() {
         {userVote && (
           <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-muted/50 text-sm text-muted-foreground">
             <span className="text-base">✅</span>
-            <span>You've already answered today's challenge</span>
+            <span>You've already answered today's poll</span>
           </div>
         )}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">

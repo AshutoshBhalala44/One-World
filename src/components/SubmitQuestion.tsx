@@ -23,7 +23,7 @@ export function SubmitQuestion() {
     return (
       <div className="text-center py-20">
         <Lightbulb className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
-        <p className="text-muted-foreground mb-4">Sign in to submit your own challenge question.</p>
+        <p className="text-muted-foreground mb-4">Sign in to submit your own poll question.</p>
         <button
           onClick={() => navigate("/auth")}
           className="text-sm font-medium text-accent hover:text-accent/80 transition-colors"
@@ -122,7 +122,7 @@ export function SubmitQuestion() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h3 className="font-display text-xl font-bold text-foreground mb-1">
-              Suggest a Challenge Question
+              Suggest a Poll Question
             </h3>
             <p className="text-sm text-muted-foreground">
               Submit your question or let AI generate one for you.

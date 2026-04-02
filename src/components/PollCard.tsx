@@ -35,7 +35,7 @@ export function PollCard({ poll }: { poll: Poll }) {
 
   const handleVote = (optionId: string) => {
     if (!user) {
-      toast.error("Sign in to respond", {
+      toast.error("Sign in to cast your vote", {
         action: { label: "Sign In", onClick: () => navigate("/auth") },
       });
       return;
