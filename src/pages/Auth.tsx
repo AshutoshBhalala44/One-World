@@ -292,7 +292,7 @@ const Auth = () => {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          By signing in, you agree to participate in transparent, unmanipulated polling.
+          By signing in, you agree to participate in transparent, unmanipulated challenges.
         </p>
       </motion.div>
     </div>

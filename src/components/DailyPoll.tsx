@@ -146,7 +146,7 @@ export function DailyPoll() {
       setVoteCounts((counts as any) || []);
     } catch (err: any) {
       if (err.code === "23505") {
-        toast.error("You've already voted on this poll");
+        toast.error("You've already responded to this challenge");
       } else {
         toast.error("Failed to cast vote");
       }
@@ -166,7 +166,7 @@ export function DailyPoll() {
   if (!poll) {
     return (
       <div className="text-center py-20 text-muted-foreground">
-        <p className="text-lg">No poll available today. Check back tomorrow!</p>
+        <p className="text-lg">No challenge available today. Check back tomorrow!</p>
       </div>
     );
   }
