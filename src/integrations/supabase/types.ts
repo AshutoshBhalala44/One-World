@@ -225,32 +225,18 @@ export type Database = {
       }
     }
     Views: {
-      poll_vote_counts: {
-        Row: {
-          option_id: string | null
-          poll_id: string | null
-          vote_count: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "votes_option_id_fkey"
-            columns: ["option_id"]
-            isOneToOne: false
-            referencedRelation: "poll_options"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "votes_poll_id_fkey"
-            columns: ["poll_id"]
-            isOneToOne: false
-            referencedRelation: "polls"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       cleanup_expired_otps: { Args: never; Returns: undefined }
+      get_poll_vote_counts: {
+        Args: never
+        Returns: {
+          option_id: string
+          poll_id: string
+          vote_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
