@@ -28,7 +28,7 @@ export function HeroSection() {
             <span className="text-gradient-gold">No manipulation.</span>
           </h1>
           <p className="text-lg md:text-xl opacity-80 leading-relaxed mb-6 max-w-lg font-body">
-            The most transparent polling platform on Earth. See where the world 
+            The world's most transparent polling platform. See where the world
             truly stands on the issues that matter — broken down by country, in real time.
           </p>
           <div className="flex items-center gap-4 text-sm opacity-60">
