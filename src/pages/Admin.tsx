@@ -109,7 +109,7 @@ export default function Admin() {
       );
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load polls");
+      toast.error("Failed to load challenges");
     } finally {
       setLoadingPolls(false);
     }
@@ -156,10 +156,10 @@ export default function Admin() {
       .eq("id", pollId);
 
     if (error) {
-      toast.error("Failed to approve poll");
+      toast.error("Failed to approve challenge");
       return;
     }
-    toast.success("Poll approved");
+    toast.success("Challenge approved");
     fetchPolls();
   }
 
@@ -170,25 +170,25 @@ export default function Admin() {
       .eq("id", pollId);
 
     if (error) {
-      toast.error("Failed to reject poll");
+      toast.error("Failed to reject challenge");
       return;
     }
-    toast.success("Poll rejected — it won't appear to users");
+    toast.success("Challenge rejected — it won't appear to users");
     fetchPolls();
   }
 
   async function handleDelete(pollId: string) {
-    if (!confirm("Delete this poll permanently?")) return;
+    if (!confirm("Delete this challenge permanently?")) return;
 
     // Delete options first, then poll
     await supabase.from("poll_options").delete().eq("poll_id", pollId);
     const { error } = await supabase.from("polls").delete().eq("id", pollId);
 
     if (error) {
-      toast.error("Failed to delete poll");
+      toast.error("Failed to delete challenge");
       return;
     }
-    toast.success("Poll deleted");
+    toast.success("Challenge deleted");
     fetchPolls();
   }
 
@@ -219,7 +219,7 @@ export default function Admin() {
       }
     }
 
-    toast.success("Poll updated");
+    toast.success("Challenge updated");
     setEditingPoll(null);
     fetchPolls();
   }
@@ -330,7 +330,7 @@ export default function Admin() {
 
       if (optErr) throw optErr;
 
-      toast.success("Poll created successfully");
+      toast.success("Challenge created successfully");
       setShowCreateForm(false);
       setNewQuestion("");
       setNewCategory("general");
@@ -338,7 +338,7 @@ export default function Admin() {
       setNewDate(new Date().toISOString().split("T")[0]);
       fetchPolls();
     } catch (err: any) {
-      toast.error("Failed to create poll: " + (err.message || "Unknown error"));
+      toast.error("Failed to create challenge: " + (err.message || "Unknown error"));
     } finally {
       setCreating(false);
     }
@@ -361,7 +361,7 @@ export default function Admin() {
         toast.info(data?.message || "No open poll date was available");
       }
     } catch (err) {
-      toast.error("Failed to generate poll");
+      toast.error("Failed to generate challenge");
       console.error(err);
     } finally {
       setGenerating(false);
