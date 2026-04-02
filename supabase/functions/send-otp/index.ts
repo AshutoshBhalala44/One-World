@@ -40,6 +40,14 @@ serve(async (req) => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
+    // Hash the OTP before storing
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashedCode = Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
     // Invalidate previous codes for this phone
     await supabase
       .from("otp_codes")
@@ -47,10 +55,10 @@ serve(async (req) => {
       .eq("phone", phone)
       .eq("verified", false);
 
-    // Store OTP
+    // Store hashed OTP
     const { error: insertError } = await supabase
       .from("otp_codes")
-      .insert({ phone, code, expires_at: expiresAt });
+      .insert({ phone, code: hashedCode, expires_at: expiresAt });
 
     if (insertError) {
       console.error("Failed to store OTP:", insertError);
@@ -60,7 +68,7 @@ serve(async (req) => {
       );
     }
 
-    // Skip SMS sending - no verification required
+    // Return the plaintext code to send to user (via SMS in production)
     console.log(`OTP for ${phone}: ${code}`);
 
     return new Response(

@@ -26,12 +26,20 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find matching OTP
+    // Hash the user-supplied code for comparison
+    const encoder = new TextEncoder();
+    const data = encoder.encode(code);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashedCode = Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    // Find matching OTP using hashed code
     const { data: otpRecord, error: fetchError } = await supabase
       .from("otp_codes")
       .select("*")
       .eq("phone", phone)
-      .eq("code", code)
+      .eq("code", hashedCode)
       .eq("verified", false)
       .gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false })

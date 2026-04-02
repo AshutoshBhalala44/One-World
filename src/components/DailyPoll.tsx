@@ -87,13 +87,10 @@ export function DailyPoll() {
 
       setOptions(optionsData || []);
 
-      // Fetch vote counts
-      const { data: counts } = await supabase
-        .from("poll_vote_counts" as any)
-        .select("*")
-        .eq("poll_id", pollData.id);
-
-      setVoteCounts((counts as any) || []);
+      // Fetch vote counts via secure function
+      const { data: counts } = await supabase.rpc("get_poll_vote_counts");
+      const filtered = (counts || []).filter((c: any) => c.poll_id === pollData.id);
+      setVoteCounts(filtered);
 
       // Check if user already voted
       if (user) {
@@ -137,13 +134,10 @@ export function DailyPoll() {
 
       setUserVote(optionId);
 
-      // Refresh vote counts
-      const { data: counts } = await supabase
-        .from("poll_vote_counts" as any)
-        .select("*")
-        .eq("poll_id", poll.id);
-
-      setVoteCounts((counts as any) || []);
+      // Refresh vote counts via secure function
+      const { data: counts } = await supabase.rpc("get_poll_vote_counts");
+      const filtered = (counts || []).filter((c: any) => c.poll_id === poll.id);
+      setVoteCounts(filtered);
     } catch (err: any) {
       if (err.code === "23505") {
         toast.error("You've already voted on this poll");
