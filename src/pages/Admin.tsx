@@ -266,6 +266,7 @@ export default function Admin() {
     }
   }
 
+  async function handleApprove(pollId: string) {
     const { error } = await supabase
       .from("polls")
       .update({ status: "approved", needs_review: false } as any)
