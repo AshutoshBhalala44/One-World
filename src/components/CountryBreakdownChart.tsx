@@ -352,9 +352,9 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                               <YAxis
                                 type="category"
                                 dataKey="name"
-                                width={120}
+                                width={90}
                                 tick={{
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
