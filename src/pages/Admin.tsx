@@ -269,6 +269,52 @@ export default function Admin() {
     }
   }
 
+  async function handleApproveWeekly(pollId: string) {
+    const { error } = await supabase
+      .from("weekly_polls")
+      .update({ status: "approved", needs_review: false } as any)
+      .eq("id", pollId);
+    if (error) { toast.error("Failed to approve"); return; }
+    toast.success("Weekly challenge approved");
+    fetchWeeklyPolls();
+  }
+
+  async function handleRejectWeekly(pollId: string) {
+    const { error } = await supabase
+      .from("weekly_polls")
+      .update({ status: "rejected", needs_review: false } as any)
+      .eq("id", pollId);
+    if (error) { toast.error("Failed to reject"); return; }
+    toast.success("Weekly challenge rejected");
+    fetchWeeklyPolls();
+  }
+
+  function startEditWeekly(wp: WeeklyPollWithOptions) {
+    setEditingWeekly(wp.id);
+    setEditWeeklyQuestion(wp.question);
+    setEditWeeklyOptions(wp.options.map((o) => o.label));
+  }
+
+  async function saveEditWeekly(wp: WeeklyPollWithOptions) {
+    const { error: pollErr } = await supabase
+      .from("weekly_polls")
+      .update({ question: editWeeklyQuestion } as any)
+      .eq("id", wp.id);
+    if (pollErr) { toast.error("Failed to update question"); return; }
+
+    for (let i = 0; i < wp.options.length; i++) {
+      if (editWeeklyOptions[i] !== wp.options[i].label) {
+        await supabase
+          .from("weekly_poll_options")
+          .update({ label: editWeeklyOptions[i] } as any)
+          .eq("id", wp.options[i].id);
+      }
+    }
+
+    toast.success("Weekly challenge updated");
+    setEditingWeekly(null);
+    fetchWeeklyPolls();
+  }
   async function handleApprove(pollId: string) {
     const { error } = await supabase
       .from("polls")
