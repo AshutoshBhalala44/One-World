@@ -20,9 +20,10 @@ import {
   RefreshCw,
   Plus,
   CalendarIcon,
+  Trophy,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, startOfWeek, addWeeks } from "date-fns";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
