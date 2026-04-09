@@ -100,6 +100,7 @@ export default function Admin() {
     return format(next, "yyyy-MM-dd");
   });
   const [creatingWeekly, setCreatingWeekly] = useState(false);
+  const [generatingWeekly, setGeneratingWeekly] = useState(false);
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
@@ -241,6 +242,28 @@ export default function Admin() {
     if (error) { toast.error("Failed to delete"); return; }
     toast.success("Weekly poll deleted");
     fetchWeeklyPolls();
+  }
+
+  async function handleGenerateWeekly() {
+    setGeneratingWeekly(true);
+    try {
+      const resp = await supabase.functions.invoke("generate-weekly-poll", { body: {} });
+      if (resp.error) throw resp.error;
+      const data = resp.data;
+      if (data?.success) {
+        toast.success(`Generated weekly challenge for ${data.week_start_date}: "${data.question}"`);
+        fetchWeeklyPolls();
+      } else if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.info(data?.message || "No open week was available");
+      }
+    } catch (err) {
+      toast.error("Failed to generate weekly challenge");
+      console.error(err);
+    } finally {
+      setGeneratingWeekly(false);
+    }
   }
 
   async function handleApprove(pollId: string) {
@@ -823,10 +846,16 @@ export default function Admin() {
                   <Trophy className="w-4 h-4" />
                   Weekly Challenges
                 </h3>
-                <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {showWeeklyForm ? "Cancel" : "Create Weekly"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {showWeeklyForm ? "Cancel" : "Create Weekly"}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleGenerateWeekly} disabled={generatingWeekly}>
+                    {generatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                    AI Generate
+                  </Button>
+                </div>
               </div>
 
               {showWeeklyForm && (
