@@ -96,6 +96,7 @@ export default function Admin() {
     if (isAdmin) {
       fetchPolls();
       fetchAdmins();
+      fetchWeeklyPolls();
     }
   }, [isAdmin, roleLoading]);
 
