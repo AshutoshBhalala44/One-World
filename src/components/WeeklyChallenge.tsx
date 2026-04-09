@@ -67,11 +67,11 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
     try {
       const weekStart = getCurrentWeekStart();
 
-      const { data: pollData } = await supabase
+      const { data: pollData } = await (supabase
         .from("weekly_polls")
         .select("*")
-        .eq("week_start_date", weekStart)
-        .neq("status" as any, "rejected")
+        .eq("week_start_date", weekStart) as any)
+        .neq("status", "rejected")
         .maybeSingle();
 
       if (!pollData) {
