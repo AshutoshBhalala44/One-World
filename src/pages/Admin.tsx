@@ -24,6 +24,15 @@ import {
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { format, startOfWeek, addWeeks } from "date-fns";
+
+function getCurrentAdminWeekStart(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diff);
+  return monday.toISOString().split("T")[0];
+}
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
