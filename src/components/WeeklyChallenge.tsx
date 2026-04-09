@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Trophy, Loader2, Users, Lock, Sparkles } from "lucide-react";
+import { Trophy, Loader2, Users, Lock, Sparkles, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 interface WeeklyPollOption {
