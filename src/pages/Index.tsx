@@ -4,16 +4,21 @@ import { HeroSection } from "@/components/HeroSection";
 import { DailyPoll } from "@/components/DailyPoll";
 import { MyResponses } from "@/components/MyResponses";
 import { SubmitQuestion } from "@/components/SubmitQuestion";
+import { WeeklyChallenge, DailyLocked } from "@/components/WeeklyChallenge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 
 const Index = () => {
+  const [weeklyUnlocked, setWeeklyUnlocked] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <HeroSection />
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-10">
+        <WeeklyChallenge onUnlocked={setWeeklyUnlocked} />
+
         <Tabs defaultValue="today" className="w-full">
           <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto">
             <TabsTrigger value="today" className="text-xs sm:text-sm flex-1 sm:flex-none">
@@ -28,7 +33,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="today">
-            <DailyPoll />
+            {weeklyUnlocked ? <DailyPoll /> : <DailyLocked />}
           </TabsContent>
 
           <TabsContent value="responses">

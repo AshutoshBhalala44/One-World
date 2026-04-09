@@ -20,9 +20,10 @@ import {
   RefreshCw,
   Plus,
   CalendarIcon,
+  Trophy,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, startOfWeek, addWeeks } from "date-fns";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -42,6 +43,17 @@ interface AdminUser {
   user_id: string;
   role: string;
   phone?: string;
+}
+
+interface WeeklyPollWithOptions {
+  id: string;
+  question: string;
+  category: string;
+  week_start_date: string;
+  status: string;
+  needs_review: boolean;
+  created_at: string;
+  options: { id: string; label: string; sort_order: number }[];
 }
 
 export default function Admin() {
@@ -66,11 +78,25 @@ export default function Admin() {
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [creating, setCreating] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(new Date());
+
+  // Weekly polls state
+  const [weeklyPolls, setWeeklyPolls] = useState<WeeklyPollWithOptions[]>([]);
+  const [loadingWeekly, setLoadingWeekly] = useState(true);
+  const [showWeeklyForm, setShowWeeklyForm] = useState(false);
+  const [weeklyQuestion, setWeeklyQuestion] = useState("");
+  const [weeklyCategory, setWeeklyCategory] = useState("general");
+  const [weeklyOptions, setWeeklyOptions] = useState(["", "", "", ""]);
+  const [weeklyDate, setWeeklyDate] = useState(() => {
+    const next = startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 });
+    return format(next, "yyyy-MM-dd");
+  });
+  const [creatingWeekly, setCreatingWeekly] = useState(false);
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
       fetchPolls();
       fetchAdmins();
+      fetchWeeklyPolls();
     }
   }, [isAdmin, roleLoading]);
 
@@ -147,6 +173,65 @@ export default function Admin() {
     } finally {
       setLoadingAdmins(false);
     }
+  }
+
+  async function fetchWeeklyPolls() {
+    setLoadingWeekly(true);
+    try {
+      const { data: pollsData } = await supabase
+        .from("weekly_polls")
+        .select("*")
+        .order("week_start_date", { ascending: false })
+        .limit(20);
+      if (!pollsData) { setWeeklyPolls([]); return; }
+      const pollIds = pollsData.map((p: any) => p.id);
+      const { data: optionsData } = await supabase
+        .from("weekly_poll_options")
+        .select("*")
+        .in("weekly_poll_id", pollIds)
+        .order("sort_order");
+      const optionsByPoll = (optionsData || []).reduce((acc: any, opt: any) => {
+        if (!acc[opt.weekly_poll_id]) acc[opt.weekly_poll_id] = [];
+        acc[opt.weekly_poll_id].push(opt);
+        return acc;
+      }, {} as Record<string, any[]>);
+      setWeeklyPolls(pollsData.map((p: any) => ({ ...p, options: optionsByPoll[p.id] || [] })));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load weekly polls");
+    } finally { setLoadingWeekly(false); }
+  }
+
+  async function handleCreateWeeklyPoll() {
+    if (!weeklyQuestion.trim()) { toast.error("Please enter a question"); return; }
+    const validOpts = weeklyOptions.filter((o) => o.trim());
+    if (validOpts.length < 2) { toast.error("At least 2 options required"); return; }
+    setCreatingWeekly(true);
+    try {
+      const { data: newPoll, error: pollErr } = await supabase
+        .from("weekly_polls")
+        .insert({ question: weeklyQuestion.trim(), category: weeklyCategory, week_start_date: weeklyDate, status: "approved", needs_review: false } as any)
+        .select("id").single();
+      if (pollErr) throw pollErr;
+      const optionRows = validOpts.map((label, idx) => ({ weekly_poll_id: (newPoll as any).id, label: label.trim(), sort_order: idx }));
+      const { error: optErr } = await supabase.from("weekly_poll_options").insert(optionRows);
+      if (optErr) throw optErr;
+      toast.success("Weekly poll created!");
+      setShowWeeklyForm(false);
+      setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", "", "", ""]);
+      setWeeklyDate(format(startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 }), "yyyy-MM-dd"));
+      fetchWeeklyPolls();
+    } catch (err: any) { toast.error("Failed: " + (err.message || "Unknown error")); }
+    finally { setCreatingWeekly(false); }
+  }
+
+  async function handleDeleteWeeklyPoll(pollId: string) {
+    if (!confirm("Delete this weekly poll permanently?")) return;
+    await supabase.from("weekly_poll_options").delete().eq("weekly_poll_id", pollId);
+    const { error } = await supabase.from("weekly_polls").delete().eq("id", pollId);
+    if (error) { toast.error("Failed to delete"); return; }
+    toast.success("Weekly poll deleted");
+    fetchWeeklyPolls();
   }
 
   async function handleApprove(pollId: string) {
@@ -559,6 +644,7 @@ export default function Admin() {
         <Tabs defaultValue="polls" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="polls">📊 Polls</TabsTrigger>
+            <TabsTrigger value="weekly">🏆 Weekly</TabsTrigger>
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
           </TabsList>
@@ -718,6 +804,97 @@ export default function Admin() {
                 })}
               </div>
             )}
+          </TabsContent>
+
+
+          <TabsContent value="weekly">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  Weekly Challenges
+                </h3>
+                <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  {showWeeklyForm ? "Cancel" : "Create Weekly"}
+                </Button>
+              </div>
+
+              {showWeeklyForm && (
+                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-5">
+                  <h4 className="font-semibold text-foreground mb-3">New Weekly Challenge</h4>
+                  <p className="text-xs text-muted-foreground mb-4">Weekly challenges start on Mondays. Users must answer before accessing daily questions.</p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
+                      <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Category</label>
+                        <select value={weeklyCategory} onChange={(e) => setWeeklyCategory(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground">
+                          {["general", "technology", "politics", "environment", "society", "economy", "health", "culture", "science", "education"].map((c) => (
+                            <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Week Start (Monday)</label>
+                        <input type="date" value={weeklyDate} onChange={(e) => setWeeklyDate(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Options (2–4)</label>
+                      <div className="space-y-2">
+                        {weeklyOptions.map((opt, i) => (
+                          <input key={i} value={opt} onChange={(e) => { const u = [...weeklyOptions]; u[i] = e.target.value; setWeeklyOptions(u); }} placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`} className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button variant="ghost" size="sm" onClick={() => setShowWeeklyForm(false)}>Cancel</Button>
+                      <Button size="sm" onClick={handleCreateWeeklyPoll} disabled={creatingWeekly}>
+                        {creatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        Create Weekly Challenge
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {loadingWeekly ? (
+                <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+              ) : weeklyPolls.length === 0 ? (
+                <div className="text-center py-16 text-muted-foreground">
+                  <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">No weekly challenges yet. Create one to get started!</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {weeklyPolls.map((wp, i) => (
+                    <motion.div key={wp.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} className="rounded-xl border border-border bg-card p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{wp.category}</span>
+                            <span className="text-xs text-muted-foreground">Week of {wp.week_start_date}</span>
+                          </div>
+                          <h4 className="font-semibold text-foreground text-sm leading-snug">{wp.question}</h4>
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {wp.options.map((opt) => (
+                              <span key={opt.id} className="text-xs px-2 py-1 rounded-md bg-secondary text-muted-foreground">{opt.label}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Delete" onClick={() => handleDeleteWeeklyPoll(wp.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="schedule">

@@ -223,6 +223,104 @@ export type Database = {
           },
         ]
       }
+      weekly_poll_options: {
+        Row: {
+          id: string
+          label: string
+          sort_order: number
+          weekly_poll_id: string
+        }
+        Insert: {
+          id?: string
+          label: string
+          sort_order?: number
+          weekly_poll_id: string
+        }
+        Update: {
+          id?: string
+          label?: string
+          sort_order?: number
+          weekly_poll_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_poll_options_weekly_poll_id_fkey"
+            columns: ["weekly_poll_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_polls: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          needs_review: boolean
+          question: string
+          status: string
+          week_start_date: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          needs_review?: boolean
+          question: string
+          status?: string
+          week_start_date: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          needs_review?: boolean
+          question?: string
+          status?: string
+          week_start_date?: string
+        }
+        Relationships: []
+      }
+      weekly_votes: {
+        Row: {
+          created_at: string
+          id: string
+          option_id: string
+          user_id: string
+          weekly_poll_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_id: string
+          user_id: string
+          weekly_poll_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_id?: string
+          user_id?: string
+          weekly_poll_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_votes_weekly_poll_id_fkey"
+            columns: ["weekly_poll_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -235,6 +333,14 @@ export type Database = {
           option_id: string
           poll_id: string
           vote_count: number
+        }[]
+      }
+      get_weekly_vote_counts: {
+        Args: never
+        Returns: {
+          option_id: string
+          vote_count: number
+          weekly_poll_id: string
         }[]
       }
       has_role: {

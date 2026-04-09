@@ -1,0 +1,318 @@
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Trophy, Loader2, Users, Lock, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+
+interface WeeklyPollOption {
+  id: string;
+  label: string;
+  sort_order: number;
+}
+
+interface WeeklyPoll {
+  id: string;
+  question: string;
+  category: string;
+  week_start_date: string;
+}
+
+interface VoteCount {
+  option_id: string;
+  vote_count: number;
+}
+
+const optionColors = [
+  "from-purple-500/20 to-purple-500/5",
+  "from-amber-500/20 to-amber-500/5",
+  "from-teal-500/20 to-teal-500/5",
+  "from-rose-500/20 to-rose-500/5",
+];
+
+const optionAccents = [
+  "border-purple-500/40",
+  "border-amber-500/40",
+  "border-teal-500/40",
+  "border-rose-500/40",
+];
+
+function getCurrentWeekStart(): string {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun, 1=Mon, ...
+  const diff = day === 0 ? 6 : day - 1; // days since Monday
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diff);
+  return monday.toISOString().split("T")[0];
+}
+
+export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean) => void }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [poll, setPoll] = useState<WeeklyPoll | null>(null);
+  const [options, setOptions] = useState<WeeklyPollOption[]>([]);
+  const [voteCounts, setVoteCounts] = useState<VoteCount[]>([]);
+  const [userVote, setUserVote] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [voting, setVoting] = useState(false);
+  const [noWeeklyPoll, setNoWeeklyPoll] = useState(false);
+
+  useEffect(() => {
+    fetchWeeklyPoll();
+  }, [user]);
+
+  async function fetchWeeklyPoll() {
+    setLoading(true);
+    try {
+      const weekStart = getCurrentWeekStart();
+
+      const { data: pollData } = await (supabase
+        .from("weekly_polls")
+        .select("*")
+        .eq("week_start_date", weekStart) as any)
+        .neq("status", "rejected")
+        .maybeSingle();
+
+      if (!pollData) {
+        setNoWeeklyPoll(true);
+        onUnlocked(true); // No weekly poll = auto-unlock daily
+        setLoading(false);
+        return;
+      }
+
+      setPoll(pollData as any);
+
+      const { data: optionsData } = await supabase
+        .from("weekly_poll_options")
+        .select("*")
+        .eq("weekly_poll_id", (pollData as any).id)
+        .order("sort_order");
+
+      setOptions((optionsData || []) as any);
+
+      // Fetch vote counts
+      const { data: counts } = await supabase.rpc("get_weekly_vote_counts");
+      const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === (pollData as any).id);
+      setVoteCounts(filtered as any);
+
+      // Check if user already voted
+      if (user) {
+        const { data: existingVote } = await supabase
+          .from("weekly_votes")
+          .select("option_id")
+          .eq("weekly_poll_id", (pollData as any).id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (existingVote) {
+          setUserVote((existingVote as any).option_id);
+          onUnlocked(true);
+        } else {
+          onUnlocked(false);
+        }
+      } else {
+        onUnlocked(false);
+      }
+    } catch (err) {
+      console.error("Error fetching weekly poll:", err);
+      onUnlocked(true); // On error, don't block
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVote(optionId: string) {
+    if (!user) {
+      toast.error("Sign in to answer the weekly challenge", {
+        action: { label: "Sign In", onClick: () => navigate("/auth") },
+      });
+      return;
+    }
+
+    if (userVote || !poll) return;
+
+    setVoting(true);
+    try {
+      const { error } = await supabase.from("weekly_votes").insert({
+        weekly_poll_id: poll.id,
+        option_id: optionId,
+        user_id: user.id,
+      });
+
+      if (error) throw error;
+
+      setUserVote(optionId);
+      onUnlocked(true);
+
+      // Refresh vote counts
+      const { data: counts } = await supabase.rpc("get_weekly_vote_counts");
+      const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === poll.id);
+      setVoteCounts(filtered as any);
+
+      toast.success("🎉 Weekly challenge answered! Daily challenges unlocked!");
+    } catch (err: any) {
+      if (err.code === "23505") {
+        toast.error("You've already answered this week's challenge");
+        onUnlocked(true);
+      } else {
+        toast.error("Failed to submit answer");
+      }
+    } finally {
+      setVoting(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (noWeeklyPoll) return null;
+
+  const totalVotes = voteCounts.reduce((sum, vc) => sum + Number(vc.vote_count), 0);
+
+  function getPercentage(optionId: string) {
+    const count = voteCounts.find((vc) => vc.option_id === optionId);
+    if (!count || totalVotes === 0) return 0;
+    return Math.round((Number(count.vote_count) / totalVotes) * 100);
+  }
+
+  const hasVoted = userVote !== null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl overflow-hidden max-w-2xl mx-auto mb-8"
+    >
+      {/* Header banner */}
+      <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 p-4 sm:p-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <Trophy className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-white font-display text-lg sm:text-xl font-bold">
+              Weekly Challenge
+            </h2>
+            <p className="text-white/70 text-xs sm:text-sm">
+              {hasVoted
+                ? "✅ Completed — daily challenges unlocked!"
+                : "Answer this to unlock daily challenges"}
+            </p>
+          </div>
+          {!hasVoted && (
+            <div className="ml-auto">
+              <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="bg-card border border-t-0 border-border rounded-b-xl p-5 sm:p-6">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+          <Users className="w-4 h-4" />
+          <span>{totalVotes} answers</span>
+          <span className="ml-auto text-xs uppercase tracking-wider font-medium">
+            {poll?.category}
+          </span>
+        </div>
+
+        <h3 className="font-display text-xl sm:text-2xl font-bold text-foreground mb-5 leading-snug">
+          {poll?.question}
+        </h3>
+
+        <div className="space-y-3">
+          {options.map((option, i) => {
+            const isSelected = userVote === option.id;
+            const percentage = getPercentage(option.id);
+
+            return (
+              <button
+                key={option.id}
+                onClick={() => handleVote(option.id)}
+                disabled={hasVoted || voting}
+                className={`relative w-full text-left rounded-lg border-2 transition-all duration-200 overflow-hidden ${
+                  hasVoted
+                    ? `cursor-default ${isSelected ? optionAccents[i % optionAccents.length] : "border-border/50"}`
+                    : `cursor-pointer border-border hover:${optionAccents[i % optionAccents.length]} hover:shadow-md active:scale-[0.99]`
+                } ${isSelected ? "ring-1 ring-purple-500/30" : ""}`}
+              >
+                {hasVoted && (
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percentage}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+                    className={`absolute inset-y-0 left-0 bg-gradient-to-r ${optionColors[i % optionColors.length]} rounded-lg`}
+                  />
+                )}
+
+                <div className="relative flex items-center justify-between px-4 py-3.5">
+                  <div className="flex items-center gap-3">
+                    {!hasVoted && (
+                      <div className="w-5 h-5 rounded-full border-2 border-purple-400/50 flex-shrink-0" />
+                    )}
+                    {hasVoted && isSelected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-5 h-5 rounded-full bg-purple-500 flex-shrink-0 flex items-center justify-center"
+                      >
+                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                      </motion.div>
+                    )}
+                    {hasVoted && !isSelected && (
+                      <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/20 flex-shrink-0" />
+                    )}
+                    <span className={`text-sm font-medium ${hasVoted && isSelected ? "text-foreground" : "text-foreground/80"}`}>
+                      {option.label}
+                    </span>
+                  </div>
+
+                  {hasVoted && (
+                    <motion.span
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className={`text-sm font-bold tabular-nums ${
+                        isSelected ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    >
+                      {percentage}%
+                    </motion.span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Shown when daily challenges are locked */
+export function DailyLocked() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-xl border-2 border-dashed border-muted-foreground/20 bg-muted/30 p-8 sm:p-12 text-center max-w-2xl mx-auto"
+    >
+      <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+        <Lock className="w-7 h-7 text-muted-foreground" />
+      </div>
+      <h3 className="font-display text-xl font-bold text-foreground mb-2">
+        Daily Challenge Locked
+      </h3>
+      <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+        Answer this week's challenge above to unlock today's daily question. It only takes a moment!
+      </p>
+    </motion.div>
+  );
+}
