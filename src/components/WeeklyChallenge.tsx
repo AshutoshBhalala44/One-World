@@ -87,7 +87,12 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
     return () => clearInterval(timer);
   }, []);
 
+  // Reset vote state when user changes (sign out/in)
   useEffect(() => {
+    if (!user) {
+      setUserVote(null);
+      onUnlocked(false);
+    }
     fetchWeeklyPoll();
   }, [user]);
 
