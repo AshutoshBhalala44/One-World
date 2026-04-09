@@ -175,6 +175,65 @@ export default function Admin() {
     }
   }
 
+  async function fetchWeeklyPolls() {
+    setLoadingWeekly(true);
+    try {
+      const { data: pollsData } = await supabase
+        .from("weekly_polls")
+        .select("*")
+        .order("week_start_date", { ascending: false })
+        .limit(20);
+      if (!pollsData) { setWeeklyPolls([]); return; }
+      const pollIds = pollsData.map((p: any) => p.id);
+      const { data: optionsData } = await supabase
+        .from("weekly_poll_options")
+        .select("*")
+        .in("weekly_poll_id", pollIds)
+        .order("sort_order");
+      const optionsByPoll = (optionsData || []).reduce((acc: any, opt: any) => {
+        if (!acc[opt.weekly_poll_id]) acc[opt.weekly_poll_id] = [];
+        acc[opt.weekly_poll_id].push(opt);
+        return acc;
+      }, {} as Record<string, any[]>);
+      setWeeklyPolls(pollsData.map((p: any) => ({ ...p, options: optionsByPoll[p.id] || [] })));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load weekly polls");
+    } finally { setLoadingWeekly(false); }
+  }
+
+  async function handleCreateWeeklyPoll() {
+    if (!weeklyQuestion.trim()) { toast.error("Please enter a question"); return; }
+    const validOpts = weeklyOptions.filter((o) => o.trim());
+    if (validOpts.length < 2) { toast.error("At least 2 options required"); return; }
+    setCreatingWeekly(true);
+    try {
+      const { data: newPoll, error: pollErr } = await supabase
+        .from("weekly_polls")
+        .insert({ question: weeklyQuestion.trim(), category: weeklyCategory, week_start_date: weeklyDate, status: "approved", needs_review: false } as any)
+        .select("id").single();
+      if (pollErr) throw pollErr;
+      const optionRows = validOpts.map((label, idx) => ({ weekly_poll_id: (newPoll as any).id, label: label.trim(), sort_order: idx }));
+      const { error: optErr } = await supabase.from("weekly_poll_options").insert(optionRows);
+      if (optErr) throw optErr;
+      toast.success("Weekly poll created!");
+      setShowWeeklyForm(false);
+      setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", "", "", ""]);
+      setWeeklyDate(format(startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 }), "yyyy-MM-dd"));
+      fetchWeeklyPolls();
+    } catch (err: any) { toast.error("Failed: " + (err.message || "Unknown error")); }
+    finally { setCreatingWeekly(false); }
+  }
+
+  async function handleDeleteWeeklyPoll(pollId: string) {
+    if (!confirm("Delete this weekly poll permanently?")) return;
+    await supabase.from("weekly_poll_options").delete().eq("weekly_poll_id", pollId);
+    const { error } = await supabase.from("weekly_polls").delete().eq("id", pollId);
+    if (error) { toast.error("Failed to delete"); return; }
+    toast.success("Weekly poll deleted");
+    fetchWeeklyPolls();
+  }
+
   async function handleApprove(pollId: string) {
     const { error } = await supabase
       .from("polls")
