@@ -23,10 +23,10 @@ interface OptionInfo {
 }
 
 const CHART_COLORS = [
-  "hsl(222, 60%, 18%)",
-  "hsl(40, 95%, 55%)",
-  "hsl(222, 40%, 30%)",
-  "hsl(42, 100%, 70%)",
+  "hsl(262, 70%, 58%)",   // vibrant purple
+  "hsl(40, 95%, 55%)",    // gold/amber
+  "hsl(172, 66%, 50%)",   // teal
+  "hsl(340, 75%, 60%)",   // rose/pink
 ];
 
 const ALL_COUNTRIES: { country: string; flag: string }[] = [
@@ -92,6 +92,9 @@ function generateCountryData(
   });
 }
 
+const AXIS_TEXT_COLOR = "hsl(220, 15%, 65%)";
+const CURSOR_COLOR = "hsl(220, 20%, 50%, 0.15)";
+
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
@@ -114,7 +117,7 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<{
@@ -206,7 +209,7 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                       type="number"
                       domain={[0, 100]}
                       tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: 11, fill: "hsl(220, 10%, 46%)" }}
+                      tick={{ fontSize: 11, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -214,13 +217,13 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                       type="category"
                       dataKey="name"
                       width={120}
-                      tick={{ fontSize: 12, fill: "hsl(222, 47%, 11%)" }}
+                      tick={{ fontSize: 12, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <Tooltip
                       content={<CustomTooltip />}
-                      cursor={{ fill: "hsl(220, 16%, 93%, 0.5)" }}
+                      cursor={{ fill: CURSOR_COLOR }}
                     />
                     <Legend
                       wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
@@ -341,7 +344,7 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                                 tickFormatter={(v) => `${v}%`}
                                 tick={{
                                   fontSize: 10,
-                                  fill: "hsl(220, 10%, 46%)",
+                                  fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
                                 tickLine={false}
@@ -352,7 +355,7 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                                 width={120}
                                 tick={{
                                   fontSize: 12,
-                                  fill: "hsl(222, 47%, 11%)",
+                                  fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
                                 tickLine={false}
@@ -360,7 +363,7 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                               <Tooltip
                                 content={<CustomTooltip />}
                                 cursor={{
-                                  fill: "hsl(220, 16%, 93%, 0.5)",
+                                  fill: CURSOR_COLOR,
                                 }}
                               />
                               {options.map((opt, i) => (
