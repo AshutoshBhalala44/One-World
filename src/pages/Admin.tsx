@@ -904,6 +904,11 @@ export default function Admin() {
                 return acc;
               }, {} as Record<string, number>);
 
+              const weeklyDates = weeklyPolls.reduce((acc, wp) => {
+                acc[wp.week_start_date] = wp;
+                return acc;
+              }, {} as Record<string, WeeklyPollWithOptions>);
+
               const selectedDateStr = selectedCalendarDate
                 ? format(selectedCalendarDate, "yyyy-MM-dd")
                 : null;
@@ -912,143 +917,237 @@ export default function Admin() {
                 ? polls.filter((p) => p.active_date === selectedDateStr)
                 : [];
 
+              // Check if selected date falls within a weekly poll week
+              const selectedWeekStart = selectedCalendarDate
+                ? format(startOfWeek(selectedCalendarDate, { weekStartsOn: 1 }), "yyyy-MM-dd")
+                : null;
+              const weeklyForDate = selectedWeekStart ? weeklyDates[selectedWeekStart] : undefined;
+
               const scheduledDates = Object.keys(pollDates).map(
                 (d) => new Date(d + "T00:00:00")
               );
 
+              const weeklyStartDates = Object.keys(weeklyDates).map(
+                (d) => new Date(d + "T00:00:00")
+              );
+
               return (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  {/* Upcoming weekly schedule overview */}
                   <div className="rounded-xl border border-border bg-card p-4">
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4" />
-                      Poll Calendar
+                      <Trophy className="w-4 h-4" />
+                      Weekly Challenge Schedule
                     </h3>
-                    <Calendar
-                      mode="single"
-                      selected={selectedCalendarDate}
-                      onSelect={setSelectedCalendarDate}
-                      className="p-3 pointer-events-auto"
-                      modifiers={{ scheduled: scheduledDates }}
-                      modifiersClassNames={{
-                        scheduled: "bg-primary/20 text-primary font-bold",
-                      }}
-                    />
-                    <p className="text-xs text-muted-foreground mt-2 px-1">
-                      Highlighted dates have scheduled polls.
-                    </p>
+                    {weeklyPolls.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">No weekly challenges scheduled yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {weeklyPolls.slice(0, 6).map((wp) => {
+                          const weekEnd = new Date(wp.week_start_date + "T00:00:00");
+                          weekEnd.setDate(weekEnd.getDate() + 6);
+                          const isCurrentWeek = wp.week_start_date === getCurrentAdminWeekStart();
+                          return (
+                            <div
+                              key={wp.id}
+                              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border ${
+                                isCurrentWeek
+                                  ? "border-primary/40 bg-primary/5"
+                                  : "border-border bg-background"
+                              }`}
+                            >
+                              <div className="flex-shrink-0 w-16 text-center">
+                                <div className={`text-xs font-bold ${isCurrentWeek ? "text-primary" : "text-muted-foreground"}`}>
+                                  {format(new Date(wp.week_start_date + "T00:00:00"), "MMM d")}
+                                </div>
+                                <div className="text-[10px] text-muted-foreground">
+                                  – {format(weekEnd, "MMM d")}
+                                </div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{wp.question}</p>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{wp.category}</span>
+                                  {isCurrentWeek && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold uppercase">
+                                      Active
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                                onClick={() => handleDeleteWeeklyPoll(wp.id)}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
-                  <div className="rounded-xl border border-border bg-card p-4">
-                    <h3 className="font-semibold text-foreground mb-3">
-                      {selectedDateStr
-                        ? format(selectedCalendarDate!, "MMMM d, yyyy")
-                        : "Select a date"}
-                    </h3>
-
-                    {selectedDateStr && pollsForDate.length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-sm text-muted-foreground mb-3">
-                          No polls scheduled for this date.
-                        </p>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setNewDate(selectedDateStr);
-                            setShowCreateForm(true);
-                            // Scroll to top where form is
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Poll for This Date
-                        </Button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="rounded-xl border border-border bg-card p-4">
+                      <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <CalendarIcon className="w-4 h-4" />
+                        Poll Calendar
+                      </h3>
+                      <Calendar
+                        mode="single"
+                        selected={selectedCalendarDate}
+                        onSelect={setSelectedCalendarDate}
+                        className="p-3 pointer-events-auto"
+                        modifiers={{ scheduled: scheduledDates, weekly: weeklyStartDates }}
+                        modifiersClassNames={{
+                          scheduled: "bg-primary/20 text-primary font-bold",
+                          weekly: "ring-2 ring-purple-500/50 ring-offset-1 ring-offset-background",
+                        }}
+                      />
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2 px-1">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-sm bg-primary/20" />
+                          <span>Daily poll</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-sm ring-2 ring-purple-500/50" />
+                          <span>Weekly start</span>
+                        </div>
                       </div>
-                    )}
+                    </div>
 
-                    {pollsForDate.length > 0 && (
-                      <div className="space-y-3">
-                        {pollsForDate.map((poll) => (
-                          <div
-                            key={poll.id}
-                            className={`rounded-lg border p-3 ${
-                              poll.status === "rejected"
-                                ? "border-destructive/30 bg-destructive/5 opacity-60"
-                                : poll.needs_review
-                                ? "border-accent/40 bg-accent/5"
-                                : "border-border bg-background"
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                                {poll.category}
-                              </span>
-                              {poll.needs_review && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-semibold uppercase">
-                                  Needs Review
-                                </span>
-                              )}
-                              {poll.status === "approved" && !poll.needs_review && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold uppercase">
-                                  Approved
-                                </span>
-                              )}
-                              {poll.status === "rejected" && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-destructive/20 text-destructive font-semibold uppercase">
-                                  Rejected
-                                </span>
-                              )}
-                            </div>
-                            <h4 className="font-semibold text-foreground text-sm">
-                              {poll.question}
-                            </h4>
-                            <div className="flex flex-wrap gap-1 mt-1.5">
-                              {poll.options.map((opt) => (
-                                <span
-                                  key={opt.id}
-                                  className="text-xs px-2 py-0.5 rounded-md bg-secondary text-muted-foreground"
-                                >
-                                  {opt.label}
-                                </span>
-                              ))}
-                            </div>
-                            <div className="flex gap-1 mt-2">
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 text-xs"
-                                onClick={() => startEdit(poll)}
-                              >
-                                <Pencil className="w-3 h-3 mr-1" />
-                                Edit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 text-xs text-destructive hover:bg-destructive/10"
-                                onClick={() => handleDelete(poll.id)}
-                              >
-                                <Trash2 className="w-3 h-3 mr-1" />
-                                Delete
-                              </Button>
-                            </div>
+                    <div className="rounded-xl border border-border bg-card p-4">
+                      <h3 className="font-semibold text-foreground mb-3">
+                        {selectedDateStr
+                          ? format(selectedCalendarDate!, "MMMM d, yyyy")
+                          : "Select a date"}
+                      </h3>
+
+                      {/* Show weekly poll info if applicable */}
+                      {weeklyForDate && (
+                        <div className="mb-3 rounded-lg border border-purple-500/30 bg-purple-500/5 p-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Trophy className="w-3.5 h-3.5 text-purple-500" />
+                            <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+                              Weekly Challenge
+                            </span>
                           </div>
-                        ))}
+                          <p className="text-sm font-medium text-foreground">{weeklyForDate.question}</p>
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {weeklyForDate.options.map((opt) => (
+                              <span key={opt.id} className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">{opt.label}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full mt-2"
-                          onClick={() => {
-                            setNewDate(selectedDateStr);
-                            setShowCreateForm(true);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          }}
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add Another Poll
-                        </Button>
-                      </div>
-                    )}
+                      {selectedDateStr && pollsForDate.length === 0 && (
+                        <div className="text-center py-8">
+                          <p className="text-sm text-muted-foreground mb-3">
+                            No polls scheduled for this date.
+                          </p>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setNewDate(selectedDateStr);
+                              setShowCreateForm(true);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Create Poll for This Date
+                          </Button>
+                        </div>
+                      )}
+
+                      {pollsForDate.length > 0 && (
+                        <div className="space-y-3">
+                          {pollsForDate.map((poll) => (
+                            <div
+                              key={poll.id}
+                              className={`rounded-lg border p-3 ${
+                                poll.status === "rejected"
+                                  ? "border-destructive/30 bg-destructive/5 opacity-60"
+                                  : poll.needs_review
+                                  ? "border-accent/40 bg-accent/5"
+                                  : "border-border bg-background"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                                  {poll.category}
+                                </span>
+                                {poll.needs_review && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-semibold uppercase">
+                                    Needs Review
+                                  </span>
+                                )}
+                                {poll.status === "approved" && !poll.needs_review && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-semibold uppercase">
+                                    Approved
+                                  </span>
+                                )}
+                                {poll.status === "rejected" && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-destructive/20 text-destructive font-semibold uppercase">
+                                    Rejected
+                                  </span>
+                                )}
+                              </div>
+                              <h4 className="font-semibold text-foreground text-sm">
+                                {poll.question}
+                              </h4>
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {poll.options.map((opt) => (
+                                  <span
+                                    key={opt.id}
+                                    className="text-xs px-2 py-0.5 rounded-md bg-secondary text-muted-foreground"
+                                  >
+                                    {opt.label}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="flex gap-1 mt-2">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-7 text-xs"
+                                  onClick={() => startEdit(poll)}
+                                >
+                                  <Pencil className="w-3 h-3 mr-1" />
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-7 text-xs text-destructive hover:bg-destructive/10"
+                                  onClick={() => handleDelete(poll.id)}
+                                >
+                                  <Trash2 className="w-3 h-3 mr-1" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full mt-2"
+                            onClick={() => {
+                              setNewDate(selectedDateStr);
+                              setShowCreateForm(true);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Another Poll
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
