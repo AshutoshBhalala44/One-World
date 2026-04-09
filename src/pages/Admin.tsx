@@ -45,6 +45,17 @@ interface AdminUser {
   phone?: string;
 }
 
+interface WeeklyPollWithOptions {
+  id: string;
+  question: string;
+  category: string;
+  week_start_date: string;
+  status: string;
+  needs_review: boolean;
+  created_at: string;
+  options: { id: string; label: string; sort_order: number }[];
+}
+
 export default function Admin() {
   const { user } = useAuth();
   const { isAdmin, loading: roleLoading } = useAdminRole();
