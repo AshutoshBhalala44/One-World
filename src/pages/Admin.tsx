@@ -99,7 +99,8 @@ export default function Admin() {
     const next = startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 });
     return format(next, "yyyy-MM-dd");
   });
-  const [creatingWeekly, setCreatingWeekly] = useState(false);
+  const [creatingWeekly, setCreatingWeekly] = false);
+  const [generatingWeekly, setGeneratingWeekly] = useState(false);
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
