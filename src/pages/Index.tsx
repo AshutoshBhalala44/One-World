@@ -15,15 +15,15 @@ const Index = () => {
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-10">
         <Tabs defaultValue="today" className="w-full">
-          <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto grid grid-cols-3 sm:flex">
-            <TabsTrigger value="today" className="text-xs sm:text-sm px-2 sm:px-4">
-              🗳️ <span className="hidden sm:inline">Today's </span>Challenge
+          <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto">
+            <TabsTrigger value="today" className="text-xs sm:text-sm flex-1 sm:flex-none">
+              🗳️ Today's Challenge
             </TabsTrigger>
-            <TabsTrigger value="responses" className="text-xs sm:text-sm px-2 sm:px-4">
-              📋 <span className="hidden sm:inline">My </span>Responses
+            <TabsTrigger value="responses" className="text-xs sm:text-sm flex-1 sm:flex-none">
+              📋 My Responses
             </TabsTrigger>
-            <TabsTrigger value="submit" className="text-xs sm:text-sm px-2 sm:px-4">
-              💡 Submit<span className="hidden sm:inline"> Question</span>
+            <TabsTrigger value="submit" className="text-xs sm:text-sm flex-1 sm:flex-none">
+              💡 Submit
             </TabsTrigger>
           </TabsList>
 
