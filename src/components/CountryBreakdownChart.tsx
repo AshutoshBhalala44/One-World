@@ -202,22 +202,22 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                   <BarChart
                     data={chartData}
                     layout="vertical"
-                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                    margin={{ top: 5, right: 15, left: 0, bottom: 5 }}
                     barCategoryGap="20%"
                   >
                     <XAxis
                       type="number"
                       domain={[0, 100]}
                       tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: 11, fill: AXIS_TEXT_COLOR }}
+                      tick={{ fontSize: 10, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={120}
-                      tick={{ fontSize: 12, fill: AXIS_TEXT_COLOR }}
+                      width={90}
+                      tick={{ fontSize: 11, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -333,8 +333,8 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                               layout="vertical"
                               margin={{
                                 top: 0,
-                                right: 20,
-                                left: 10,
+                                right: 15,
+                                left: 0,
                                 bottom: 0,
                               }}
                             >
@@ -352,9 +352,9 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                               <YAxis
                                 type="category"
                                 dataKey="name"
-                                width={120}
+                                width={90}
                                 tick={{
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
