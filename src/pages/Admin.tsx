@@ -78,6 +78,19 @@ export default function Admin() {
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [creating, setCreating] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(new Date());
+
+  // Weekly polls state
+  const [weeklyPolls, setWeeklyPolls] = useState<WeeklyPollWithOptions[]>([]);
+  const [loadingWeekly, setLoadingWeekly] = useState(true);
+  const [showWeeklyForm, setShowWeeklyForm] = useState(false);
+  const [weeklyQuestion, setWeeklyQuestion] = useState("");
+  const [weeklyCategory, setWeeklyCategory] = useState("general");
+  const [weeklyOptions, setWeeklyOptions] = useState(["", "", "", ""]);
+  const [weeklyDate, setWeeklyDate] = useState(() => {
+    const next = startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 });
+    return format(next, "yyyy-MM-dd");
+  });
+  const [creatingWeekly, setCreatingWeekly] = useState(false);
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
