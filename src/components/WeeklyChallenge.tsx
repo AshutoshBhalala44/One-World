@@ -76,6 +76,16 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
   const [loading, setLoading] = useState(true);
   const [voting, setVoting] = useState(false);
   const [noWeeklyPoll, setNoWeeklyPoll] = useState(false);
+  const [countdown, setCountdown] = useState(() => formatCountdown(getNextMondayMidnight().getTime() - Date.now()));
+
+  // Countdown timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const ms = getNextMondayMidnight().getTime() - Date.now();
+      setCountdown(formatCountdown(ms));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     fetchWeeklyPoll();
