@@ -1,4 +1,4 @@
-import { LogOut, User, Shield } from "lucide-react";
+import { LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,6 @@ export function Header() {
           </span>
           {user ? (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">
-                  {user.user_metadata?.phone || user.phone || "User"}
-                </span>
-              </div>
               {isAdmin && (
                 <Button
                   variant="ghost"
