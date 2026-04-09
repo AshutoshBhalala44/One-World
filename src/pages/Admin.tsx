@@ -846,10 +846,16 @@ export default function Admin() {
                   <Trophy className="w-4 h-4" />
                   Weekly Challenges
                 </h3>
-                <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {showWeeklyForm ? "Cancel" : "Create Weekly"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    {showWeeklyForm ? "Cancel" : "Create Weekly"}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleGenerateWeekly} disabled={generatingWeekly}>
+                    {generatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                    AI Generate
+                  </Button>
+                </div>
               </div>
 
               {showWeeklyForm && (
