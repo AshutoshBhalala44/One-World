@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Trophy, Loader2, Users, Lock, Sparkles } from "lucide-react";
+import { Trophy, Loader2, Users, Lock, Sparkles, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 interface WeeklyPollOption {
@@ -47,6 +47,25 @@ function getCurrentWeekStart(): string {
   return monday.toISOString().split("T")[0];
 }
 
+function getNextMondayMidnight(): Date {
+  const now = new Date();
+  const day = now.getDay();
+  const daysUntilMonday = day === 0 ? 1 : 8 - day;
+  const next = new Date(now);
+  next.setDate(now.getDate() + daysUntilMonday);
+  next.setHours(0, 0, 0, 0);
+  return next;
+}
+
+function formatCountdown(ms: number): { days: number; hours: number; minutes: number; seconds: number } {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return { days, hours, minutes, seconds };
+}
+
 export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean) => void }) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -57,6 +76,16 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
   const [loading, setLoading] = useState(true);
   const [voting, setVoting] = useState(false);
   const [noWeeklyPoll, setNoWeeklyPoll] = useState(false);
+  const [countdown, setCountdown] = useState(() => formatCountdown(getNextMondayMidnight().getTime() - Date.now()));
+
+  // Countdown timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const ms = getNextMondayMidnight().getTime() - Date.now();
+      setCountdown(formatCountdown(ms));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     fetchWeeklyPoll();
@@ -195,7 +224,7 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
           <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <Trophy className="w-5 h-5 text-white" />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-white font-display text-lg sm:text-xl font-bold">
               Weekly Challenge
             </h2>
@@ -210,6 +239,29 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
               <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
             </div>
           )}
+        </div>
+
+        {/* Countdown timer */}
+        <div className="mt-3 flex items-center gap-2">
+          <Clock className="w-3.5 h-3.5 text-white/60" />
+          <span className="text-white/60 text-[10px] sm:text-xs uppercase tracking-wider font-medium">
+            Next challenge in
+          </span>
+          <div className="flex gap-1.5 ml-auto">
+            {[
+              { val: countdown.days, label: "D" },
+              { val: countdown.hours, label: "H" },
+              { val: countdown.minutes, label: "M" },
+              { val: countdown.seconds, label: "S" },
+            ].map(({ val, label }) => (
+              <div key={label} className="flex items-center gap-0.5">
+                <span className="bg-white/15 backdrop-blur-sm text-white font-mono text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded">
+                  {String(val).padStart(2, "0")}
+                </span>
+                <span className="text-white/50 text-[9px] font-medium">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
