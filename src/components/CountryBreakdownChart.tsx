@@ -333,8 +333,8 @@ export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
                               layout="vertical"
                               margin={{
                                 top: 0,
-                                right: 20,
-                                left: 10,
+                                right: 15,
+                                left: 0,
                                 bottom: 0,
                               }}
                             >
