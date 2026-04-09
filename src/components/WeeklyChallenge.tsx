@@ -224,7 +224,7 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
           <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <Trophy className="w-5 h-5 text-white" />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-white font-display text-lg sm:text-xl font-bold">
               Weekly Challenge
             </h2>
@@ -239,6 +239,29 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
               <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
             </div>
           )}
+        </div>
+
+        {/* Countdown timer */}
+        <div className="mt-3 flex items-center gap-2">
+          <Clock className="w-3.5 h-3.5 text-white/60" />
+          <span className="text-white/60 text-[10px] sm:text-xs uppercase tracking-wider font-medium">
+            Next challenge in
+          </span>
+          <div className="flex gap-1.5 ml-auto">
+            {[
+              { val: countdown.days, label: "D" },
+              { val: countdown.hours, label: "H" },
+              { val: countdown.minutes, label: "M" },
+              { val: countdown.seconds, label: "S" },
+            ].map(({ val, label }) => (
+              <div key={label} className="flex items-center gap-0.5">
+                <span className="bg-white/15 backdrop-blur-sm text-white font-mono text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded">
+                  {String(val).padStart(2, "0")}
+                </span>
+                <span className="text-white/50 text-[9px] font-medium">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
