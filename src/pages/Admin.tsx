@@ -244,7 +244,28 @@ export default function Admin() {
     fetchWeeklyPolls();
   }
 
-  async function handleApprove(pollId: string) {
+  async function handleGenerateWeekly() {
+    setGeneratingWeekly(true);
+    try {
+      const resp = await supabase.functions.invoke("generate-weekly-poll", { body: {} });
+      if (resp.error) throw resp.error;
+      const data = resp.data;
+      if (data?.success) {
+        toast.success(`Generated weekly challenge for ${data.week_start_date}: "${data.question}"`);
+        fetchWeeklyPolls();
+      } else if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.info(data?.message || "No open week was available");
+      }
+    } catch (err) {
+      toast.error("Failed to generate weekly challenge");
+      console.error(err);
+    } finally {
+      setGeneratingWeekly(false);
+    }
+  }
+
     const { error } = await supabase
       .from("polls")
       .update({ status: "approved", needs_review: false } as any)
