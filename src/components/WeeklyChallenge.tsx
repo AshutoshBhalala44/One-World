@@ -40,10 +40,9 @@ const optionAccents = [
 
 function getCurrentWeekStart(): string {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun, 1=Mon, ...
-  const diff = day === 0 ? 6 : day - 1; // days since Monday
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - diff);
+  const utcDay = now.getUTCDay(); // 0=Sun, 1=Mon, ...
+  const diff = utcDay === 0 ? 6 : utcDay - 1; // days since Monday
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff));
   return monday.toISOString().split("T")[0];
 }
 
