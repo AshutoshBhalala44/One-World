@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,7 +32,11 @@ const optionColors = [
   "bg-gold-light",
 ];
 
-export function DailyPoll() {
+interface DailyPollProps {
+  scrollRef?: React.RefObject<HTMLDivElement>;
+}
+
+export function DailyPoll({ scrollRef }: DailyPollProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [poll, setPoll] = useState<Poll | null>(null);
@@ -41,6 +45,7 @@ export function DailyPoll() {
   const [userVote, setUserVote] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [voting, setVoting] = useState(false);
+  const breakdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchTodaysPoll();
@@ -51,7 +56,6 @@ export function DailyPoll() {
     try {
       const today = new Date().toISOString().split("T")[0];
 
-      // Try today's poll first, then fall back to the most recent poll
       let { data: pollData } = await (supabase
         .from("polls")
         .select("*")
@@ -87,12 +91,10 @@ export function DailyPoll() {
 
       setOptions(optionsData || []);
 
-      // Fetch vote counts via secure function
       const { data: counts } = await supabase.rpc("get_poll_vote_counts");
       const filtered = (counts || []).filter((c: any) => c.poll_id === pollData.id);
       setVoteCounts(filtered);
 
-      // Check if user already voted
       if (user) {
         const { data: existingVote } = await supabase
           .from("votes")
@@ -134,10 +136,14 @@ export function DailyPoll() {
 
       setUserVote(optionId);
 
-      // Refresh vote counts via secure function
       const { data: counts } = await supabase.rpc("get_poll_vote_counts");
       const filtered = (counts || []).filter((c: any) => c.poll_id === poll.id);
       setVoteCounts(filtered);
+
+      // Auto-scroll to country breakdown after render
+      setTimeout(() => {
+        breakdownRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 600);
     } catch (err: any) {
       if (err.code === "23505") {
         toast.error("You've already voted on this poll");
@@ -175,6 +181,7 @@ export function DailyPoll() {
 
   return (
     <motion.div
+      ref={scrollRef as any}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl bg-card shadow-card overflow-hidden max-w-2xl mx-auto"
@@ -265,9 +272,12 @@ export function DailyPoll() {
         </div>
 
         {userVote && (
-          <CountryBreakdownChart
-            options={options.map((o) => ({ id: o.id, label: o.label }))}
-          />
+          <div ref={breakdownRef}>
+            <CountryBreakdownChart
+              options={options.map((o) => ({ id: o.id, label: o.label }))}
+              autoExpand
+            />
+          </div>
         )}
       </div>
     </motion.div>

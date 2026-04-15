@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Trophy, Loader2, Users, Lock, Sparkles, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { CountryBreakdownChart } from "./CountryBreakdownChart";
 
 interface WeeklyPollOption {
   id: string;
@@ -40,8 +41,8 @@ const optionAccents = [
 
 function getCurrentWeekStart(): string {
   const now = new Date();
-  const utcDay = now.getUTCDay(); // 0=Sun, 1=Mon, ...
-  const diff = utcDay === 0 ? 6 : utcDay - 1; // days since Monday
+  const utcDay = now.getUTCDay();
+  const diff = utcDay === 0 ? 6 : utcDay - 1;
   const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff));
   return monday.toISOString().split("T")[0];
 }
@@ -65,7 +66,12 @@ function formatCountdown(ms: number): { days: number; hours: number; minutes: nu
   return { days, hours, minutes, seconds };
 }
 
-export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean) => void }) {
+interface WeeklyChallengeProps {
+  onUnlocked: (unlocked: boolean) => void;
+  scrollRef?: React.RefObject<HTMLDivElement>;
+}
+
+export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [poll, setPoll] = useState<WeeklyPoll | null>(null);
@@ -76,8 +82,8 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
   const [voting, setVoting] = useState(false);
   const [noWeeklyPoll, setNoWeeklyPoll] = useState(false);
   const [countdown, setCountdown] = useState(() => formatCountdown(getNextMondayMidnight().getTime() - Date.now()));
+  const breakdownRef = useRef<HTMLDivElement>(null);
 
-  // Countdown timer
   useEffect(() => {
     const timer = setInterval(() => {
       const ms = getNextMondayMidnight().getTime() - Date.now();
@@ -86,7 +92,6 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
     return () => clearInterval(timer);
   }, []);
 
-  // Reset vote state when user changes (sign out/in)
   useEffect(() => {
     if (!user) {
       setUserVote(null);
@@ -109,7 +114,7 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
 
       if (!pollData) {
         setNoWeeklyPoll(true);
-        onUnlocked(true); // No weekly poll = auto-unlock daily
+        onUnlocked(true);
         setLoading(false);
         return;
       }
@@ -124,12 +129,10 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
 
       setOptions((optionsData || []) as any);
 
-      // Fetch vote counts
       const { data: counts } = await supabase.rpc("get_weekly_vote_counts");
       const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === (pollData as any).id);
       setVoteCounts(filtered as any);
 
-      // Check if user already voted
       if (user) {
         const { data: existingVote } = await supabase
           .from("weekly_votes")
@@ -149,7 +152,7 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
       }
     } catch (err) {
       console.error("Error fetching weekly poll:", err);
-      onUnlocked(true); // On error, don't block
+      onUnlocked(true);
     } finally {
       setLoading(false);
     }
@@ -178,12 +181,16 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
       setUserVote(optionId);
       onUnlocked(true);
 
-      // Refresh vote counts
       const { data: counts } = await supabase.rpc("get_weekly_vote_counts");
       const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === poll.id);
       setVoteCounts(filtered as any);
 
       toast.success("🎉 Weekly challenge answered! Daily challenges unlocked!");
+
+      // Auto-scroll to country breakdown after a brief delay for render
+      setTimeout(() => {
+        breakdownRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 600);
     } catch (err: any) {
       if (err.code === "23505") {
         toast.error("You've already answered this week's challenge");
@@ -218,6 +225,7 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
 
   return (
     <motion.div
+      ref={scrollRef as any}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl overflow-hidden max-w-2xl mx-auto mb-8"
@@ -347,6 +355,15 @@ export function WeeklyChallenge({ onUnlocked }: { onUnlocked: (unlocked: boolean
             );
           })}
         </div>
+
+        {hasVoted && (
+          <div ref={breakdownRef}>
+            <CountryBreakdownChart
+              options={options.map((o) => ({ id: o.id, label: o.label }))}
+              autoExpand
+            />
+          </div>
+        )}
       </div>
     </motion.div>
   );
