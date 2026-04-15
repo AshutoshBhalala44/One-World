@@ -244,17 +244,20 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                 </ResponsiveContainer>
               </div>
 
-              {/* Custom vertical legend */}
-              <div className="flex flex-col gap-1.5 mt-3 mb-1">
-                {options.map((opt, i) => (
-                  <div key={opt.id} className="flex items-center gap-2">
-                    <div
-                      className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
-                      style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
-                    />
-                    <span className="text-[11px] text-muted-foreground">{opt.label}</span>
-                  </div>
-                ))}
+              {/* Legend */}
+              <div className="mt-3 mb-1">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">Legend</p>
+                <div className="flex flex-col gap-1.5">
+                  {options.map((opt, i) => (
+                    <div key={opt.id} className="flex items-center gap-2">
+                      <div
+                        className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+                        style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                      />
+                      <span className="text-[11px] text-muted-foreground">{opt.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Search section */}
