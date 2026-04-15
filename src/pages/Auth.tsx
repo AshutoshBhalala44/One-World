@@ -97,7 +97,6 @@ const Auth = () => {
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
-    const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
