@@ -227,6 +227,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                     />
                     <Legend
                       wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
+                      align="left"
                       iconType="square"
                       iconSize={10}
                     />
