@@ -97,11 +97,17 @@ const Auth = () => {
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
+    const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
     if (value && index < 5) {
       otpRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-submit when all 6 digits are filled
+    if (value && index === 5 && newOtp.every((d) => d)) {
+      setTimeout(() => handleVerifyOtp(), 150);
     }
   };
 
@@ -124,6 +130,7 @@ const Auth = () => {
     setOtp(newOtp);
     if (pasted.length === 6) {
       otpRefs.current[5]?.focus();
+      setTimeout(() => handleVerifyOtp(), 150);
     }
   };
 
