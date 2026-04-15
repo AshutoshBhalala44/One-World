@@ -39,7 +39,7 @@ const Index = () => {
       <Header />
       <HeroSection />
 
-      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-10">
+      <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6">
         <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
 
         <Tabs defaultValue="today" className="w-full">
