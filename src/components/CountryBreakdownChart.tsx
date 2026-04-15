@@ -116,8 +116,8 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-export function CountryBreakdownChart({ options }: { options: OptionInfo[] }) {
-  const [expanded, setExpanded] = useState(true);
+export function CountryBreakdownChart({ options, autoExpand = false }: { options: OptionInfo[]; autoExpand?: boolean }) {
+  const [expanded, setExpanded] = useState(autoExpand);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<{

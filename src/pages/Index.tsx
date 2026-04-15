@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { DailyPoll } from "@/components/DailyPoll";
@@ -10,6 +10,29 @@ import { motion } from "framer-motion";
 
 const Index = () => {
   const [weeklyUnlocked, setWeeklyUnlocked] = useState(false);
+  const [initialScrollDone, setInitialScrollDone] = useState(false);
+  const weeklyRef = useRef<HTMLDivElement>(null);
+  const dailyRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to the active question after loading
+  useEffect(() => {
+    if (initialScrollDone) return;
+
+    // Wait for components to finish loading
+    const timer = setTimeout(() => {
+      if (!weeklyUnlocked && weeklyRef.current) {
+        // Weekly is unanswered — scroll to it
+        weeklyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        setInitialScrollDone(true);
+      } else if (weeklyUnlocked && dailyRef.current) {
+        // Weekly answered, scroll to daily
+        dailyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        setInitialScrollDone(true);
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [weeklyUnlocked, initialScrollDone]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -17,7 +40,7 @@ const Index = () => {
       <HeroSection />
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-10">
-        <WeeklyChallenge onUnlocked={setWeeklyUnlocked} />
+        <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
 
         <Tabs defaultValue="today" className="w-full">
           <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto">
@@ -33,7 +56,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="today">
-            {weeklyUnlocked ? <DailyPoll /> : <DailyLocked />}
+            {weeklyUnlocked ? <DailyPoll scrollRef={dailyRef} /> : <DailyLocked />}
           </TabsContent>
 
           <TabsContent value="responses">
