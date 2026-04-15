@@ -25,7 +25,7 @@ interface OptionInfo {
 const CHART_COLORS = [
   "hsl(262, 70%, 58%)",   // vibrant purple
   "hsl(40, 95%, 55%)",    // gold/amber
-  "hsl(172, 66%, 50%)",   // teal
+  "hsl(172, 42%, 52%)",   // muted teal
   "hsl(340, 75%, 60%)",   // rose/pink
 ];
 
