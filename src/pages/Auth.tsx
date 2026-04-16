@@ -38,8 +38,13 @@ const Auth = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      toast.success("Verification code sent to your phone!");
-      setOtp(["", "", "", "", "", ""]);
+      // Auto-fill OTP code (no SMS verification required)
+      if (data?.code) {
+        const digits = data.code.split("");
+        setOtp(digits);
+      }
+
+      toast.success("Verification code ready!");
       setStep("otp");
     } catch (err: any) {
       toast.error(err.message || "Failed to send verification code");
@@ -103,11 +108,6 @@ const Auth = () => {
     if (value && index < 5) {
       otpRefs.current[index + 1]?.focus();
     }
-
-    // Auto-submit when all 6 digits are filled
-    if (value && index === 5 && newOtp.every((d) => d)) {
-      setTimeout(() => handleVerifyOtp(), 150);
-    }
   };
 
   const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -129,7 +129,6 @@ const Auth = () => {
     setOtp(newOtp);
     if (pasted.length === 6) {
       otpRefs.current[5]?.focus();
-      setTimeout(() => handleVerifyOtp(), 150);
     }
   };
 

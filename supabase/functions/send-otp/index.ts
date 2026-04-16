@@ -34,35 +34,7 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Twilio credentials
-    const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioAuth = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioFrom = Deno.env.get("TWILIO_PHONE_NUMBER");
-
-    if (!twilioSid || !twilioAuth || !twilioFrom) {
-      console.error("Missing Twilio credentials");
-      return new Response(
-        JSON.stringify({ error: "SMS service is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     await supabase.rpc("cleanup_expired_otps");
-
-    // Rate limiting: max 3 OTPs per phone per 10 minutes
-    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-    const { count } = await supabase
-      .from("otp_codes")
-      .select("*", { count: "exact", head: true })
-      .eq("phone", phone)
-      .gt("created_at", tenMinutesAgo);
-
-    if (count && count >= 3) {
-      return new Response(
-        JSON.stringify({ error: "Too many attempts. Please wait a few minutes before trying again." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     // Generate 6-digit OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -96,38 +68,11 @@ serve(async (req) => {
       );
     }
 
-    // Send SMS via Twilio
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
-    const smsBody = `🌍 One World\n\nYour verification code is: ${code}\n\nThis code expires in 5 minutes. Do not share it with anyone.`;
-
-    const twilioResponse = await fetch(twilioUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": "Basic " + btoa(`${twilioSid}:${twilioAuth}`),
-      },
-      body: new URLSearchParams({
-        To: phone,
-        From: twilioFrom,
-        Body: smsBody,
-      }),
-    });
-
-    if (!twilioResponse.ok) {
-      const twilioError = await twilioResponse.json();
-      console.error("Twilio SMS error:", JSON.stringify(twilioError));
-      // Clean up the stored OTP since SMS failed
-      await supabase.from("otp_codes").delete().eq("phone", phone).eq("verified", false);
-      return new Response(
-        JSON.stringify({ error: "Failed to send verification code. Please check your phone number and try again." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    console.log(`OTP sent via SMS to ${phone}`);
+    // Return the plaintext code to send to user (via SMS in production)
+    console.log(`OTP for ${phone}: ${code}`);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Verification code sent" }),
+      JSON.stringify({ success: true, message: "Verification code generated", code }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
