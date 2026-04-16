@@ -9,27 +9,25 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 
 const Index = () => {
-  const [weeklyUnlocked, setWeeklyUnlocked] = useState(false);
+  const [weeklyUnlocked, setWeeklyUnlocked] = useState<boolean | null>(null);
   const [initialScrollDone, setInitialScrollDone] = useState(false);
   const weeklyRef = useRef<HTMLDivElement>(null);
   const dailyRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to the active question after loading
+  // Auto-scroll to the active question once weekly state is known
   useEffect(() => {
     if (initialScrollDone) return;
+    if (weeklyUnlocked === null) return; // wait until fetch completes
 
-    // Wait for components to finish loading
     const timer = setTimeout(() => {
       if (!weeklyUnlocked && weeklyRef.current) {
-        // Weekly is unanswered — scroll to it
-        weeklyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        weeklyRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
         setInitialScrollDone(true);
       } else if (weeklyUnlocked && dailyRef.current) {
-        // Weekly answered, scroll to daily
         dailyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
         setInitialScrollDone(true);
       }
-    }, 800);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [weeklyUnlocked, initialScrollDone]);
