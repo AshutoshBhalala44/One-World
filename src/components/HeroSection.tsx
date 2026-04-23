@@ -13,27 +13,29 @@ export function HeroSection() {
           loading="eager"
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/60 via-navy/40 to-background" />
+      {/* Subtle vignette so the corner card stays readable, but most of the globe stays clear */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-navy-deep/70 via-transparent to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background" />
 
-      <div className="relative container mx-auto px-4 py-12 sm:py-20 md:py-28">
+      <div className="relative container mx-auto px-4 min-h-[60vh] sm:min-h-[70vh] flex items-end py-8 sm:py-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="max-w-2xl"
+          className="max-w-md sm:max-w-lg rounded-2xl border border-foreground/10 bg-background/40 backdrop-blur-md p-5 sm:p-6 shadow-2xl"
         >
-          <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight mb-3 sm:mb-4">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight mb-2 sm:mb-3">
             Every voice counts.
             <br />
             <span className="text-gradient-gold">No manipulation.</span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl opacity-80 leading-relaxed mb-4 sm:mb-6 max-w-lg font-body">
+          <p className="text-sm sm:text-base opacity-80 leading-relaxed mb-3 sm:mb-4 font-body">
             The world's most transparent polling platform. See where the world
-            truly stands on the issues that matter — broken down by country, in real time.
+            truly stands — broken down by country, in real time.
           </p>
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm opacity-60">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs opacity-70">
             <span className="flex items-center gap-1.5">🌍 190+ countries</span>
-            <span className="flex items-center gap-1.5">📊 Real-time results</span>
+            <span className="flex items-center gap-1.5">📊 Real-time</span>
             <span className="flex items-center gap-1.5">🔒 Tamper-proof</span>
           </div>
         </motion.div>
