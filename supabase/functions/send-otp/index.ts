@@ -7,6 +7,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const TWILIO_GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -33,6 +35,32 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
+    const TWILIO_PHONE_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "SMS service is not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (!TWILIO_API_KEY) {
+      console.error("TWILIO_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "SMS service is not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    if (!TWILIO_PHONE_NUMBER) {
+      console.error("TWILIO_PHONE_NUMBER is not configured");
+      return new Response(
+        JSON.stringify({ error: "SMS sender number is not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     await supabase.rpc("cleanup_expired_otps");
 
@@ -68,11 +96,42 @@ serve(async (req) => {
       );
     }
 
-    // Return the plaintext code to send to user (via SMS in production)
-    console.log(`OTP for ${phone}: ${code}`);
+    // Send SMS via Twilio gateway
+    const twilioResponse = await fetch(`${TWILIO_GATEWAY_URL}/Messages.json`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "X-Connection-Api-Key": TWILIO_API_KEY,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        To: phone,
+        From: TWILIO_PHONE_NUMBER,
+        Body: `Your One World verification code is ${code}. It expires in 5 minutes.`,
+      }),
+    });
+
+    const twilioData = await twilioResponse.json();
+
+    if (!twilioResponse.ok) {
+      console.error("Twilio send failed:", twilioResponse.status, twilioData);
+      // Roll back the stored OTP so a retry isn't blocked
+      await supabase
+        .from("otp_codes")
+        .delete()
+        .eq("phone", phone)
+        .eq("verified", false);
+
+      return new Response(
+        JSON.stringify({ error: "Failed to send verification code. Please try again." }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`OTP sent to ${phone} (Twilio SID: ${twilioData.sid})`);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Verification code generated", code }),
+      JSON.stringify({ success: true, message: "Verification code sent" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
