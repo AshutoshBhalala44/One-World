@@ -4,10 +4,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const TWILIO_GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
+const phoneRegex = /^\+[1-9]\d{1,14}$/;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -24,7 +25,6 @@ serve(async (req) => {
       );
     }
 
-    const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(phone)) {
       return new Response(
         JSON.stringify({ error: "Invalid phone number format. Use E.164 format (e.g., +1234567890)" }),
@@ -40,35 +40,30 @@ serve(async (req) => {
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
     const TWILIO_PHONE_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
 
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
+    if (!LOVABLE_API_KEY || !TWILIO_API_KEY) {
+      console.error("Twilio gateway credentials are not configured");
       return new Response(
-        JSON.stringify({ error: "SMS service is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "SMS service is not configured", fallback: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    if (!TWILIO_API_KEY) {
-      console.error("TWILIO_API_KEY is not configured");
+
+    if (!TWILIO_PHONE_NUMBER || !phoneRegex.test(TWILIO_PHONE_NUMBER)) {
+      console.error("TWILIO_PHONE_NUMBER is invalid or missing", TWILIO_PHONE_NUMBER);
       return new Response(
-        JSON.stringify({ error: "SMS service is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-    if (!TWILIO_PHONE_NUMBER) {
-      console.error("TWILIO_PHONE_NUMBER is not configured");
-      return new Response(
-        JSON.stringify({ error: "SMS sender number is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: "SMS sender number is invalid. Set TWILIO_PHONE_NUMBER in E.164 format, for example +15551234567.",
+          fallback: true,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     await supabase.rpc("cleanup_expired_otps");
 
-    // Generate 6-digit OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
-    // Hash the OTP before storing
     const encoder = new TextEncoder();
     const data = encoder.encode(code);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -76,14 +71,12 @@ serve(async (req) => {
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
 
-    // Invalidate previous codes for this phone
     await supabase
       .from("otp_codes")
       .delete()
       .eq("phone", phone)
       .eq("verified", false);
 
-    // Store hashed OTP
     const { error: insertError } = await supabase
       .from("otp_codes")
       .insert({ phone, code: hashedCode, expires_at: expiresAt });
@@ -91,12 +84,11 @@ serve(async (req) => {
     if (insertError) {
       console.error("Failed to store OTP:", insertError);
       return new Response(
-        JSON.stringify({ error: "Failed to generate verification code" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "Failed to generate verification code", fallback: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Send SMS via Twilio gateway
     const twilioResponse = await fetch(`${TWILIO_GATEWAY_URL}/Messages.json`, {
       method: "POST",
       headers: {
@@ -115,16 +107,22 @@ serve(async (req) => {
 
     if (!twilioResponse.ok) {
       console.error("Twilio send failed:", twilioResponse.status, twilioData);
-      // Roll back the stored OTP so a retry isn't blocked
+
       await supabase
         .from("otp_codes")
         .delete()
         .eq("phone", phone)
         .eq("verified", false);
 
+      const twilioMessage = typeof twilioData?.message === "string" ? twilioData.message : null;
+      const errorMessage =
+        twilioResponse.status === 400 && twilioMessage
+          ? `Twilio rejected the SMS: ${twilioMessage}`
+          : "Failed to send verification code. Please try again.";
+
       return new Response(
-        JSON.stringify({ error: "Failed to send verification code. Please try again." }),
-        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: errorMessage, fallback: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -137,8 +135,8 @@ serve(async (req) => {
   } catch (error) {
     console.error("send-otp error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: "Failed to send verification code. Please try again.", fallback: true }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
