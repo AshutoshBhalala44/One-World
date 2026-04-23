@@ -383,6 +383,18 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
         </div>
 
         {hasVoted && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={handleChangeAnswer}
+              disabled={voting}
+              className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 disabled:opacity-50"
+            >
+              {voting ? "Updating…" : "Change my answer"}
+            </button>
+          </div>
+        )}
+
+        {hasVoted && (
           <div ref={breakdownRef}>
             <CountryBreakdownChart
               options={options.map((o) => ({ id: o.id, label: o.label }))}
