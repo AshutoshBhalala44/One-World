@@ -158,6 +158,32 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
     }
   }
 
+  async function handleChangeAnswer() {
+    if (!user || !poll || !userVote) return;
+    setVoting(true);
+    try {
+      const { error } = await supabase
+        .from("weekly_votes")
+        .delete()
+        .eq("weekly_poll_id", poll.id)
+        .eq("user_id", user.id);
+      if (error) throw error;
+
+      setUserVote(null);
+      onUnlocked(false);
+
+      const { data: counts } = await supabase.rpc("get_weekly_vote_counts");
+      const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === poll.id);
+      setVoteCounts(filtered as any);
+
+      toast.success("Pick a new answer");
+    } catch (err) {
+      toast.error("Failed to change answer");
+    } finally {
+      setVoting(false);
+    }
+  }
+
   async function handleVote(optionId: string) {
     if (!user) {
       toast.error("Sign in to answer the weekly challenge", {
@@ -355,6 +381,18 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
             );
           })}
         </div>
+
+        {hasVoted && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={handleChangeAnswer}
+              disabled={voting}
+              className="text-xs font-medium text-muted-foreground hover:text-foreground underline underline-offset-4 disabled:opacity-50"
+            >
+              {voting ? "Updating…" : "Change my answer"}
+            </button>
+          </div>
+        )}
 
         {hasVoted && (
           <div ref={breakdownRef}>

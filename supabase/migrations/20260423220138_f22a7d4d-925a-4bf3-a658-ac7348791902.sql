@@ -1,0 +1,1 @@
+CREATE POLICY "Users can delete own weekly vote" ON public.weekly_votes FOR DELETE TO authenticated USING (auth.uid() = user_id);
