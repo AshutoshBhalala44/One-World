@@ -350,7 +350,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               layout="vertical"
                               margin={{
                                 top: 0,
-                                right: 15,
+                                right: isMobile ? 8 : 15,
                                 left: 0,
                                 bottom: 0,
                               }}
@@ -369,9 +369,9 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               <YAxis
                                 type="category"
                                 dataKey="name"
-                                width={120}
+                                width={yAxisWidth}
                                 tick={{
-                                  fontSize: 15,
+                                  fontSize: yAxisFontSize,
                                   fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
