@@ -216,8 +216,8 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={90}
-                      tick={{ fontSize: 11, fill: AXIS_TEXT_COLOR }}
+                      width={110}
+                      tick={{ fontSize: 13, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
