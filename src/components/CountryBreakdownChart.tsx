@@ -245,14 +245,16 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
               </div>
 
               {/* Legend */}
-              <div className="flex flex-col gap-2 mt-3 mb-1">
+              <div className="flex flex-col gap-2 mt-4 mb-1 w-full">
                 {options.map((opt, i) => (
-                  <div key={opt.id} className="flex items-center gap-2.5">
+                  <div key={opt.id} className="flex items-start gap-2.5 w-full">
                     <div
-                      className="w-4 h-4 flex-shrink-0"
+                      className="w-4 h-4 mt-0.5 flex-shrink-0"
                       style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
                     />
-                    <span className="text-sm text-muted-foreground">{opt.label}</span>
+                    <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 flex-1">
+                      {opt.label}
+                    </span>
                   </div>
                 ))}
               </div>
