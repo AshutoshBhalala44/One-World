@@ -98,7 +98,7 @@ const CURSOR_COLOR = "hsl(220, 20%, 50%, 0.15)";
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-xs">
+    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-xs max-w-[220px] break-words">
       <p className="font-semibold text-foreground mb-1">{label}</p>
       {payload.map((entry: any) => (
         <div key={entry.name} className="flex items-center gap-2">
@@ -224,6 +224,9 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                     <Tooltip
                       content={<CustomTooltip />}
                       cursor={{ fill: CURSOR_COLOR }}
+                      wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
+                      allowEscapeViewBox={{ x: false, y: false }}
+                      offset={12}
                     />
                     {options.map((opt, i) => (
                       <Bar
@@ -375,6 +378,9 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                                 cursor={{
                                   fill: CURSOR_COLOR,
                                 }}
+                                wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
+                                allowEscapeViewBox={{ x: false, y: false }}
+                                offset={12}
                               />
                               {options.map((opt, i) => (
                                 <Bar
