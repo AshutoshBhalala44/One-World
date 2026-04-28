@@ -378,6 +378,9 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                                 cursor={{
                                   fill: CURSOR_COLOR,
                                 }}
+                                wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
+                                allowEscapeViewBox={{ x: false, y: false }}
+                                offset={12}
                               />
                               {options.map((opt, i) => (
                                 <Bar
