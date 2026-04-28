@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CountryData {
   country: string;
