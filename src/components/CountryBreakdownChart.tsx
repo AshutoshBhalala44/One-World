@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CountryData {
   country: string;
@@ -117,6 +118,9 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function CountryBreakdownChart({ options, autoExpand = false }: { options: OptionInfo[]; autoExpand?: boolean }) {
+  const isMobile = useIsMobile();
+  const yAxisWidth = isMobile ? 95 : 120;
+  const yAxisFontSize = isMobile ? 12 : 15;
   const [expanded, setExpanded] = useState(autoExpand);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -192,7 +196,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 rounded-lg bg-secondary/30 p-4">
+            <div className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
               {/* Default chart */}
               <div
                 className="w-full"
@@ -202,7 +206,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                   <BarChart
                     data={chartData}
                     layout="vertical"
-                    margin={{ top: 5, right: 15, left: 0, bottom: 5 }}
+                    margin={{ top: 5, right: isMobile ? 8 : 15, left: 0, bottom: 5 }}
                     barCategoryGap="20%"
                   >
                     <XAxis
@@ -216,8 +220,8 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                     <YAxis
                       type="category"
                       dataKey="name"
-                      width={120}
-                      tick={{ fontSize: 15, fill: AXIS_TEXT_COLOR }}
+                      width={yAxisWidth}
+                      tick={{ fontSize: yAxisFontSize, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -346,7 +350,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               layout="vertical"
                               margin={{
                                 top: 0,
-                                right: 15,
+                                right: isMobile ? 8 : 15,
                                 left: 0,
                                 bottom: 0,
                               }}
@@ -365,9 +369,9 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               <YAxis
                                 type="category"
                                 dataKey="name"
-                                width={120}
+                                width={yAxisWidth}
                                 tick={{
-                                  fontSize: 15,
+                                  fontSize: yAxisFontSize,
                                   fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
