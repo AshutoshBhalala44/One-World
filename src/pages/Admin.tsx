@@ -506,7 +506,7 @@ export default function Admin() {
       setShowCreateForm(false);
       setNewQuestion("");
       setNewCategory("general");
-      setNewOptions(["", "", "", ""]);
+      setNewOptions(["", ""]);
       setNewDate(new Date().toISOString().split("T")[0]);
       fetchPolls();
     } catch (err: any) {
