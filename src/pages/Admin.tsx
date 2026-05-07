@@ -88,6 +88,7 @@ export default function Admin() {
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [creating, setCreating] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(new Date());
+  const [activeTab, setActiveTab] = useState("polls");
 
   // Weekly polls state
   const [weeklyPolls, setWeeklyPolls] = useState<WeeklyPollWithOptions[]>([]);
@@ -623,29 +624,31 @@ export default function Admin() {
               Manage polls, review AI-generated content, and administer users.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              size="sm"
-              variant={showCreateForm ? "secondary" : "default"}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {showCreateForm ? "Cancel" : "Create Poll"}
-            </Button>
-            <Button
-              onClick={handleGenerateNow}
-              disabled={generating}
-              variant="outline"
-              size="sm"
-            >
-              {generating ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <RefreshCw className="w-4 h-4 mr-2" />
-              )}
-              AI Generate
-            </Button>
-          </div>
+          {activeTab === "polls" && (
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                size="sm"
+                variant={showCreateForm ? "secondary" : "default"}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {showCreateForm ? "Cancel" : "Create Poll"}
+              </Button>
+              <Button
+                onClick={handleGenerateNow}
+                disabled={generating}
+                variant="outline"
+                size="sm"
+              >
+                {generating ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                )}
+                AI Generate
+              </Button>
+            </div>
+          )}
         </div>
 
         {showCreateForm && (
@@ -789,7 +792,7 @@ export default function Admin() {
           </motion.div>
         )}
 
-        <Tabs defaultValue="polls" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="polls">📊 Polls</TabsTrigger>
             <TabsTrigger value="weekly">🏆 Weekly</TabsTrigger>
