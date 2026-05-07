@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
-import { HeroSection } from "@/components/HeroSection";
 import { DailyPoll } from "@/components/DailyPoll";
 import { MyResponses } from "@/components/MyResponses";
 import { SubmitQuestion } from "@/components/SubmitQuestion";
@@ -35,7 +34,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <HeroSection />
+
 
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6">
         <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
