@@ -1042,7 +1042,7 @@ export default function Admin() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                               <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{wp.category}</span>
-                              <span className="text-xs text-muted-foreground">Week of {wp.week_start_date}</span>
+                              <span className="text-xs text-muted-foreground">{wp.end_date ? `${wp.week_start_date} → ${wp.end_date}` : `Week of ${wp.week_start_date}`}</span>
                               {wp.needs_review && (
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-semibold uppercase tracking-wider">
                                   Needs Review
