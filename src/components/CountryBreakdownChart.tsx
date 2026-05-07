@@ -160,7 +160,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
     ? [
         (() => {
           const row: Record<string, any> = {
-            name: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
+            name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
           };
           options.forEach((opt) => {
             row[opt.label] = selectedBreakdown.results[opt.id] || 0;
