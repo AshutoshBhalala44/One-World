@@ -665,23 +665,48 @@ export default function Admin() {
 
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                  Options (2–4)
+                  Options ({newOptions.length}/4)
                 </label>
                 <div className="space-y-2">
                   {newOptions.map((opt, i) => (
-                    <input
-                      key={i}
-                      value={opt}
-                      onChange={(e) => {
-                        const updated = [...newOptions];
-                        updated[i] = e.target.value;
-                        setNewOptions(updated);
-                      }}
-                      placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`}
-                      className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground"
-                      maxLength={100}
-                    />
+                    <div key={i} className="flex gap-2">
+                      <input
+                        value={opt}
+                        onChange={(e) => {
+                          const updated = [...newOptions];
+                          updated[i] = e.target.value;
+                          setNewOptions(updated);
+                        }}
+                        placeholder={`Option ${i + 1}`}
+                        className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground"
+                        maxLength={100}
+                      />
+                      {newOptions.length > 2 && (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="h-9 w-9 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                          onClick={() => setNewOptions(newOptions.filter((_, idx) => idx !== i))}
+                          title="Remove option"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   ))}
+                  {newOptions.length < 4 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setNewOptions([...newOptions, ""])}
+                      className="text-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" />
+                      Add option
+                    </Button>
+                  )}
                 </div>
               </div>
 
