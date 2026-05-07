@@ -34,7 +34,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <HeroSection />
+
 
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6">
         <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
