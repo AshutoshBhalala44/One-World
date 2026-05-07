@@ -256,6 +256,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          end_date: string | null
           id: string
           needs_review: boolean
           question: string
@@ -265,6 +266,7 @@ export type Database = {
         Insert: {
           category?: string
           created_at?: string
+          end_date?: string | null
           id?: string
           needs_review?: boolean
           question: string
@@ -274,6 +276,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          end_date?: string | null
           id?: string
           needs_review?: boolean
           question?: string

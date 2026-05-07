@@ -59,6 +59,7 @@ interface WeeklyPollWithOptions {
   question: string;
   category: string;
   week_start_date: string;
+  end_date?: string | null;
   status: string;
   needs_review: boolean;
   created_at: string;
@@ -83,7 +84,7 @@ export default function Admin() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newQuestion, setNewQuestion] = useState("");
   const [newCategory, setNewCategory] = useState("general");
-  const [newOptions, setNewOptions] = useState(["", "", "", ""]);
+  const [newOptions, setNewOptions] = useState(["", ""]);
   const [newDate, setNewDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [creating, setCreating] = useState(false);
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(new Date());
@@ -94,11 +95,12 @@ export default function Admin() {
   const [showWeeklyForm, setShowWeeklyForm] = useState(false);
   const [weeklyQuestion, setWeeklyQuestion] = useState("");
   const [weeklyCategory, setWeeklyCategory] = useState("general");
-  const [weeklyOptions, setWeeklyOptions] = useState(["", "", "", ""]);
+  const [weeklyOptions, setWeeklyOptions] = useState(["", ""]);
   const [weeklyDate, setWeeklyDate] = useState(() => {
     const next = startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 });
     return format(next, "yyyy-MM-dd");
   });
+  const [weeklyEndDate, setWeeklyEndDate] = useState<string>("");
   const [creatingWeekly, setCreatingWeekly] = useState(false);
   const [generatingWeekly, setGeneratingWeekly] = useState(false);
   const [editingWeekly, setEditingWeekly] = useState<string | null>(null);
@@ -219,20 +221,25 @@ export default function Admin() {
     if (!weeklyQuestion.trim()) { toast.error("Please enter a question"); return; }
     const validOpts = weeklyOptions.filter((o) => o.trim());
     if (validOpts.length < 2) { toast.error("At least 2 options required"); return; }
+    if (weeklyEndDate && weeklyEndDate < weeklyDate) {
+      toast.error("End date must be on or after the start date");
+      return;
+    }
     setCreatingWeekly(true);
     try {
       const { data: newPoll, error: pollErr } = await supabase
         .from("weekly_polls")
-        .insert({ question: weeklyQuestion.trim(), category: weeklyCategory, week_start_date: weeklyDate, status: "approved", needs_review: false } as any)
+        .insert({ question: weeklyQuestion.trim(), category: weeklyCategory, week_start_date: weeklyDate, end_date: weeklyEndDate || null, status: "approved", needs_review: false } as any)
         .select("id").single();
       if (pollErr) throw pollErr;
       const optionRows = validOpts.map((label, idx) => ({ weekly_poll_id: (newPoll as any).id, label: label.trim(), sort_order: idx }));
       const { error: optErr } = await supabase.from("weekly_poll_options").insert(optionRows);
       if (optErr) throw optErr;
-      toast.success("Weekly poll created!");
+      toast.success("Weekly challenge created!");
       setShowWeeklyForm(false);
-      setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", "", "", ""]);
+      setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", ""]);
       setWeeklyDate(format(startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 }), "yyyy-MM-dd"));
+      setWeeklyEndDate("");
       fetchWeeklyPolls();
     } catch (err: any) { toast.error("Failed: " + (err.message || "Unknown error")); }
     finally { setCreatingWeekly(false); }
@@ -500,7 +507,7 @@ export default function Admin() {
       setShowCreateForm(false);
       setNewQuestion("");
       setNewCategory("general");
-      setNewOptions(["", "", "", ""]);
+      setNewOptions(["", ""]);
       setNewDate(new Date().toISOString().split("T")[0]);
       fetchPolls();
     } catch (err: any) {
@@ -659,23 +666,48 @@ export default function Admin() {
 
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">
-                  Options (2–4)
+                  Options ({newOptions.length}/4)
                 </label>
                 <div className="space-y-2">
                   {newOptions.map((opt, i) => (
-                    <input
-                      key={i}
-                      value={opt}
-                      onChange={(e) => {
-                        const updated = [...newOptions];
-                        updated[i] = e.target.value;
-                        setNewOptions(updated);
-                      }}
-                      placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`}
-                      className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground"
-                      maxLength={100}
-                    />
+                    <div key={i} className="flex gap-2">
+                      <input
+                        value={opt}
+                        onChange={(e) => {
+                          const updated = [...newOptions];
+                          updated[i] = e.target.value;
+                          setNewOptions(updated);
+                        }}
+                        placeholder={`Option ${i + 1}`}
+                        className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground"
+                        maxLength={100}
+                      />
+                      {newOptions.length > 2 && (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="h-9 w-9 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                          onClick={() => setNewOptions(newOptions.filter((_, idx) => idx !== i))}
+                          title="Remove option"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   ))}
+                  {newOptions.length < 4 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setNewOptions([...newOptions, ""])}
+                      className="text-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" />
+                      Add option
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -916,7 +948,7 @@ export default function Admin() {
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
                       <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Category</label>
                         <select value={weeklyCategory} onChange={(e) => setWeeklyCategory(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground">
@@ -926,16 +958,34 @@ export default function Admin() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Week Start (Monday)</label>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Start Date (Monday)</label>
                         <input type="date" value={weeklyDate} onChange={(e) => setWeeklyDate(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
                       </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">End Date (optional)</label>
+                        <input type="date" value={weeklyEndDate} onChange={(e) => setWeeklyEndDate(e.target.value)} min={weeklyDate} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
+                      </div>
                     </div>
+                    <p className="text-[11px] text-muted-foreground -mt-1">Leave end date empty for a single week. Set it to extend the challenge across multiple weeks.</p>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Options (2–4)</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Options ({weeklyOptions.length}/4)</label>
                       <div className="space-y-2">
                         {weeklyOptions.map((opt, i) => (
-                          <input key={i} value={opt} onChange={(e) => { const u = [...weeklyOptions]; u[i] = e.target.value; setWeeklyOptions(u); }} placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`} className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
+                          <div key={i} className="flex gap-2">
+                            <input value={opt} onChange={(e) => { const u = [...weeklyOptions]; u[i] = e.target.value; setWeeklyOptions(u); }} placeholder={`Option ${i + 1}`} className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
+                            {weeklyOptions.length > 2 && (
+                              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-destructive hover:bg-destructive/10 flex-shrink-0" onClick={() => setWeeklyOptions(weeklyOptions.filter((_, idx) => idx !== i))} title="Remove option">
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
                         ))}
+                        {weeklyOptions.length < 4 && (
+                          <Button type="button" size="sm" variant="ghost" onClick={() => setWeeklyOptions([...weeklyOptions, ""])} className="text-xs">
+                            <Plus className="w-3.5 h-3.5 mr-1" />
+                            Add option
+                          </Button>
+                        )}
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
@@ -992,7 +1042,7 @@ export default function Admin() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                               <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{wp.category}</span>
-                              <span className="text-xs text-muted-foreground">Week of {wp.week_start_date}</span>
+                              <span className="text-xs text-muted-foreground">{wp.end_date ? `${wp.week_start_date} → ${wp.end_date}` : `Week of ${wp.week_start_date}`}</span>
                               {wp.needs_review && (
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-semibold uppercase tracking-wider">
                                   Needs Review

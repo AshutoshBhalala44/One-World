@@ -1,0 +1,1 @@
+ALTER TABLE public.weekly_polls ADD COLUMN IF NOT EXISTS end_date date;
