@@ -209,7 +209,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                   <BarChart
                     data={chartData}
                     layout="vertical"
-                    margin={{ top: 5, right: isMobile ? 8 : 15, left: 0, bottom: 5 }}
+                    margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
                     barCategoryGap="20%"
                   >
                     <XAxis
