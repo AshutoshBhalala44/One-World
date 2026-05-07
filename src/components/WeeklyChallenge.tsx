@@ -103,14 +103,21 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
   async function fetchWeeklyPoll() {
     setLoading(true);
     try {
+      const today = new Date().toISOString().split("T")[0];
       const weekStart = getCurrentWeekStart();
 
-      const { data: pollData } = await (supabase
+      // Find an active challenge: either spans today (end_date >= today AND week_start_date <= today)
+      // or matches this week's Monday for legacy single-week challenges (end_date is null).
+      const { data: spanningPolls } = await (supabase
         .from("weekly_polls")
-        .select("*")
-        .eq("week_start_date", weekStart) as any)
+        .select("*") as any)
         .neq("status", "rejected")
-        .maybeSingle();
+        .lte("week_start_date", today)
+        .or(`end_date.gte.${today},and(end_date.is.null,week_start_date.eq.${weekStart})`)
+        .order("week_start_date", { ascending: false })
+        .limit(1);
+
+      const pollData = spanningPolls && spanningPolls.length > 0 ? spanningPolls[0] : null;
 
       if (!pollData) {
         setNoWeeklyPoll(true);
