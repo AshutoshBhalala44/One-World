@@ -120,8 +120,9 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export function CountryBreakdownChart({ options, autoExpand = false }: { options: OptionInfo[]; autoExpand?: boolean }) {
   const isMobile = useIsMobile();
-  const yAxisWidth = isMobile ? 95 : 120;
-  const yAxisFontSize = isMobile ? 12 : 15;
+  const yAxisWidth = isMobile ? 70 : 120;
+  const yAxisFontSize = isMobile ? 13 : 15;
+  const chartRightMargin = isMobile ? 24 : 15;
   const [expanded, setExpanded] = useState(autoExpand);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -208,7 +209,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                   <BarChart
                     data={chartData}
                     layout="vertical"
-                    margin={{ top: 5, right: isMobile ? 8 : 15, left: 0, bottom: 5 }}
+                    margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
                     barCategoryGap="20%"
                   >
                     <XAxis
@@ -352,7 +353,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               layout="vertical"
                               margin={{
                                 top: 0,
-                                right: isMobile ? 8 : 15,
+                                right: chartRightMargin,
                                 left: 0,
                                 bottom: 0,
                               }}
