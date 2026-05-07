@@ -1096,25 +1096,80 @@ export default function Admin() {
                             </div>
 
                             {isEditing ? (
-                              <div className="space-y-2">
-                                <input
-                                  value={editWeeklyQuestion}
-                                  onChange={(e) => setEditWeeklyQuestion(e.target.value)}
-                                  className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
-                                />
-                                {editWeeklyOptions.map((opt, j) => (
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
                                   <input
-                                    key={j}
-                                    value={opt}
-                                    onChange={(e) => {
-                                      const newOpts = [...editWeeklyOptions];
-                                      newOpts[j] = e.target.value;
-                                      setEditWeeklyOptions(newOpts);
-                                    }}
-                                    className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground"
-                                    placeholder={`Option ${j + 1}`}
+                                    value={editWeeklyQuestion}
+                                    onChange={(e) => setEditWeeklyQuestion(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
                                   />
-                                ))}
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Start Date (Monday)</label>
+                                    <input
+                                      type="date"
+                                      value={editWeeklyStartDate}
+                                      onChange={(e) => setEditWeeklyStartDate(e.target.value)}
+                                      className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1 block">End Date (optional)</label>
+                                    <input
+                                      type="date"
+                                      value={editWeeklyEndDate}
+                                      min={editWeeklyStartDate}
+                                      onChange={(e) => setEditWeeklyEndDate(e.target.value)}
+                                      className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground"
+                                    />
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-xs font-medium text-muted-foreground mb-1 block">Options ({editWeeklyOptions.length}/4)</label>
+                                  <div className="space-y-2">
+                                    {editWeeklyOptions.map((opt, j) => (
+                                      <div key={j} className="flex gap-2">
+                                        <input
+                                          value={opt.label}
+                                          onChange={(e) => {
+                                            const newOpts = [...editWeeklyOptions];
+                                            newOpts[j] = { ...newOpts[j], label: e.target.value };
+                                            setEditWeeklyOptions(newOpts);
+                                          }}
+                                          className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground"
+                                          placeholder={`Option ${j + 1}`}
+                                          maxLength={100}
+                                        />
+                                        {editWeeklyOptions.length > 2 && (
+                                          <Button
+                                            type="button"
+                                            size="icon"
+                                            variant="ghost"
+                                            className="h-9 w-9 text-destructive hover:bg-destructive/10 flex-shrink-0"
+                                            onClick={() => setEditWeeklyOptions(editWeeklyOptions.filter((_, idx) => idx !== j))}
+                                            title="Remove option"
+                                          >
+                                            <X className="w-4 h-4" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    ))}
+                                    {editWeeklyOptions.length < 4 && (
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => setEditWeeklyOptions([...editWeeklyOptions, { label: "" }])}
+                                        className="text-xs"
+                                      >
+                                        <Plus className="w-3.5 h-3.5 mr-1" />
+                                        Add option
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
                                 <div className="flex gap-2 mt-2">
                                   <Button size="sm" onClick={() => saveEditWeekly(wp)}>Save</Button>
                                   <Button size="sm" variant="ghost" onClick={() => setEditingWeekly(null)}>Cancel</Button>
