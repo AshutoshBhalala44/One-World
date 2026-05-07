@@ -15,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface CountryData {
   country: string;
   flag: string;
+  code: string;
   results: Record<string, number>;
 }
 
@@ -30,43 +31,43 @@ const CHART_COLORS = [
   "hsl(340, 75%, 60%)",   // rose/pink
 ];
 
-const ALL_COUNTRIES: { country: string; flag: string }[] = [
-  { country: "United States", flag: "🇺🇸" },
-  { country: "United Kingdom", flag: "🇬🇧" },
-  { country: "India", flag: "🇮🇳" },
-  { country: "Germany", flag: "🇩🇪" },
-  { country: "Brazil", flag: "🇧🇷" },
-  { country: "Japan", flag: "🇯🇵" },
-  { country: "Canada", flag: "🇨🇦" },
-  { country: "Australia", flag: "🇦🇺" },
-  { country: "France", flag: "🇫🇷" },
-  { country: "Mexico", flag: "🇲🇽" },
-  { country: "South Korea", flag: "🇰🇷" },
-  { country: "Italy", flag: "🇮🇹" },
-  { country: "Spain", flag: "🇪🇸" },
-  { country: "Nigeria", flag: "🇳🇬" },
-  { country: "South Africa", flag: "🇿🇦" },
-  { country: "Argentina", flag: "🇦🇷" },
-  { country: "Indonesia", flag: "🇮🇩" },
-  { country: "Turkey", flag: "🇹🇷" },
-  { country: "Saudi Arabia", flag: "🇸🇦" },
-  { country: "Egypt", flag: "🇪🇬" },
-  { country: "Philippines", flag: "🇵🇭" },
-  { country: "Thailand", flag: "🇹🇭" },
-  { country: "Vietnam", flag: "🇻🇳" },
-  { country: "Colombia", flag: "🇨🇴" },
-  { country: "Poland", flag: "🇵🇱" },
-  { country: "Netherlands", flag: "🇳🇱" },
-  { country: "Sweden", flag: "🇸🇪" },
-  { country: "Switzerland", flag: "🇨🇭" },
-  { country: "Kenya", flag: "🇰🇪" },
-  { country: "Pakistan", flag: "🇵🇰" },
+const ALL_COUNTRIES: { country: string; flag: string; code: string }[] = [
+  { country: "United States", flag: "🇺🇸", code: "USA" },
+  { country: "United Kingdom", flag: "🇬🇧", code: "GBR" },
+  { country: "India", flag: "🇮🇳", code: "IND" },
+  { country: "Germany", flag: "🇩🇪", code: "DEU" },
+  { country: "Brazil", flag: "🇧🇷", code: "BRA" },
+  { country: "Japan", flag: "🇯🇵", code: "JPN" },
+  { country: "Canada", flag: "🇨🇦", code: "CAN" },
+  { country: "Australia", flag: "🇦🇺", code: "AUS" },
+  { country: "France", flag: "🇫🇷", code: "FRA" },
+  { country: "Mexico", flag: "🇲🇽", code: "MEX" },
+  { country: "South Korea", flag: "🇰🇷", code: "KOR" },
+  { country: "Italy", flag: "🇮🇹", code: "ITA" },
+  { country: "Spain", flag: "🇪🇸", code: "ESP" },
+  { country: "Nigeria", flag: "🇳🇬", code: "NGA" },
+  { country: "South Africa", flag: "🇿🇦", code: "ZAF" },
+  { country: "Argentina", flag: "🇦🇷", code: "ARG" },
+  { country: "Indonesia", flag: "🇮🇩", code: "IDN" },
+  { country: "Turkey", flag: "🇹🇷", code: "TUR" },
+  { country: "Saudi Arabia", flag: "🇸🇦", code: "SAU" },
+  { country: "Egypt", flag: "🇪🇬", code: "EGY" },
+  { country: "Philippines", flag: "🇵🇭", code: "PHL" },
+  { country: "Thailand", flag: "🇹🇭", code: "THA" },
+  { country: "Vietnam", flag: "🇻🇳", code: "VNM" },
+  { country: "Colombia", flag: "🇨🇴", code: "COL" },
+  { country: "Poland", flag: "🇵🇱", code: "POL" },
+  { country: "Netherlands", flag: "🇳🇱", code: "NLD" },
+  { country: "Sweden", flag: "🇸🇪", code: "SWE" },
+  { country: "Switzerland", flag: "🇨🇭", code: "CHE" },
+  { country: "Kenya", flag: "🇰🇪", code: "KEN" },
+  { country: "Pakistan", flag: "🇵🇰", code: "PAK" },
 ];
 
 const DEFAULT_COUNTRIES = ALL_COUNTRIES.slice(0, 6);
 
 function generateCountryData(
-  countries: { country: string; flag: string }[],
+  countries: { country: string; flag: string; code: string }[],
   options: OptionInfo[]
 ): CountryData[] {
   const seeds = [0.35, 0.42, 0.28, 0.5, 0.38, 0.45, 0.32, 0.47, 0.3, 0.41];
@@ -127,6 +128,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
   const [selectedCountry, setSelectedCountry] = useState<{
     country: string;
     flag: string;
+    code: string;
   } | null>(null);
 
   const defaultBreakdowns = generateCountryData(DEFAULT_COUNTRIES, options);
@@ -147,7 +149,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
   }, [selectedCountry, options]);
 
   const chartData = defaultBreakdowns.map((bd) => {
-    const row: Record<string, any> = { name: `${bd.flag} ${bd.country}` };
+    const row: Record<string, any> = { name: `${bd.flag} ${bd.code}` };
     options.forEach((opt) => {
       row[opt.label] = bd.results[opt.id] || 0;
     });
@@ -158,7 +160,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
     ? [
         (() => {
           const row: Record<string, any> = {
-            name: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
+            name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
           };
           options.forEach((opt) => {
             row[opt.label] = selectedBreakdown.results[opt.id] || 0;
@@ -252,14 +254,14 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
               </div>
 
               {/* Legend */}
-              <div className="flex flex-col gap-2 mt-4 mb-1 w-full">
+              <div className="flex flex-col gap-2 mt-4 mb-1 w-full items-center sm:items-stretch">
                 {options.map((opt, i) => (
-                  <div key={opt.id} className="flex items-start gap-2.5 w-full">
+                  <div key={opt.id} className="flex items-start gap-2.5 w-full justify-center sm:justify-start text-center sm:text-left">
                     <div
                       className="w-4 h-4 mt-0.5 flex-shrink-0"
                       style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
                     />
-                    <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 flex-1">
+                    <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 sm:flex-1">
                       {opt.label}
                     </span>
                   </div>
