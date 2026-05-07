@@ -947,7 +947,7 @@ export default function Admin() {
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
                       <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">Category</label>
                         <select value={weeklyCategory} onChange={(e) => setWeeklyCategory(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground">
@@ -957,16 +957,34 @@ export default function Admin() {
                         </select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Week Start (Monday)</label>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">Start Date (Monday)</label>
                         <input type="date" value={weeklyDate} onChange={(e) => setWeeklyDate(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
                       </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1 block">End Date (optional)</label>
+                        <input type="date" value={weeklyEndDate} onChange={(e) => setWeeklyEndDate(e.target.value)} min={weeklyDate} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
+                      </div>
                     </div>
+                    <p className="text-[11px] text-muted-foreground -mt-1">Leave end date empty for a single week. Set it to extend the challenge across multiple weeks.</p>
                     <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Options (2–4)</label>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Options ({weeklyOptions.length}/4)</label>
                       <div className="space-y-2">
                         {weeklyOptions.map((opt, i) => (
-                          <input key={i} value={opt} onChange={(e) => { const u = [...weeklyOptions]; u[i] = e.target.value; setWeeklyOptions(u); }} placeholder={`Option ${i + 1}${i >= 2 ? " (optional)" : ""}`} className="w-full px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
+                          <div key={i} className="flex gap-2">
+                            <input value={opt} onChange={(e) => { const u = [...weeklyOptions]; u[i] = e.target.value; setWeeklyOptions(u); }} placeholder={`Option ${i + 1}`} className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
+                            {weeklyOptions.length > 2 && (
+                              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-destructive hover:bg-destructive/10 flex-shrink-0" onClick={() => setWeeklyOptions(weeklyOptions.filter((_, idx) => idx !== i))} title="Remove option">
+                                <X className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
                         ))}
+                        {weeklyOptions.length < 4 && (
+                          <Button type="button" size="sm" variant="ghost" onClick={() => setWeeklyOptions([...weeklyOptions, ""])} className="text-xs">
+                            <Plus className="w-3.5 h-3.5 mr-1" />
+                            Add option
+                          </Button>
+                        )}
                       </div>
                     </div>
                     <div className="flex justify-end gap-2 pt-2">
