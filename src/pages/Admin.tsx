@@ -94,11 +94,12 @@ export default function Admin() {
   const [showWeeklyForm, setShowWeeklyForm] = useState(false);
   const [weeklyQuestion, setWeeklyQuestion] = useState("");
   const [weeklyCategory, setWeeklyCategory] = useState("general");
-  const [weeklyOptions, setWeeklyOptions] = useState(["", "", "", ""]);
+  const [weeklyOptions, setWeeklyOptions] = useState(["", ""]);
   const [weeklyDate, setWeeklyDate] = useState(() => {
     const next = startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 });
     return format(next, "yyyy-MM-dd");
   });
+  const [weeklyEndDate, setWeeklyEndDate] = useState<string>("");
   const [creatingWeekly, setCreatingWeekly] = useState(false);
   const [generatingWeekly, setGeneratingWeekly] = useState(false);
   const [editingWeekly, setEditingWeekly] = useState<string | null>(null);
