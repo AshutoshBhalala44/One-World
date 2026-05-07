@@ -59,6 +59,7 @@ interface WeeklyPollWithOptions {
   question: string;
   category: string;
   week_start_date: string;
+  end_date?: string | null;
   status: string;
   needs_review: boolean;
   created_at: string;
