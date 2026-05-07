@@ -99,9 +99,10 @@ const CURSOR_COLOR = "hsl(220, 20%, 50%, 0.15)";
 
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
+  const fullName = payload[0]?.payload?.fullName ?? label;
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-xs max-w-[220px] break-words">
-      <p className="font-semibold text-foreground mb-1">{label}</p>
+      <p className="font-semibold text-foreground mb-1">{fullName}</p>
       {payload.map((entry: any) => (
         <div key={entry.name} className="flex items-center gap-2">
           <div
@@ -150,7 +151,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
   }, [selectedCountry, options]);
 
   const chartData = defaultBreakdowns.map((bd) => {
-    const row: Record<string, any> = { name: `${bd.flag} ${bd.code}` };
+    const row: Record<string, any> = { name: `${bd.flag} ${bd.code}`, fullName: `${bd.flag} ${bd.country}` };
     options.forEach((opt) => {
       row[opt.label] = bd.results[opt.id] || 0;
     });
@@ -162,6 +163,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
         (() => {
           const row: Record<string, any> = {
             name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
+            fullName: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
           };
           options.forEach((opt) => {
             row[opt.label] = selectedBreakdown.results[opt.id] || 0;
