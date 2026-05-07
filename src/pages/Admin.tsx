@@ -220,20 +220,25 @@ export default function Admin() {
     if (!weeklyQuestion.trim()) { toast.error("Please enter a question"); return; }
     const validOpts = weeklyOptions.filter((o) => o.trim());
     if (validOpts.length < 2) { toast.error("At least 2 options required"); return; }
+    if (weeklyEndDate && weeklyEndDate < weeklyDate) {
+      toast.error("End date must be on or after the start date");
+      return;
+    }
     setCreatingWeekly(true);
     try {
       const { data: newPoll, error: pollErr } = await supabase
         .from("weekly_polls")
-        .insert({ question: weeklyQuestion.trim(), category: weeklyCategory, week_start_date: weeklyDate, status: "approved", needs_review: false } as any)
+        .insert({ question: weeklyQuestion.trim(), category: weeklyCategory, week_start_date: weeklyDate, end_date: weeklyEndDate || null, status: "approved", needs_review: false } as any)
         .select("id").single();
       if (pollErr) throw pollErr;
       const optionRows = validOpts.map((label, idx) => ({ weekly_poll_id: (newPoll as any).id, label: label.trim(), sort_order: idx }));
       const { error: optErr } = await supabase.from("weekly_poll_options").insert(optionRows);
       if (optErr) throw optErr;
-      toast.success("Weekly poll created!");
+      toast.success("Weekly challenge created!");
       setShowWeeklyForm(false);
-      setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", "", "", ""]);
+      setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", ""]);
       setWeeklyDate(format(startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 }), "yyyy-MM-dd"));
+      setWeeklyEndDate("");
       fetchWeeklyPolls();
     } catch (err: any) { toast.error("Failed: " + (err.message || "Unknown error")); }
     finally { setCreatingWeekly(false); }
