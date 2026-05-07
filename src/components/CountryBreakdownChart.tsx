@@ -353,7 +353,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               layout="vertical"
                               margin={{
                                 top: 0,
-                                right: isMobile ? 8 : 15,
+                                right: chartRightMargin,
                                 left: 0,
                                 bottom: 0,
                               }}
