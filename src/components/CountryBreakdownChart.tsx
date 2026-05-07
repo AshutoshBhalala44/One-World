@@ -15,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface CountryData {
   country: string;
   flag: string;
+  code: string;
   results: Record<string, number>;
 }
 
