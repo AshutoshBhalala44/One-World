@@ -99,9 +99,10 @@ const CURSOR_COLOR = "hsl(220, 20%, 50%, 0.15)";
 
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
+  const fullName = payload[0]?.payload?.fullName ?? label;
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-xs max-w-[220px] break-words">
-      <p className="font-semibold text-foreground mb-1">{label}</p>
+      <p className="font-semibold text-foreground mb-1">{fullName}</p>
       {payload.map((entry: any) => (
         <div key={entry.name} className="flex items-center gap-2">
           <div
