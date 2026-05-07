@@ -105,7 +105,9 @@ export default function Admin() {
   const [generatingWeekly, setGeneratingWeekly] = useState(false);
   const [editingWeekly, setEditingWeekly] = useState<string | null>(null);
   const [editWeeklyQuestion, setEditWeeklyQuestion] = useState("");
-  const [editWeeklyOptions, setEditWeeklyOptions] = useState<string[]>([]);
+  const [editWeeklyOptions, setEditWeeklyOptions] = useState<{ id?: string; label: string }[]>([]);
+  const [editWeeklyStartDate, setEditWeeklyStartDate] = useState<string>("");
+  const [editWeeklyEndDate, setEditWeeklyEndDate] = useState<string>("");
   useEffect(() => {
     if (!roleLoading && !isAdmin) return;
     if (isAdmin) {
