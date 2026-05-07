@@ -301,22 +301,55 @@ export default function Admin() {
   function startEditWeekly(wp: WeeklyPollWithOptions) {
     setEditingWeekly(wp.id);
     setEditWeeklyQuestion(wp.question);
-    setEditWeeklyOptions(wp.options.map((o) => o.label));
+    setEditWeeklyOptions(wp.options.map((o) => ({ id: o.id, label: o.label })));
+    setEditWeeklyStartDate(wp.week_start_date);
+    setEditWeeklyEndDate(wp.end_date || "");
   }
 
   async function saveEditWeekly(wp: WeeklyPollWithOptions) {
+    if (editWeeklyEndDate && editWeeklyEndDate < editWeeklyStartDate) {
+      toast.error("End date must be on or after the start date");
+      return;
+    }
+    const validOpts = editWeeklyOptions.filter((o) => o.label.trim());
+    if (validOpts.length < 2) {
+      toast.error("At least 2 options required");
+      return;
+    }
+
     const { error: pollErr } = await supabase
       .from("weekly_polls")
-      .update({ question: editWeeklyQuestion } as any)
+      .update({
+        question: editWeeklyQuestion,
+        week_start_date: editWeeklyStartDate,
+        end_date: editWeeklyEndDate || null,
+      } as any)
       .eq("id", wp.id);
-    if (pollErr) { toast.error("Failed to update question"); return; }
+    if (pollErr) { toast.error("Failed to update challenge"); return; }
 
-    for (let i = 0; i < wp.options.length; i++) {
-      if (editWeeklyOptions[i] !== wp.options[i].label) {
+    const existingIds = new Set(wp.options.map((o) => o.id));
+    const keptIds = new Set(validOpts.filter((o) => o.id).map((o) => o.id!));
+
+    // Delete removed options
+    const toDelete = [...existingIds].filter((id) => !keptIds.has(id));
+    if (toDelete.length > 0) {
+      await supabase.from("weekly_poll_options").delete().in("id", toDelete);
+    }
+
+    // Update existing + insert new
+    for (let i = 0; i < validOpts.length; i++) {
+      const opt = validOpts[i];
+      if (opt.id) {
         await supabase
           .from("weekly_poll_options")
-          .update({ label: editWeeklyOptions[i] } as any)
-          .eq("id", wp.options[i].id);
+          .update({ label: opt.label.trim(), sort_order: i } as any)
+          .eq("id", opt.id);
+      } else {
+        await supabase.from("weekly_poll_options").insert({
+          weekly_poll_id: wp.id,
+          label: opt.label.trim(),
+          sort_order: i,
+        } as any);
       }
     }
 
