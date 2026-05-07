@@ -123,22 +123,6 @@ const Welcome = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="container mx-auto px-4 py-16 sm:py-24">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Ready to be counted?
-          </h2>
-          <p className="text-muted-foreground mb-8">Swipe below to sign in and join today's Challenge.</p>
-          <div className="flex justify-center">
-            <SwipeToSignIn />
-          </div>
-          <Link to="/auth" className="inline-block mt-4 text-sm text-foreground/60 hover:text-foreground underline-offset-4 hover:underline">
-            or sign in directly
-          </Link>
-        </div>
-      </section>
-
       {/* FAQ */}
       <section className="bg-card/30 border-y border-border py-16 sm:py-24">
         <div className="container mx-auto px-4 max-w-3xl">
