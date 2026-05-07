@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Header } from "@/components/Header";
-import { HeroSection } from "@/components/HeroSection";
 import { DailyPoll } from "@/components/DailyPoll";
 import { MyResponses } from "@/components/MyResponses";
 import { SubmitQuestion } from "@/components/SubmitQuestion";
