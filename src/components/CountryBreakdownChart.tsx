@@ -128,6 +128,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
   const [selectedCountry, setSelectedCountry] = useState<{
     country: string;
     flag: string;
+    code: string;
   } | null>(null);
 
   const defaultBreakdowns = generateCountryData(DEFAULT_COUNTRIES, options);
