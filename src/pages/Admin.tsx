@@ -792,7 +792,7 @@ export default function Admin() {
           </motion.div>
         )}
 
-        <Tabs defaultValue="polls" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="polls">📊 Polls</TabsTrigger>
             <TabsTrigger value="weekly">🏆 Weekly</TabsTrigger>
