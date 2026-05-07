@@ -149,7 +149,7 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
   }, [selectedCountry, options]);
 
   const chartData = defaultBreakdowns.map((bd) => {
-    const row: Record<string, any> = { name: `${bd.flag} ${bd.country}` };
+    const row: Record<string, any> = { name: `${bd.flag} ${bd.code}` };
     options.forEach((opt) => {
       row[opt.label] = bd.results[opt.id] || 0;
     });
