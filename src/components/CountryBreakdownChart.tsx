@@ -67,7 +67,7 @@ const ALL_COUNTRIES: { country: string; flag: string; code: string }[] = [
 const DEFAULT_COUNTRIES = ALL_COUNTRIES.slice(0, 6);
 
 function generateCountryData(
-  countries: { country: string; flag: string }[],
+  countries: { country: string; flag: string; code: string }[],
   options: OptionInfo[]
 ): CountryData[] {
   const seeds = [0.35, 0.42, 0.28, 0.5, 0.38, 0.45, 0.32, 0.47, 0.3, 0.41];
