@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { DailyPoll } from "@/components/DailyPoll";
 import { MyResponses } from "@/components/MyResponses";
@@ -33,10 +34,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Your Challenges — One World Dashboard</title>
+        <meta name="description" content="Vote in today's Daily Challenge, complete the Weekly Challenge, and review your past responses on One World." />
+        <link rel="canonical" href="https://one-world.lovable.app/" />
+        <meta property="og:title" content="Your Challenges — One World Dashboard" />
+        <meta property="og:description" content="Vote in today's Daily Challenge and complete the Weekly Challenge." />
+        <meta property="og:url" content="https://one-world.lovable.app/" />
+      </Helmet>
       <Header />
 
-
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6">
+        <h1 className="sr-only">Global Challenges Dashboard</h1>
         <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
 
         <Tabs defaultValue="today" className="w-full">

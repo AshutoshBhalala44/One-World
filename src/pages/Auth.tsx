@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Phone, ArrowRight, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
 import logo from "@/assets/logo-option-5.png";
@@ -19,6 +20,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const phoneId = useId();
 
   const fullPhone = `${country.dial}${localPhone.replace(/\D/g, "")}`;
 
