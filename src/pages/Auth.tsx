@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Phone, ArrowRight, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
 import logo from "@/assets/logo-option-5.png";
@@ -19,6 +20,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const phoneId = useId();
 
   const fullPhone = `${country.dial}${localPhone.replace(/\D/g, "")}`;
 
@@ -134,14 +136,23 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 relative">
+      <Helmet>
+        <title>Sign In to One World — Phone Verification</title>
+        <meta name="description" content="Sign in to One World with phone verification. One vote per person, country-level transparency, no spam." />
+        <link rel="canonical" href="https://one-world.lovable.app/auth" />
+        <meta property="og:title" content="Sign In to One World" />
+        <meta property="og:description" content="Phone-verified access to the world's most transparent polling platform." />
+        <meta property="og:url" content="https://one-world.lovable.app/auth" />
+      </Helmet>
       <button
         onClick={() => navigate("/")}
         className="absolute top-5 left-5 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Go back to home"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
       </button>
-      <motion.div
+      <motion.main
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
@@ -168,7 +179,7 @@ const Auth = () => {
                     <Phone className="w-7 h-7 text-accent" />
                   </div>
                   <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-                    Welcome
+                    Sign In to One World
                   </h1>
                   <p className="text-muted-foreground text-sm">
                     Enter your phone number to sign in or create an account.
@@ -178,12 +189,13 @@ const Auth = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    <label htmlFor={phoneId} className="text-sm font-medium text-foreground mb-1.5 block">
                       Phone Number
                     </label>
                     <div className="flex">
                       <CountryCodePicker selected={country} onSelect={setCountry} />
                       <Input
+                        id={phoneId}
                         type="tel"
                         placeholder="234 567 8900"
                         value={localPhone}
@@ -246,6 +258,7 @@ const Auth = () => {
                         value={digit}
                         onChange={(e) => handleOtpChange(i, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                        aria-label={`Verification code digit ${i + 1} of 6`}
                         className="w-12 h-14 text-center text-2xl font-bold rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                         autoFocus={i === 0}
                       />
@@ -294,7 +307,7 @@ const Auth = () => {
         <p className="text-center text-xs text-muted-foreground mt-6">
           By signing in, you agree to participate in transparent, unmanipulated polling.
         </p>
-      </motion.div>
+      </motion.main>
     </div>
   );
 };

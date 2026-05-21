@@ -1,14 +1,18 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 
 const Privacy = () => {
-  useEffect(() => {
-    document.title = "Privacy Policy — One World";
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Privacy Policy — One World</title>
+        <meta name="description" content="How One World handles phone verification, vote privacy, and your data. We collect only what we need to keep voting honest." />
+        <link rel="canonical" href="https://one-world.lovable.app/privacy" />
+        <meta property="og:title" content="Privacy Policy — One World" />
+        <meta property="og:description" content="How One World handles phone verification, vote privacy, and your data." />
+        <meta property="og:url" content="https://one-world.lovable.app/privacy" />
+      </Helmet>
       <Header />
       <main className="container mx-auto px-4 py-12 max-w-3xl">
         <h1 className="font-display text-4xl font-bold text-foreground mb-2">Privacy Policy</h1>
