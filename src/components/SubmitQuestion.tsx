@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useId } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,8 @@ export function SubmitQuestion() {
   const [category, setCategory] = useState("general");
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const questionId = useId();
+  const categoryId = useId();
 
   if (!user) {
     return (
@@ -147,14 +149,16 @@ export function SubmitQuestion() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
+            <label id={categoryId} className="text-sm font-medium text-foreground mb-1.5 block">
               Category
             </label>
-            <div className="flex flex-wrap gap-2">
+            <div role="radiogroup" aria-labelledby={categoryId} className="flex flex-wrap gap-2">
               {filteredCategories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
+                  role="radio"
+                  aria-checked={category === cat.id}
                   onClick={() => setCategory(cat.id)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                     category === cat.id
@@ -169,10 +173,11 @@ export function SubmitQuestion() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
+            <label htmlFor={questionId} className="text-sm font-medium text-foreground mb-1.5 block">
               Your Question
             </label>
             <Textarea
+              id={questionId}
               placeholder="e.g., Should the voting age be lowered to 16?"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -190,6 +195,8 @@ export function SubmitQuestion() {
               {options.map((opt, i) => (
                 <div key={i} className="flex gap-2">
                   <Input
+                    id={`${questionId}-option-${i}`}
+                    aria-label={`Answer option ${i + 1}`}
                     placeholder={`Option ${i + 1}`}
                     value={opt}
                     onChange={(e) => updateOption(i, e.target.value)}
