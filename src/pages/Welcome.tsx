@@ -157,14 +157,7 @@ const Welcome = () => {
             <p className="text-muted-foreground">Everything you need to know before you vote.</p>
           </div>
           <Accordion type="single" collapsible className="w-full">
-            {[
-              { q: "What is One World?", a: "One World is a transparent global polling platform where verified people from 190+ countries answer Daily and Weekly Challenges. Every result is broken down by country in real time — no aggregations hiding the truth." },
-              { q: "How do you prevent bots and duplicate votes?", a: "Each account is tied to a verified phone number, enforcing one vote per person. Votes are stored anonymously, but identity verification keeps the results impossible to game." },
-              { q: "Why do I have to complete the Weekly Challenge first?", a: "The Weekly Challenge is the platform's gate. By weighing in on the week's defining question, you unlock access to all Daily Challenges and ensure every active voter has gone on the record for the week." },
-              { q: "Where do the questions come from?", a: "Daily and Weekly Challenges are AI-curated for balance and reviewed by admins before publishing. You can also suggest your own from the Submit tab — top suggestions become real Challenges." },
-              { q: "Is my vote private?", a: "Yes. Your individual vote is never tied to your phone number publicly. Only your country is associated with the result so we can show country-level breakdowns." },
-              { q: "Is One World free?", a: "Yes — voting is completely free for everyone, everywhere." },
-            ].map((item, i) => (
+            {faqs.map((item, i) => (
               <AccordionItem key={i} value={`item-${i}`}>
                 <AccordionTrigger className="text-left font-display text-base sm:text-lg">{item.q}</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed">{item.a}</AccordionContent>
@@ -173,6 +166,7 @@ const Welcome = () => {
           </Accordion>
         </div>
       </section>
+      </main>
 
       <footer className="border-t border-border py-8">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
