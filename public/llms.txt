@@ -1,0 +1,11 @@
+# One World
+
+> The world's most transparent polling platform. Verified people from 190+ countries answer Daily and Weekly Challenges, with results broken down by country in real time.
+
+One World is a global civic platform where every participant is phone-verified to ensure one vote per person. Users must complete the Weekly Challenge to unlock access to Daily Challenges. Questions are AI-curated for balance and reviewed before publishing. Results are shown live with full country-by-country breakdowns — no aggregations hiding the truth.
+
+## Pages
+
+- [Welcome](/welcome): Marketing landing page introducing One World, how it works, and why transparent global polling matters.
+- [Privacy Policy](/privacy): How user data, phone verification, and vote privacy are handled.
+- [Terms of Service](/terms): Rules for using One World, acceptable use, and account terms.
