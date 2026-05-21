@@ -33,6 +33,7 @@ export function Header() {
                   size="sm"
                   onClick={() => navigate("/admin")}
                   title="Admin Dashboard"
+                  aria-label="Open admin dashboard"
                   className="gap-1.5"
                 >
                   <Shield className="w-4 h-4" />
@@ -44,6 +45,7 @@ export function Header() {
                 size="icon"
                 onClick={signOut}
                 title="Sign out"
+                aria-label="Sign out"
               >
                 <LogOut className="w-4 h-4" />
               </Button>
