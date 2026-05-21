@@ -136,14 +136,23 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 relative">
+      <Helmet>
+        <title>Sign In to One World — Phone Verification</title>
+        <meta name="description" content="Sign in to One World with phone verification. One vote per person, country-level transparency, no spam." />
+        <link rel="canonical" href="https://one-world.lovable.app/auth" />
+        <meta property="og:title" content="Sign In to One World" />
+        <meta property="og:description" content="Phone-verified access to the world's most transparent polling platform." />
+        <meta property="og:url" content="https://one-world.lovable.app/auth" />
+      </Helmet>
       <button
         onClick={() => navigate("/")}
         className="absolute top-5 left-5 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Go back to home"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
       </button>
-      <motion.div
+      <motion.main
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
