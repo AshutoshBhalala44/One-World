@@ -40,14 +40,9 @@ const Auth = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      // Auto-fill OTP code (no SMS verification required)
-      if (data?.code) {
-        const digits = data.code.split("");
-        setOtp(digits);
-      }
-
-      toast.success("Verification code ready!");
+      toast.success("Verification code sent! Check your phone.");
       setStep("otp");
+
     } catch (err: any) {
       toast.error(err.message || "Failed to send verification code");
     } finally {
