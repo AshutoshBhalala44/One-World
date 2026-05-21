@@ -179,7 +179,7 @@ const Auth = () => {
                     <Phone className="w-7 h-7 text-accent" />
                   </div>
                   <h1 className="font-display text-2xl font-bold text-foreground mb-2">
-                    Welcome
+                    Sign In to One World
                   </h1>
                   <p className="text-muted-foreground text-sm">
                     Enter your phone number to sign in or create an account.
@@ -189,12 +189,13 @@ const Auth = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    <label htmlFor={phoneId} className="text-sm font-medium text-foreground mb-1.5 block">
                       Phone Number
                     </label>
                     <div className="flex">
                       <CountryCodePicker selected={country} onSelect={setCountry} />
                       <Input
+                        id={phoneId}
                         type="tel"
                         placeholder="234 567 8900"
                         value={localPhone}
@@ -257,6 +258,7 @@ const Auth = () => {
                         value={digit}
                         onChange={(e) => handleOtpChange(i, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                        aria-label={`Verification code digit ${i + 1} of 6`}
                         className="w-12 h-14 text-center text-2xl font-bold rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                         autoFocus={i === 0}
                       />
@@ -305,7 +307,7 @@ const Auth = () => {
         <p className="text-center text-xs text-muted-foreground mt-6">
           By signing in, you agree to participate in transparent, unmanipulated polling.
         </p>
-      </motion.div>
+      </motion.main>
     </div>
   );
 };
