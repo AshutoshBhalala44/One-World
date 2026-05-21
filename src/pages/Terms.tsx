@@ -1,14 +1,18 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 
 const Terms = () => {
-  useEffect(() => {
-    document.title = "Terms of Service — One World";
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Terms of Service — One World</title>
+        <meta name="description" content="One World's terms of service: one account per person, acceptable use, and the rules that keep every Challenge honest." />
+        <link rel="canonical" href="https://one-world.lovable.app/terms" />
+        <meta property="og:title" content="Terms of Service — One World" />
+        <meta property="og:description" content="One account per person, acceptable use, and the rules that keep every Challenge honest." />
+        <meta property="og:url" content="https://one-world.lovable.app/terms" />
+      </Helmet>
       <Header />
       <main className="container mx-auto px-4 py-12 max-w-3xl">
         <h1 className="font-display text-4xl font-bold text-foreground mb-2">Terms of Service</h1>
