@@ -63,23 +63,33 @@ const Auth = () => {
         body: { phone: fullPhone, code },
       });
 
-      if (error) throw error;
+      if (error) {
+        let msg = "Incorrect verification code. Please try again.";
+        try {
+          const ctx: any = (error as any).context;
+          if (ctx?.json) {
+            const body = await ctx.json();
+            if (body?.error) msg = body.error;
+          } else if (ctx?.text) {
+            const txt = await ctx.text();
+            const parsed = JSON.parse(txt);
+            if (parsed?.error) msg = parsed.error;
+          }
+        } catch {}
+        throw new Error(msg);
+      }
       if (data?.error) throw new Error(data.error);
 
       // Use the action link to sign in
       if (data?.actionLink) {
-        // Extract token from action link and verify
         const url = new URL(data.actionLink);
-        const token_hash = url.searchParams.get("token") || url.hash;
-        
-        // Sign in with the magic link token
+
         const { error: signInError } = await supabase.auth.verifyOtp({
           token_hash: url.searchParams.get("token") || "",
           type: "magiclink",
         });
 
         if (signInError) {
-          // Fallback: try setting session via the link
           window.location.href = data.actionLink;
           return;
         }
@@ -88,7 +98,9 @@ const Auth = () => {
       toast.success(data?.isNewUser ? "Account created!" : "Welcome back!");
       navigate("/");
     } catch (err: any) {
-      toast.error(err.message || "Invalid verification code");
+      toast.error(err.message || "Incorrect verification code");
+      setOtp(["", "", "", "", "", ""]);
+      otpRefs.current[0]?.focus();
     } finally {
       setLoading(false);
     }
