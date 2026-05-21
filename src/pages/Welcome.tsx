@@ -27,7 +27,16 @@ const Welcome = () => {
       {/* Hero */}
       <section className="relative overflow-hidden bg-hero-gradient text-[hsl(45,100%,96%)]">
         <div className="absolute inset-0 opacity-30">
-          <img src={heroImage} alt="Glowing globe representing global participation" className="w-full h-full object-cover" loading="eager" />
+          <img
+            src={heroImage}
+            alt="Glowing globe representing global participation"
+            className="w-full h-full object-cover"
+            width={1920}
+            height={1080}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/60 via-navy/40 to-background" />
 
