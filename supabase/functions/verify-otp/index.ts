@@ -22,44 +22,45 @@ serve(async (req) => {
       );
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const sid = Deno.env.get("TWILIO_ACCOUNT_SID");
+    const token = Deno.env.get("TWILIO_AUTH_TOKEN");
+    const verifySid = Deno.env.get("TWILIO_VERIFY_SERVICE_SID");
 
-    // Hash the user-supplied code for comparison
-    const encoder = new TextEncoder();
-    const data = encoder.encode(code);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashedCode = Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+    if (!sid || !token || !verifySid) {
+      return new Response(
+        JSON.stringify({ error: "SMS service is not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Find matching OTP using hashed code
-    const { data: otpRecord, error: fetchError } = await supabase
-      .from("otp_codes")
-      .select("*")
-      .eq("phone", phone)
-      .eq("code", hashedCode)
-      .eq("verified", false)
-      .gt("expires_at", new Date().toISOString())
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    // Check the code with Twilio Verify
+    const checkUrl = `https://verify.twilio.com/v2/Services/${verifySid}/VerificationCheck`;
+    const auth = btoa(`${sid}:${token}`);
 
-    if (fetchError || !otpRecord) {
+    const checkRes = await fetch(checkUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ To: phone, Code: code }),
+    });
+
+    const checkData = await checkRes.json();
+
+    if (!checkRes.ok || checkData.status !== "approved") {
+      console.error("Verify check failed:", checkRes.status, checkData);
       return new Response(
         JSON.stringify({ error: "Invalid or expired verification code" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Mark OTP as verified
-    await supabase
-      .from("otp_codes")
-      .update({ verified: true })
-      .eq("id", otpRecord.id);
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check if user with this phone exists in profiles
+    // Check if user with this phone exists
     const { data: existingProfile } = await supabase
       .from("profiles")
       .select("user_id")
@@ -72,7 +73,6 @@ serve(async (req) => {
     if (existingProfile) {
       userId = existingProfile.user_id;
     } else {
-      // Create new user via admin API
       const fakeEmail = `${phone.replace("+", "")}@phone.oneworld.app`;
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email: fakeEmail,
@@ -93,14 +93,10 @@ serve(async (req) => {
       userId = newUser.user.id;
       isNewUser = true;
 
-      // Create profile
-      await supabase.from("profiles").insert({
-        user_id: userId,
-        phone: phone,
-      });
+      await supabase.from("profiles").insert({ user_id: userId, phone });
     }
 
-    // Generate session token using admin API
+    // Generate magic link to sign the user in
     const { data: sessionData, error: sessionError } =
       await supabase.auth.admin.generateLink({
         type: "magiclink",
@@ -114,12 +110,6 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
-    // Clean up used OTP codes for this phone
-    await supabase
-      .from("otp_codes")
-      .delete()
-      .eq("phone", phone);
 
     return new Response(
       JSON.stringify({
