@@ -68,11 +68,48 @@ serve(async (req) => {
       );
     }
 
-    // Return the plaintext code to send to user (via SMS in production)
-    console.log(`OTP for ${phone}: ${code}`);
+    // Send the OTP via Twilio SMS
+    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+    const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+    const twilioFromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+    if (!twilioAccountSid || !twilioAuthToken || !twilioFromNumber) {
+      console.error("Twilio credentials are not configured");
+      return new Response(
+        JSON.stringify({ error: "SMS service is not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+    const twilioAuth = btoa(`${twilioAccountSid}:${twilioAuthToken}`);
+
+    const twilioRes = await fetch(twilioUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${twilioAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        To: phone,
+        From: twilioFromNumber,
+        Body: `Your One World verification code is: ${code}. It expires in 5 minutes.`,
+      }),
+    });
+
+    if (!twilioRes.ok) {
+      const errBody = await twilioRes.text();
+      console.error("Twilio send failed:", twilioRes.status, errBody);
+      return new Response(
+        JSON.stringify({ error: "Failed to send verification code via SMS" }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`OTP sent via Twilio to ${phone}`);
 
     return new Response(
-      JSON.stringify({ success: true, message: "Verification code generated", code }),
+      JSON.stringify({ success: true, message: "Verification code sent" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
