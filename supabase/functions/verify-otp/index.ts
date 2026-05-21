@@ -51,8 +51,8 @@ serve(async (req) => {
     if (!checkRes.ok || checkData.status !== "approved") {
       console.error("Verify check failed:", checkRes.status, checkData);
       return new Response(
-        JSON.stringify({ error: "Invalid or expired verification code" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "Incorrect or expired verification code. Please try again." }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
