@@ -968,7 +968,7 @@ export default function Admin() {
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
                     <Plus className="w-4 h-4 mr-2" />
-                    {showWeeklyForm ? "Cancel" : "Create Weekly"}
+                    {showWeeklyForm ? "Cancel" : "Create Global"}
                   </Button>
                   <Button size="sm" variant="outline" onClick={handleGenerateWeekly} disabled={generatingWeekly}>
                     {generatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
