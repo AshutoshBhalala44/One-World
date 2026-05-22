@@ -31,7 +31,7 @@ const Welcome = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>One World — Transparent Global Challenges</title>
-        <meta name="description" content="Join the world's most transparent polling platform. Verified voters from 190+ countries answer Daily and Weekly Challenges with real-time, country-level results." />
+        <meta name="description" content="Join the world's most transparent polling platform. Verified voters from 190+ countries answer Daily Challenges and Global Topics with real-time, country-level results." />
         <link rel="canonical" href="https://one-world.lovable.app/welcome" />
         <meta property="og:title" content="One World — Transparent Global Challenges" />
         <meta property="og:description" content="See where the world truly stands. Verified, country-level results in real time." />
@@ -97,7 +97,7 @@ const Welcome = () => {
         <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             { icon: Phone, title: "Verify your phone", body: "One vote per person. Quick, private OTP — no spam." },
-            { icon: Trophy, title: "Complete the Weekly Challenge", body: "Unlock the platform by weighing in on the week's defining question." },
+            { icon: Trophy, title: "Complete the Global Topic", body: "Unlock the platform by weighing in on the week's defining question." },
             { icon: Vote, title: "Vote in Daily Challenges", body: "Join fresh, AI-curated questions every day and watch results roll in live." },
           ].map((step, i) => (
             <motion.div

@@ -36,10 +36,10 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>Your Challenges — One World Dashboard</title>
-        <meta name="description" content="Vote in today's Daily Challenge, complete the Weekly Challenge, and review your past responses on One World." />
+        <meta name="description" content="Vote in today's Daily Challenge, complete the Global Topic, and review your past responses on One World." />
         <link rel="canonical" href="https://one-world.lovable.app/" />
         <meta property="og:title" content="Your Challenges — One World Dashboard" />
-        <meta property="og:description" content="Vote in today's Daily Challenge and complete the Weekly Challenge." />
+        <meta property="og:description" content="Vote in today's Daily Challenge and complete the Global Topic." />
         <meta property="og:url" content="https://one-world.lovable.app/" />
       </Helmet>
       <Header />
