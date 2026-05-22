@@ -24,18 +24,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let initialized = false;
+    let currentToken: string | null = null;
+
+    const apply = (nextSession: Session | null) => {
+      const nextToken = nextSession?.access_token ?? null;
+      // Skip redundant updates that would re-render the tree for no reason.
+      if (initialized && nextToken === currentToken) return;
+      currentToken = nextToken;
+      initialized = true;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      setLoading(false);
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
+      (_event, nextSession) => apply(nextSession)
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+    supabase.auth.getSession().then(({ data: { session: nextSession } }) => {
+      apply(nextSession);
     });
 
     return () => subscription.unsubscribe();
