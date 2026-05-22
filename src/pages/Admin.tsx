@@ -984,7 +984,7 @@ export default function Admin() {
                   <div className="space-y-3">
                     <div>
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
-                      <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
+                      <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big Global Topic question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
@@ -1004,7 +1004,7 @@ export default function Admin() {
                         <input type="date" value={weeklyEndDate} onChange={(e) => setWeeklyEndDate(e.target.value)} min={weeklyDate} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
                       </div>
                     </div>
-                    <p className="text-[11px] text-muted-foreground -mt-1">Leave end date empty for a single week. Set it to extend the challenge across multiple weeks.</p>
+                    <p className="text-[11px] text-muted-foreground -mt-1">Leave end date empty for a single week. Set it to extend the topic across multiple weeks.</p>
                     <div>
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Options ({weeklyOptions.length}/4)</label>
                       <div className="space-y-2">
@@ -1030,7 +1030,7 @@ export default function Admin() {
                       <Button variant="ghost" size="sm" onClick={() => setShowWeeklyForm(false)}>Cancel</Button>
                       <Button size="sm" onClick={handleCreateWeeklyPoll} disabled={creatingWeekly}>
                         {creatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                        Create Weekly Challenge
+                        Create Global Topic
                       </Button>
                     </div>
                   </div>
