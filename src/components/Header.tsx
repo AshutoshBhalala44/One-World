@@ -52,15 +52,30 @@ export function Header() {
                   <span className="hidden sm:inline text-xs">Admin</span>
                 </Button>
               )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={signOut}
-                title="Sign out"
-                aria-label="Sign out"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title="Sign out"
+                    aria-label="Sign out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-background border-border">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-foreground">Sign Out?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-muted-foreground">
+                      You will need to verify your phone number again to sign back in.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="border-border text-foreground hover:bg-muted hover:text-foreground">Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={signOut} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Sign Out</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           ) : (
             <Button
