@@ -193,7 +193,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
 
   async function handleVote(optionId: string) {
     if (!user) {
-      toast.error("Sign in to answer the weekly challenge", {
+      toast.error("Sign in to answer the Global Topic", {
         action: { label: "Sign In", onClick: () => navigate("/auth") },
       });
       return;
@@ -218,7 +218,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
       const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === poll.id);
       setVoteCounts(filtered as any);
 
-      toast.success("🎉 Weekly challenge answered! Daily challenges unlocked!");
+      toast.success("🎉 Global Topic answered! Daily challenges unlocked!");
 
       // Auto-scroll to country breakdown after a brief delay for render
       setTimeout(() => {
@@ -226,7 +226,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
       }, 600);
     } catch (err: any) {
       if (err.code === "23505") {
-        toast.error("You've already answered this week's challenge");
+        toast.error("You've already answered this week's Global Topic");
         onUnlocked(true);
       } else {
         toast.error("Failed to submit answer");
@@ -271,11 +271,11 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
           </div>
           <div className="flex-1">
             <h2 className="text-white font-display text-lg sm:text-xl font-bold">
-              Weekly Challenge
+              Global Topic
             </h2>
             <p className="text-white/70 text-xs sm:text-sm">
               {hasVoted
-                ? "✅ Completed — daily challenges unlocked!"
+                ? "Answered Global Topic -- Daily Challenge Unlocked"
                 : "Answer this to unlock daily challenges"}
             </p>
           </div>
@@ -290,7 +290,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
         <div className="mt-3 flex items-center gap-2">
           <Clock className="w-3.5 h-3.5 text-white/60" />
           <span className="text-white/60 text-[10px] sm:text-xs uppercase tracking-wider font-medium">
-            Next challenge in
+            Next topic in
           </span>
           <div className="flex gap-1.5 ml-auto">
             {[
@@ -429,7 +429,7 @@ export function DailyLocked() {
         Daily Challenge Locked
       </h3>
       <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-        Answer this week's challenge above to unlock today's daily question. It only takes a moment!
+        Answer this week's Global Topic above to unlock today's daily question. It only takes a moment!
       </p>
     </motion.div>
   );
