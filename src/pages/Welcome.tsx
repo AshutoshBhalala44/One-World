@@ -30,11 +30,11 @@ const Welcome = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>One World — Transparent Global Challenges</title>
-        <meta name="description" content="Join the world's most transparent polling platform. Verified voters from 190+ countries answer Daily Challenges and Global Topics with real-time, country-level results." />
+        <title>One World — What the World Actually Thinks</title>
+        <meta name="description" content="Built to show what the world actually thinks — not what algorithms want you to believe. Verified voters from 190+ countries answer Daily Challenges and Global Topics with real-time, country-level results." />
         <link rel="canonical" href="https://one-world.lovable.app/welcome" />
-        <meta property="og:title" content="One World — Transparent Global Challenges" />
-        <meta property="og:description" content="See where the world truly stands. Verified, country-level results in real time." />
+        <meta property="og:title" content="One World — What the World Actually Thinks" />
+        <meta property="og:description" content="Built to show what the world actually thinks — not what algorithms want you to believe." />
         <meta property="og:url" content="https://one-world.lovable.app/welcome" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
@@ -70,7 +70,7 @@ const Welcome = () => {
               <span className="text-gradient-gold">No manipulation.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl opacity-80 leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto font-body">
-              The world's most transparent polling platform. See where the world truly stands on the issues that matter — broken down by country, in real time.
+              Built to show what the world actually thinks — not what algorithms want you to believe. See where the world truly stands on the issues that matter.
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 text-xs sm:text-sm opacity-70 mb-10">
               <span className="flex items-center gap-1.5">🌍 190+ countries</span>
@@ -170,7 +170,7 @@ const Welcome = () => {
 
       <footer className="border-t border-border py-8">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
-          <p>One World — Transparent global polling. Every voice matters.</p>
+          <p>One World — What the world actually thinks. Every voice matters.</p>
           <nav className="flex items-center gap-5">
             <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
