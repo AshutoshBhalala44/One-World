@@ -70,7 +70,7 @@ const Welcome = () => {
               <span className="text-gradient-gold">No manipulation.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl opacity-80 leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto font-body">
-              The world's most transparent polling platform. See where the world truly stands on the issues that matter — broken down by country, in real time.
+              Built to show what the world actually thinks — not what algorithms want you to believe. See where the world truly stands on the issues that matter.
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 text-xs sm:text-sm opacity-70 mb-10">
               <span className="flex items-center gap-1.5">🌍 190+ countries</span>
