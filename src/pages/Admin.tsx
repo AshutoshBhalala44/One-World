@@ -1271,10 +1271,10 @@ export default function Admin() {
                   <div className="rounded-xl border border-border bg-card p-4">
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <Trophy className="w-4 h-4" />
-                      Weekly Challenge Schedule
+                      Global Topic Schedule
                     </h3>
                     {weeklyPolls.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">No weekly challenges scheduled yet.</p>
+                      <p className="text-sm text-muted-foreground">No Global Topics scheduled yet.</p>
                     ) : (
                       <div className="space-y-2">
                         {weeklyPolls.slice(0, 6).map((wp) => {
@@ -1366,7 +1366,7 @@ export default function Admin() {
                           <div className="flex items-center gap-2 mb-1">
                             <Trophy className="w-3.5 h-3.5 text-purple-500" />
                             <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-                              Weekly Challenge
+                              Global Topic
                             </span>
                           </div>
                           <p className="text-sm font-medium text-foreground">{weeklyForDate.question}</p>
