@@ -28,7 +28,11 @@ serve(async (req) => {
       });
     }
 
-    const { category } = await req.json();
+    const { category: rawCategory } = await req.json();
+    const ALLOWED_CATEGORIES = ["general", "technology", "politics", "environment", "society", "economy", "health", "culture", "science", "education", "sports"];
+    const category = typeof rawCategory === "string" && ALLOWED_CATEGORIES.includes(rawCategory)
+      ? rawCategory
+      : "general";
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
