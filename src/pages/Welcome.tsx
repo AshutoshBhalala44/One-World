@@ -30,11 +30,11 @@ const Welcome = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>One World — Transparent Global Challenges</title>
-        <meta name="description" content="Join the world's most transparent polling platform. Verified voters from 190+ countries answer Daily Challenges and Global Topics with real-time, country-level results." />
+        <title>One World — What the World Actually Thinks</title>
+        <meta name="description" content="Built to show what the world actually thinks — not what algorithms want you to believe. Verified voters from 190+ countries answer Daily Challenges and Global Topics with real-time, country-level results." />
         <link rel="canonical" href="https://one-world.lovable.app/welcome" />
-        <meta property="og:title" content="One World — Transparent Global Challenges" />
-        <meta property="og:description" content="See where the world truly stands. Verified, country-level results in real time." />
+        <meta property="og:title" content="One World — What the World Actually Thinks" />
+        <meta property="og:description" content="Built to show what the world actually thinks — not what algorithms want you to believe." />
         <meta property="og:url" content="https://one-world.lovable.app/welcome" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
