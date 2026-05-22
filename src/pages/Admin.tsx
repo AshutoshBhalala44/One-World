@@ -249,7 +249,7 @@ export default function Admin() {
   }
 
   async function handleDeleteWeeklyPoll(pollId: string) {
-    if (!confirm("Delete this weekly poll permanently?")) return;
+    if (!confirm("Delete this Global Topic permanently?")) return;
     await supabase.from("weekly_poll_options").delete().eq("weekly_poll_id", pollId);
     const { error } = await supabase.from("weekly_polls").delete().eq("id", pollId);
     if (error) { toast.error("Failed to delete"); return; }
