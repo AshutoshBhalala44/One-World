@@ -8,10 +8,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import heroImage from "@/assets/hero-globe.jpg";
 
 const faqs = [
-  { q: "What is One World?", a: "One World is a transparent global polling platform where verified people from 190+ countries answer Daily and Weekly Challenges. Every result is broken down by country in real time — no aggregations hiding the truth." },
+  { q: "What is One World?", a: "One World is a transparent global polling platform where verified people from 190+ countries answer Daily and Global Topics. Every result is broken down by country in real time — no aggregations hiding the truth." },
   { q: "How do you prevent bots and duplicate votes?", a: "Each account is tied to a verified phone number, enforcing one vote per person. Votes are stored anonymously, but identity verification keeps the results impossible to game." },
-  { q: "Why do I have to complete the Weekly Challenge first?", a: "The Weekly Challenge is the platform's gate. By weighing in on the week's defining question, you unlock access to all Daily Challenges and ensure every active voter has gone on the record for the week." },
-  { q: "Where do the questions come from?", a: "Daily and Weekly Challenges are AI-curated for balance and reviewed by admins before publishing. You can also suggest your own from the Submit tab — top suggestions become real Challenges." },
+  { q: "Why do I have to complete the Global Topic first?", a: "The Global Topic is the platform's gate. By weighing in on the week's defining question, you unlock access to all Daily Challenges and ensure every active voter has gone on the record for the week." },
+  { q: "Where do the questions come from?", a: "Daily Challenges and Global Topics are AI-curated for balance and reviewed by admins before publishing. You can also suggest your own from the Submit tab — top suggestions become real Challenges." },
   { q: "Is my vote private?", a: "Yes. Your individual vote is never tied to your phone number publicly. Only your country is associated with the result so we can show country-level breakdowns." },
   { q: "Is One World free?", a: "Yes — voting is completely free for everyone, everywhere." },
 ];
@@ -31,7 +31,7 @@ const Welcome = () => {
     <div className="min-h-screen bg-background">
       <Helmet>
         <title>One World — Transparent Global Challenges</title>
-        <meta name="description" content="Join the world's most transparent polling platform. Verified voters from 190+ countries answer Daily and Weekly Challenges with real-time, country-level results." />
+        <meta name="description" content="Join the world's most transparent polling platform. Verified voters from 190+ countries answer Daily Challenges and Global Topics with real-time, country-level results." />
         <link rel="canonical" href="https://one-world.lovable.app/welcome" />
         <meta property="og:title" content="One World — Transparent Global Challenges" />
         <meta property="og:description" content="See where the world truly stands. Verified, country-level results in real time." />
@@ -97,7 +97,7 @@ const Welcome = () => {
         <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             { icon: Phone, title: "Verify your phone", body: "One vote per person. Quick, private OTP — no spam." },
-            { icon: Trophy, title: "Complete the Weekly Challenge", body: "Unlock the platform by weighing in on the week's defining question." },
+            { icon: Trophy, title: "Complete the Global Topic", body: "Unlock the platform by weighing in on the week's defining question." },
             { icon: Vote, title: "Vote in Daily Challenges", body: "Join fresh, AI-curated questions every day and watch results roll in live." },
           ].map((step, i) => (
             <motion.div

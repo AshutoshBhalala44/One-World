@@ -238,7 +238,7 @@ export default function Admin() {
       const optionRows = validOpts.map((label, idx) => ({ weekly_poll_id: (newPoll as any).id, label: label.trim(), sort_order: idx }));
       const { error: optErr } = await supabase.from("weekly_poll_options").insert(optionRows);
       if (optErr) throw optErr;
-      toast.success("Weekly challenge created!");
+      toast.success("Global Topic created!");
       setShowWeeklyForm(false);
       setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", ""]);
       setWeeklyDate(format(startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 }), "yyyy-MM-dd"));
@@ -249,7 +249,7 @@ export default function Admin() {
   }
 
   async function handleDeleteWeeklyPoll(pollId: string) {
-    if (!confirm("Delete this weekly poll permanently?")) return;
+    if (!confirm("Delete this Global Topic permanently?")) return;
     await supabase.from("weekly_poll_options").delete().eq("weekly_poll_id", pollId);
     const { error } = await supabase.from("weekly_polls").delete().eq("id", pollId);
     if (error) { toast.error("Failed to delete"); return; }
@@ -264,7 +264,7 @@ export default function Admin() {
       if (resp.error) throw resp.error;
       const data = resp.data;
       if (data?.success) {
-        toast.success(`Generated weekly challenge for ${data.week_start_date}: "${data.question}"`);
+        toast.success(`Generated Global Topic for ${data.week_start_date}: "${data.question}"`);
         fetchWeeklyPolls();
       } else if (data?.error) {
         toast.error(data.error);
@@ -272,7 +272,7 @@ export default function Admin() {
         toast.info(data?.message || "No open week was available");
       }
     } catch (err) {
-      toast.error("Failed to generate weekly challenge");
+      toast.error("Failed to generate Global Topic");
       console.error(err);
     } finally {
       setGeneratingWeekly(false);
@@ -285,7 +285,7 @@ export default function Admin() {
       .update({ status: "approved", needs_review: false } as any)
       .eq("id", pollId);
     if (error) { toast.error("Failed to approve"); return; }
-    toast.success("Weekly challenge approved");
+    toast.success("Global Topic approved");
     fetchWeeklyPolls();
   }
 
@@ -295,7 +295,7 @@ export default function Admin() {
       .update({ status: "rejected", needs_review: false } as any)
       .eq("id", pollId);
     if (error) { toast.error("Failed to reject"); return; }
-    toast.success("Weekly challenge rejected");
+    toast.success("Global Topic rejected");
     fetchWeeklyPolls();
   }
 
@@ -354,7 +354,7 @@ export default function Admin() {
       }
     }
 
-    toast.success("Weekly challenge updated");
+    toast.success("Global Topic updated");
     setEditingWeekly(null);
     fetchWeeklyPolls();
   }
@@ -795,7 +795,7 @@ export default function Admin() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="polls">📊 Polls</TabsTrigger>
-            <TabsTrigger value="weekly">🏆 Weekly</TabsTrigger>
+            <TabsTrigger value="weekly">🏆 Global</TabsTrigger>
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
           </TabsList>
@@ -963,12 +963,12 @@ export default function Admin() {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Trophy className="w-4 h-4" />
-                  Weekly Challenges
+                  Global Topics
                 </h3>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
                     <Plus className="w-4 h-4 mr-2" />
-                    {showWeeklyForm ? "Cancel" : "Create Weekly"}
+                    {showWeeklyForm ? "Cancel" : "Create Global"}
                   </Button>
                   <Button size="sm" variant="outline" onClick={handleGenerateWeekly} disabled={generatingWeekly}>
                     {generatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
@@ -979,12 +979,12 @@ export default function Admin() {
 
               {showWeeklyForm && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-5">
-                  <h4 className="font-semibold text-foreground mb-3">New Weekly Challenge</h4>
-                  <p className="text-xs text-muted-foreground mb-4">Weekly challenges start on Mondays. Users must answer before accessing daily questions.</p>
+                  <h4 className="font-semibold text-foreground mb-3">New Global Topic</h4>
+                  <p className="text-xs text-muted-foreground mb-4">Global Topics start on Mondays. Users must answer before accessing daily questions.</p>
                   <div className="space-y-3">
                     <div>
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
-                      <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
+                      <input value={weeklyQuestion} onChange={(e) => setWeeklyQuestion(e.target.value)} placeholder="This week's big Global Topic question..." className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50" maxLength={200} />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
@@ -1004,7 +1004,7 @@ export default function Admin() {
                         <input type="date" value={weeklyEndDate} onChange={(e) => setWeeklyEndDate(e.target.value)} min={weeklyDate} className="w-full px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground" />
                       </div>
                     </div>
-                    <p className="text-[11px] text-muted-foreground -mt-1">Leave end date empty for a single week. Set it to extend the challenge across multiple weeks.</p>
+                    <p className="text-[11px] text-muted-foreground -mt-1">Leave end date empty for a single week. Set it to extend the topic across multiple weeks.</p>
                     <div>
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Options ({weeklyOptions.length}/4)</label>
                       <div className="space-y-2">
@@ -1030,7 +1030,7 @@ export default function Admin() {
                       <Button variant="ghost" size="sm" onClick={() => setShowWeeklyForm(false)}>Cancel</Button>
                       <Button size="sm" onClick={handleCreateWeeklyPoll} disabled={creatingWeekly}>
                         {creatingWeekly ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                        Create Weekly Challenge
+                        Create Global Topic
                       </Button>
                     </div>
                   </div>
@@ -1042,7 +1042,7 @@ export default function Admin() {
               ) : weeklyPolls.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">No weekly challenges yet. Create one to get started!</p>
+                  <p className="text-sm">No Global Topics yet. Create one to get started!</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1052,10 +1052,10 @@ export default function Admin() {
                       <div className="flex items-center gap-2 mb-1">
                         <AlertTriangle className="w-5 h-5 text-accent" />
                         <h3 className="font-semibold text-foreground">
-                          {weeklyPolls.filter((wp) => wp.needs_review).length} weekly challenge{weeklyPolls.filter((wp) => wp.needs_review).length > 1 ? "s" : ""} pending review
+                          {weeklyPolls.filter((wp) => wp.needs_review).length} Global Topic{weeklyPolls.filter((wp) => wp.needs_review).length > 1 ? "s" : ""} pending review
                         </h3>
                       </div>
-                      <p className="text-sm text-muted-foreground">AI-generated weekly challenges went live automatically but haven't been reviewed yet.</p>
+                      <p className="text-sm text-muted-foreground">AI-generated Global Topics went live automatically but haven't been reviewed yet.</p>
                     </motion.div>
                   )}
 
@@ -1271,10 +1271,10 @@ export default function Admin() {
                   <div className="rounded-xl border border-border bg-card p-4">
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <Trophy className="w-4 h-4" />
-                      Weekly Challenge Schedule
+                      Global Topic Schedule
                     </h3>
                     {weeklyPolls.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">No weekly challenges scheduled yet.</p>
+                      <p className="text-sm text-muted-foreground">No Global Topics scheduled yet.</p>
                     ) : (
                       <div className="space-y-2">
                         {weeklyPolls.slice(0, 6).map((wp) => {
@@ -1366,7 +1366,7 @@ export default function Admin() {
                           <div className="flex items-center gap-2 mb-1">
                             <Trophy className="w-3.5 h-3.5 text-purple-500" />
                             <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-                              Weekly Challenge
+                              Global Topic
                             </span>
                           </div>
                           <p className="text-sm font-medium text-foreground">{weeklyForDate.question}</p>
