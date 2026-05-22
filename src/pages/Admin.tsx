@@ -272,7 +272,7 @@ export default function Admin() {
         toast.info(data?.message || "No open week was available");
       }
     } catch (err) {
-      toast.error("Failed to generate weekly challenge");
+      toast.error("Failed to generate Global Topic");
       console.error(err);
     } finally {
       setGeneratingWeekly(false);
@@ -285,7 +285,7 @@ export default function Admin() {
       .update({ status: "approved", needs_review: false } as any)
       .eq("id", pollId);
     if (error) { toast.error("Failed to approve"); return; }
-    toast.success("Weekly challenge approved");
+    toast.success("Global Topic approved");
     fetchWeeklyPolls();
   }
 
@@ -295,7 +295,7 @@ export default function Admin() {
       .update({ status: "rejected", needs_review: false } as any)
       .eq("id", pollId);
     if (error) { toast.error("Failed to reject"); return; }
-    toast.success("Weekly challenge rejected");
+    toast.success("Global Topic rejected");
     fetchWeeklyPolls();
   }
 
@@ -354,7 +354,7 @@ export default function Admin() {
       }
     }
 
-    toast.success("Weekly challenge updated");
+    toast.success("Global Topic updated");
     setEditingWeekly(null);
     fetchWeeklyPolls();
   }
