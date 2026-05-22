@@ -238,7 +238,7 @@ export default function Admin() {
       const optionRows = validOpts.map((label, idx) => ({ weekly_poll_id: (newPoll as any).id, label: label.trim(), sort_order: idx }));
       const { error: optErr } = await supabase.from("weekly_poll_options").insert(optionRows);
       if (optErr) throw optErr;
-      toast.success("Weekly challenge created!");
+      toast.success("Global Topic created!");
       setShowWeeklyForm(false);
       setWeeklyQuestion(""); setWeeklyCategory("general"); setWeeklyOptions(["", ""]);
       setWeeklyDate(format(startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 }), "yyyy-MM-dd"));
