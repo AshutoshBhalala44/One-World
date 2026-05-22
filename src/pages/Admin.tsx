@@ -979,8 +979,8 @@ export default function Admin() {
 
               {showWeeklyForm && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border border-border bg-card p-5">
-                  <h4 className="font-semibold text-foreground mb-3">New Weekly Challenge</h4>
-                  <p className="text-xs text-muted-foreground mb-4">Weekly challenges start on Mondays. Users must answer before accessing daily questions.</p>
+                  <h4 className="font-semibold text-foreground mb-3">New Global Topic</h4>
+                  <p className="text-xs text-muted-foreground mb-4">Global Topics start on Mondays. Users must answer before accessing daily questions.</p>
                   <div className="space-y-3">
                     <div>
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Question</label>
