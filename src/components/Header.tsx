@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
