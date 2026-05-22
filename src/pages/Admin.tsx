@@ -1042,7 +1042,7 @@ export default function Admin() {
               ) : weeklyPolls.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">
                   <Trophy className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">No weekly challenges yet. Create one to get started!</p>
+                  <p className="text-sm">No Global Topics yet. Create one to get started!</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1052,10 +1052,10 @@ export default function Admin() {
                       <div className="flex items-center gap-2 mb-1">
                         <AlertTriangle className="w-5 h-5 text-accent" />
                         <h3 className="font-semibold text-foreground">
-                          {weeklyPolls.filter((wp) => wp.needs_review).length} weekly challenge{weeklyPolls.filter((wp) => wp.needs_review).length > 1 ? "s" : ""} pending review
+                          {weeklyPolls.filter((wp) => wp.needs_review).length} Global Topic{weeklyPolls.filter((wp) => wp.needs_review).length > 1 ? "s" : ""} pending review
                         </h3>
                       </div>
-                      <p className="text-sm text-muted-foreground">AI-generated weekly challenges went live automatically but haven't been reviewed yet.</p>
+                      <p className="text-sm text-muted-foreground">AI-generated Global Topics went live automatically but haven't been reviewed yet.</p>
                     </motion.div>
                   )}
 
