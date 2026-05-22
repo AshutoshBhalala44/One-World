@@ -795,7 +795,7 @@ export default function Admin() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="polls">📊 Polls</TabsTrigger>
-            <TabsTrigger value="weekly">🏆 Weekly</TabsTrigger>
+            <TabsTrigger value="weekly">🏆 Global</TabsTrigger>
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
           </TabsList>
@@ -963,7 +963,7 @@ export default function Admin() {
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Trophy className="w-4 h-4" />
-                  Weekly Challenges
+                  Global Topics
                 </h3>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => setShowWeeklyForm(!showWeeklyForm)} variant={showWeeklyForm ? "secondary" : "default"}>
