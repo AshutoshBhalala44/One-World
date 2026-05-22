@@ -264,7 +264,7 @@ export default function Admin() {
       if (resp.error) throw resp.error;
       const data = resp.data;
       if (data?.success) {
-        toast.success(`Generated weekly challenge for ${data.week_start_date}: "${data.question}"`);
+        toast.success(`Generated Global Topic for ${data.week_start_date}: "${data.question}"`);
         fetchWeeklyPolls();
       } else if (data?.error) {
         toast.error(data.error);
