@@ -35,23 +35,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Your Challenges — One World Dashboard</title>
-        <meta name="description" content="Vote in today's Daily Challenge, complete the Global Topic, and review your past responses on One World." />
+        <title>Your Topics — One World Dashboard</title>
+        <meta name="description" content="Vote in today's Daily Topic, complete the Global Topic, and review your past responses on One World." />
         <link rel="canonical" href="https://one-world.lovable.app/" />
-        <meta property="og:title" content="Your Challenges — One World Dashboard" />
-        <meta property="og:description" content="Vote in today's Daily Challenge and complete the Global Topic." />
+        <meta property="og:title" content="Your Topics — One World Dashboard" />
+        <meta property="og:description" content="Vote in today's Daily Topic and complete the Global Topic." />
         <meta property="og:url" content="https://one-world.lovable.app/" />
       </Helmet>
       <Header />
 
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6">
-        <h1 className="sr-only">Global Challenges Dashboard</h1>
+        <h1 className="sr-only">Global Topics Dashboard</h1>
         <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
 
         <Tabs defaultValue="today" className="w-full">
           <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto">
             <TabsTrigger value="today" className="text-xs sm:text-sm flex-1 sm:flex-none">
-              🗳️ Today's Challenge
+              🗳️ Today's Topic
             </TabsTrigger>
             <TabsTrigger value="responses" className="text-xs sm:text-sm flex-1 sm:flex-none">
               📋 My Responses

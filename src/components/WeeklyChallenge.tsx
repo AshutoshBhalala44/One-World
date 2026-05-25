@@ -218,7 +218,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
       const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === poll.id);
       setVoteCounts(filtered as any);
 
-      toast.success("🎉 Global Topic answered! Daily challenges unlocked!");
+      toast.success("🎉 Global Topic answered! Daily topics unlocked!");
 
       // Auto-scroll to country breakdown after a brief delay for render
       setTimeout(() => {
@@ -275,8 +275,8 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
             </h2>
             <p className="text-white/70 text-xs sm:text-sm">
               {hasVoted
-                ? "Answered Global Topic -- Daily Challenge Unlocked"
-                : "Answer this to unlock daily challenges"}
+                ? "Answered Global Topic -- Daily Topic Unlocked"
+                : "Answer this to unlock daily topics"}
             </p>
           </div>
           {!hasVoted && (
@@ -426,10 +426,10 @@ export function DailyLocked() {
         <Lock className="w-7 h-7 text-muted-foreground" />
       </div>
       <h3 className="font-display text-xl font-bold text-foreground mb-2">
-        Daily Challenge Locked
+        Daily Topic Locked
       </h3>
       <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-        Answer this week's Global Topic above to unlock today's daily question. It only takes a moment!
+        Answer this week's Global Topic above to unlock today's daily topic. It only takes a moment!
       </p>
     </motion.div>
   );
