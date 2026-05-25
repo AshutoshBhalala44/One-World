@@ -218,7 +218,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
       const filtered = (counts || []).filter((c: any) => c.weekly_poll_id === poll.id);
       setVoteCounts(filtered as any);
 
-      toast.success("🎉 Global Topic answered! Daily challenges unlocked!");
+      toast.success("🎉 Global Topic answered! Daily topics unlocked!");
 
       // Auto-scroll to country breakdown after a brief delay for render
       setTimeout(() => {
