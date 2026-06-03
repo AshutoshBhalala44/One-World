@@ -5,7 +5,8 @@ import { Header } from "@/components/Header";
 import { SwipeToSignIn } from "@/components/SwipeToSignIn";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight } from "lucide-react";
+import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight, Heart } from "lucide-react";
+import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import heroImage from "@/assets/hero-globe.jpg";
 
@@ -106,6 +107,55 @@ const Welcome = () => {
             )}
           </motion.div>
         </div>
+      </section>
+
+      {/* Support our mission */}
+      <section className="container mx-auto px-4 py-16 sm:py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative max-w-4xl mx-auto rounded-3xl overflow-hidden border border-gold/30 bg-gradient-to-br from-navy-deep via-navy to-navy-deep p-8 sm:p-12 shadow-2xl"
+        >
+          <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,hsl(45,100%,60%/0.4),transparent_60%)]" />
+          <div className="relative grid md:grid-cols-[1fr_auto] gap-8 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 border border-gold/30 mb-4">
+                <Heart className="w-3.5 h-3.5 text-gold" />
+                <span className="text-xs font-semibold tracking-wide text-gold uppercase">Support our mission</span>
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-[hsl(45,100%,96%)] mb-3">
+                Keep every voice <span className="text-gradient-gold">heard, free, and unfiltered.</span>
+              </h2>
+              <p className="text-[hsl(45,100%,96%)]/75 leading-relaxed max-w-xl">
+                One World is free for every voter, everywhere. Your donation funds phone verification, AI curation, and the infrastructure that keeps results tamper-proof — no ads, no investors, no agenda.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 md:min-w-[220px]">
+              <div className="grid grid-cols-3 gap-2">
+                {[5, 25, 100].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => toast.info("Donations launching soon — thank you for the support!")}
+                    className="px-3 py-3 rounded-xl border border-gold/40 bg-gold/5 hover:bg-gold/15 transition-colors text-[hsl(45,100%,96%)] font-display font-semibold"
+                  >
+                    ${amount}
+                  </button>
+                ))}
+              </div>
+              <Button
+                size="lg"
+                onClick={() => toast.info("Donations launching soon — thank you for the support!")}
+                className="bg-gold text-navy-deep hover:bg-gold/90 font-semibold gap-2 h-12 rounded-full shadow-lg"
+              >
+                <Heart className="w-4 h-4 fill-navy-deep" />
+                Donate
+              </Button>
+              <p className="text-[10px] text-[hsl(45,100%,96%)]/50 text-center">Secure checkout coming soon</p>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* How it works */}
