@@ -52,6 +52,7 @@ export function MyResponses() {
           id,
           created_at,
           poll_id,
+          option_id,
           poll:polls(question, category, active_date),
           option:poll_options(label)
         `)
