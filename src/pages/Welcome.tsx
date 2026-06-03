@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { SwipeToSignIn } from "@/components/SwipeToSignIn";
-import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import heroImage from "@/assets/hero-globe.jpg";
 
