@@ -29,6 +29,8 @@ const faqJsonLd = {
 };
 
 const Welcome = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
