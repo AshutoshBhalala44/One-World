@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { SwipeToSignIn } from "@/components/SwipeToSignIn";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { DonationCheckoutDialog } from "@/components/DonationCheckoutDialog";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { isPaymentsConfigured } from "@/lib/stripe";
 import heroImage from "@/assets/hero-globe.jpg";
 
 const faqs = [
@@ -29,11 +34,51 @@ const faqJsonLd = {
   })),
 };
 
+const PRESET_AMOUNTS = [5, 25, 100];
+
 const Welcome = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(25);
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [checkoutCents, setCheckoutCents] = useState<number>(0);
+
+  const handleDonate = () => {
+    if (!isPaymentsConfigured()) {
+      toast.error("Payments are not configured for this build.");
+      return;
+    }
+    const raw = customAmount.trim();
+    let amount = 0;
+    if (raw) {
+      const parsed = Number(raw);
+      if (!Number.isFinite(parsed) || parsed <= 0) {
+        toast.error("Please enter a valid donation amount.");
+        return;
+      }
+      amount = parsed;
+    } else if (selectedPreset) {
+      amount = selectedPreset;
+    } else {
+      toast.error("Please choose or enter an amount.");
+      return;
+    }
+    if (amount < 1) {
+      toast.error("Minimum donation is $1.");
+      return;
+    }
+    if (amount > 10000) {
+      toast.error("For donations over $10,000, please contact us directly.");
+      return;
+    }
+    setCheckoutCents(Math.round(amount * 100));
+    setCheckoutOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <PaymentTestModeBanner />
       <Helmet>
         <title>One World — What the World Actually Thinks</title>
         <meta name="description" content="Built to show what the world actually thinks — not what algorithms want you to believe. Verified voters from 190+ countries answer Daily Topics and Global Topics with real-time, country-level results." />
@@ -132,31 +177,70 @@ const Welcome = () => {
                 One World is free for every voter, everywhere. Your donation funds phone verification, AI curation, and the infrastructure that keeps results tamper-proof — no ads, no investors, no agenda.
               </p>
             </div>
-            <div className="flex flex-col gap-3 md:min-w-[220px]">
+            <div className="flex flex-col gap-3 md:min-w-[260px]">
               <div className="grid grid-cols-3 gap-2">
-                {[5, 25, 100].map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => toast.info("Donations launching soon — thank you for the support!")}
-                    className="px-3 py-3 rounded-xl border border-gold/40 bg-gold/5 hover:bg-gold/15 transition-colors text-[hsl(45,100%,96%)] font-display font-semibold"
-                  >
-                    ${amount}
-                  </button>
-                ))}
+                {PRESET_AMOUNTS.map((amount) => {
+                  const active = selectedPreset === amount && !customAmount.trim();
+                  return (
+                    <button
+                      key={amount}
+                      type="button"
+                      onClick={() => {
+                        setSelectedPreset(amount);
+                        setCustomAmount("");
+                      }}
+                      aria-pressed={active}
+                      className={`px-3 py-3 rounded-xl border transition-colors font-display font-semibold ${
+                        active
+                          ? "border-gold bg-gold text-navy-deep"
+                          : "border-gold/40 bg-gold/5 hover:bg-gold/15 text-[hsl(45,100%,96%)]"
+                      }`}
+                    >
+                      ${amount}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(45,100%,96%)]/60 font-display">$</span>
+                <Input
+                  type="number"
+                  inputMode="decimal"
+                  min={1}
+                  step="1"
+                  placeholder="Custom amount"
+                  value={customAmount}
+                  onChange={(e) => {
+                    setCustomAmount(e.target.value);
+                    if (e.target.value.trim()) setSelectedPreset(null);
+                  }}
+                  className="pl-7 bg-[hsl(45,100%,96%)]/5 border-gold/30 text-[hsl(45,100%,96%)] placeholder:text-[hsl(45,100%,96%)]/40 focus-visible:ring-gold/40"
+                  aria-label="Custom donation amount in US dollars"
+                />
               </div>
               <Button
                 size="lg"
-                onClick={() => toast.info("Donations launching soon — thank you for the support!")}
+                onClick={handleDonate}
                 className="bg-gold text-navy-deep hover:bg-gold/90 font-semibold gap-2 h-12 rounded-full shadow-lg"
               >
                 <Heart className="w-4 h-4 fill-navy-deep" />
                 Donate
               </Button>
-              <p className="text-[10px] text-[hsl(45,100%,96%)]/50 text-center">Secure checkout coming soon</p>
+              <p className="text-[10px] text-[hsl(45,100%,96%)]/50 text-center">
+                Secure checkout powered by Stripe
+              </p>
             </div>
           </div>
         </motion.div>
       </section>
+
+      <DonationCheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        amountInCents={checkoutCents}
+        userId={user?.id}
+        customerEmail={user?.email}
+      />
 
       {/* How it works */}
       <section className="container mx-auto px-4 py-16 sm:py-24">
