@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { SwipeToSignIn } from "@/components/SwipeToSignIn";
-import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import heroImage from "@/assets/hero-globe.jpg";
 
@@ -27,6 +29,8 @@ const faqJsonLd = {
 };
 
 const Welcome = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -78,12 +82,28 @@ const Welcome = () => {
               <span className="flex items-center gap-1.5">🔒 Tamper-proof</span>
             </div>
 
-            <div className="flex justify-center">
-              <SwipeToSignIn />
-            </div>
-            <Link to="/auth" className="inline-block mt-4 text-xs text-foreground/60 hover:text-foreground underline-offset-4 hover:underline">
-              or sign in directly
-            </Link>
+            {user ? (
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-sm text-foreground/80">Welcome back — you're already signed in.</p>
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/")}
+                  className="bg-gold text-navy-deep hover:bg-gold/90 font-semibold gap-2 px-8 h-12 rounded-full shadow-lg"
+                >
+                  Enter the app
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-center">
+                  <SwipeToSignIn />
+                </div>
+                <Link to="/auth" className="inline-block mt-4 text-xs text-foreground/60 hover:text-foreground underline-offset-4 hover:underline">
+                  or sign in directly
+                </Link>
+              </>
+            )}
           </motion.div>
         </div>
       </section>
