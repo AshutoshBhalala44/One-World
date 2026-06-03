@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { SwipeToSignIn } from "@/components/SwipeToSignIn";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { DonationCheckoutDialog } from "@/components/DonationCheckoutDialog";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { isPaymentsConfigured } from "@/lib/stripe";
 import heroImage from "@/assets/hero-globe.jpg";
 
 const faqs = [
