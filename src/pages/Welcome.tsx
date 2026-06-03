@@ -34,11 +34,51 @@ const faqJsonLd = {
   })),
 };
 
+const PRESET_AMOUNTS = [5, 25, 100];
+
 const Welcome = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(25);
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [checkoutCents, setCheckoutCents] = useState<number>(0);
+
+  const handleDonate = () => {
+    if (!isPaymentsConfigured()) {
+      toast.error("Payments are not configured for this build.");
+      return;
+    }
+    const raw = customAmount.trim();
+    let amount = 0;
+    if (raw) {
+      const parsed = Number(raw);
+      if (!Number.isFinite(parsed) || parsed <= 0) {
+        toast.error("Please enter a valid donation amount.");
+        return;
+      }
+      amount = parsed;
+    } else if (selectedPreset) {
+      amount = selectedPreset;
+    } else {
+      toast.error("Please choose or enter an amount.");
+      return;
+    }
+    if (amount < 1) {
+      toast.error("Minimum donation is $1.");
+      return;
+    }
+    if (amount > 10000) {
+      toast.error("For donations over $10,000, please contact us directly.");
+      return;
+    }
+    setCheckoutCents(Math.round(amount * 100));
+    setCheckoutOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <PaymentTestModeBanner />
       <Helmet>
         <title>One World — What the World Actually Thinks</title>
         <meta name="description" content="Built to show what the world actually thinks — not what algorithms want you to believe. Verified voters from 190+ countries answer Daily Topics and Global Topics with real-time, country-level results." />
