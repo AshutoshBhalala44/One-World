@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
         },
       ],
       mode: "payment",
-      ui_mode: "embedded",
+      ui_mode: "embedded_page",
       return_url: opts.returnUrl,
       payment_intent_data: {
         description: `One World donation — $${amountDisplay}`,
