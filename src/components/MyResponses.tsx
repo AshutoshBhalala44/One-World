@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, History, Search } from "lucide-react";
+import { Loader2, History, Search, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { CountryBreakdownChart } from "./CountryBreakdownChart";
@@ -18,6 +18,7 @@ interface VoteWithPoll {
   id: string;
   created_at: string;
   poll_id: string;
+  option_id: string;
   poll: { question: string; category: string; active_date: string };
   option: { label: string };
   pollOptions?: { id: string; label: string }[];
@@ -51,6 +52,7 @@ export function MyResponses() {
           id,
           created_at,
           poll_id,
+          option_id,
           poll:polls(question, category, active_date),
           option:poll_options(label)
         `)
@@ -209,10 +211,30 @@ export function MyResponses() {
             <h4 className="font-display text-lg font-bold text-foreground mb-2">
               {response.poll?.question}
             </h4>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-navy/10 text-sm font-medium text-foreground">
-              <div className="w-3 h-3 rounded-full bg-navy" />
-              {response.option?.label}
-            </div>
+            {response.pollOptions && response.pollOptions.length > 0 && (
+              <div className="space-y-2 mt-3">
+                {response.pollOptions.map((opt) => {
+                  const isSelected = opt.id === response.option_id;
+                  return (
+                    <div
+                      key={opt.id}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                        isSelected
+                          ? "border-gold bg-gold/10 text-foreground font-medium"
+                          : "border-border bg-muted/30 text-muted-foreground"
+                      }`}
+                    >
+                      {isSelected ? (
+                        <Check className="w-4 h-4 text-gold shrink-0" />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full border border-muted-foreground/40 shrink-0" />
+                      )}
+                      <span>{opt.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             {response.pollOptions && response.pollOptions.length > 0 && (
               <CountryBreakdownChart options={response.pollOptions} />
             )}
