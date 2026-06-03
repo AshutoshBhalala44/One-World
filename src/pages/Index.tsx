@@ -48,18 +48,30 @@ const Index = () => {
         <h1 className="sr-only">Global Topics Dashboard</h1>
         <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
 
-        <Tabs defaultValue="today" className="w-full">
-          <TabsList className="mb-6 sm:mb-8 w-full sm:w-auto">
-            <TabsTrigger value="today" className="text-xs sm:text-sm flex-1 sm:flex-none">
-              🗳️ Today's Topic
-            </TabsTrigger>
-            <TabsTrigger value="responses" className="text-xs sm:text-sm flex-1 sm:flex-none">
-              📋 Previous Topics
-            </TabsTrigger>
-            <TabsTrigger value="submit" className="text-xs sm:text-sm flex-1 sm:flex-none">
-              💡 Submit
-            </TabsTrigger>
-          </TabsList>
+        <Tabs
+          defaultValue="today"
+          className="w-full"
+          onValueChange={(val) => {
+            if (val === "today" && dailyRef.current) {
+              setTimeout(() => {
+                dailyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 50);
+            }
+          }}
+        >
+          <div className="sticky top-16 z-40 -mx-3 sm:-mx-4 px-3 sm:px-4 py-2 mb-6 sm:mb-8 backdrop-blur-md bg-background/85 border-b border-border">
+            <TabsList className="w-full sm:w-auto mx-auto flex">
+              <TabsTrigger value="today" className="text-xs sm:text-sm flex-1 sm:flex-none">
+                🗳️ Today's Topic
+              </TabsTrigger>
+              <TabsTrigger value="responses" className="text-xs sm:text-sm flex-1 sm:flex-none">
+                📋 Previous Topics
+              </TabsTrigger>
+              <TabsTrigger value="submit" className="text-xs sm:text-sm flex-1 sm:flex-none">
+                💡 Submit
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="today">
             {weeklyUnlocked ? <DailyPoll scrollRef={dailyRef} /> : <DailyLocked />}
