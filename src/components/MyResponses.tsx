@@ -18,6 +18,7 @@ interface VoteWithPoll {
   id: string;
   created_at: string;
   poll_id: string;
+  option_id: string;
   poll: { question: string; category: string; active_date: string };
   option: { label: string };
   pollOptions?: { id: string; label: string }[];
