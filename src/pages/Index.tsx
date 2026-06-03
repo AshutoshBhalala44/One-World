@@ -54,7 +54,7 @@ const Index = () => {
               🗳️ Today's Topic
             </TabsTrigger>
             <TabsTrigger value="responses" className="text-xs sm:text-sm flex-1 sm:flex-none">
-              📋 My Responses
+              📋 Previous Topics
             </TabsTrigger>
             <TabsTrigger value="submit" className="text-xs sm:text-sm flex-1 sm:flex-none">
               💡 Submit
