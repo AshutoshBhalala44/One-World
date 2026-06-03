@@ -21,6 +21,8 @@ export function Header() {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
+  const location = useLocation();
+  const onWelcome = location.pathname === "/welcome";
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
@@ -33,9 +35,19 @@ export function Header() {
         </button>
         <nav className="flex items-center gap-2">
           <ThemeToggle />
-          <span className="text-sm text-muted-foreground hidden sm:block">
-            The world's voice, unfiltered.
-          </span>
+          {user && !onWelcome && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/welcome")}
+              title="Welcome page"
+              aria-label="Go to welcome page"
+              className="gap-1.5"
+            >
+              <Home className="w-4 h-4" />
+              <span className="hidden sm:inline text-xs">Welcome</span>
+            </Button>
+          )}
           {user ? (
             <div className="flex items-center gap-2">
               {isAdmin && (
