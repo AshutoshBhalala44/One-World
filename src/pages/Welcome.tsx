@@ -304,6 +304,9 @@ const Welcome = () => {
         </div>
       </section>
 
+      {/* Join the team */}
+      <JoinTheTeamSection />
+
       {/* FAQ */}
       <section className="bg-card/30 border-y border-border py-16 sm:py-24">
         <div className="container mx-auto px-4 max-w-3xl">
