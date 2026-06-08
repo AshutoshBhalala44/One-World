@@ -799,6 +799,7 @@ export default function Admin() {
             <TabsTrigger value="weekly">🏆 Global</TabsTrigger>
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
+            <TabsTrigger value="applications">💼 Applications</TabsTrigger>
           </TabsList>
 
           <TabsContent value="polls">
