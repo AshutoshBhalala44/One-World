@@ -58,6 +58,7 @@ export type Database = {
       }
       job_applications: {
         Row: {
+          admin_notes: string | null
           created_at: string
           description: string
           email: string
@@ -65,9 +66,11 @@ export type Database = {
           name: string
           resume_filename: string | null
           resume_path: string | null
+          status: Database["public"]["Enums"]["job_application_status"]
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           created_at?: string
           description: string
           email: string
@@ -75,9 +78,11 @@ export type Database = {
           name: string
           resume_filename?: string | null
           resume_path?: string | null
+          status?: Database["public"]["Enums"]["job_application_status"]
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           created_at?: string
           description?: string
           email?: string
@@ -85,6 +90,7 @@ export type Database = {
           name?: string
           resume_filename?: string | null
           resume_path?: string | null
+          status?: Database["public"]["Enums"]["job_application_status"]
           updated_at?: string
         }
         Relationships: []
@@ -431,6 +437,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      job_application_status:
+        | "new"
+        | "in_review"
+        | "shortlisted"
+        | "rejected"
+        | "hired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -559,6 +571,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      job_application_status: [
+        "new",
+        "in_review",
+        "shortlisted",
+        "rejected",
+        "hired",
+      ],
     },
   },
 } as const
