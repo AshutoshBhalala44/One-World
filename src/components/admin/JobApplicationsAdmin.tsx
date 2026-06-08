@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, FileText, Download, RefreshCw, Trash2, Save } from "lucide-react";
+import { Loader2, FileText, Download, RefreshCw, Trash2, Save, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
