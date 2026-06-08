@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 const Index = () => {
   const [weeklyUnlocked, setWeeklyUnlocked] = useState<boolean | null>(null);
   const [initialScrollDone, setInitialScrollDone] = useState(false);
+  const [activeTab, setActiveTab] = useState("today");
   const weeklyRef = useRef<HTMLDivElement>(null);
   const dailyRef = useRef<HTMLDivElement>(null);
 
@@ -47,12 +48,13 @@ const Index = () => {
 
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6 pb-28 sm:pb-32">
         <h1 className="sr-only">Global Topics Dashboard</h1>
-        <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />
+        {activeTab === "today" && <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />}
 
         <Tabs
           defaultValue="today"
           className="w-full"
           onValueChange={(val) => {
+            setActiveTab(val);
             if (val === "today" && dailyRef.current) {
               setTimeout(() => {
                 dailyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
