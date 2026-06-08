@@ -87,7 +87,7 @@ export const JoinTheTeamSection = () => {
 
       if (resume) {
         const ext = resume.name.includes(".") ? resume.name.split(".").pop() : "bin";
-        const path = `${crypto.randomUUID()}-${sanitizeFilename(resume.name)}`;
+        const path = `applications/${crypto.randomUUID()}-${sanitizeFilename(resume.name)}`;
         const { error: uploadError } = await supabase.storage
           .from("job-resumes")
           .upload(path, resume, {
