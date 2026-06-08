@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import AdminApplicationDetail from "./pages/AdminApplicationDetail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import ThankYou from "./pages/ThankYou";
