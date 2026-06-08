@@ -34,12 +34,12 @@ const faqJsonLd = {
   })),
 };
 
-const PRESET_AMOUNTS = [5, 25, 100];
+const PRESET_AMOUNTS = [1, 2, 3];
 
 const Welcome = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedPreset, setSelectedPreset] = useState<number | null>(25);
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(2);
   const [customAmount, setCustomAmount] = useState<string>("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutCents, setCheckoutCents] = useState<number>(0);
