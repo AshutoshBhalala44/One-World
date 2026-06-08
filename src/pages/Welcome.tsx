@@ -11,6 +11,7 @@ import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRig
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DonationCheckoutDialog } from "@/components/DonationCheckoutDialog";
+import { JoinTheTeamSection } from "@/components/JoinTheTeamSection";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { isPaymentsConfigured } from "@/lib/stripe";
 import heroImage from "@/assets/hero-globe.jpg";
@@ -302,6 +303,9 @@ const Welcome = () => {
           </div>
         </div>
       </section>
+
+      {/* Join the team */}
+      <JoinTheTeamSection />
 
       {/* FAQ */}
       <section className="bg-card/30 border-y border-border py-16 sm:py-24">
