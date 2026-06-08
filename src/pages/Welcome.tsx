@@ -172,7 +172,7 @@ const Welcome = () => {
                 <span className="text-xs font-semibold tracking-wide text-gold uppercase">Support our mission</span>
               </div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold text-[hsl(45,100%,96%)] mb-3">
-                Keep every voice <span className="text-gradient-gold">heard, free, and unfiltered.</span>
+                Keep every voice <span className="text-gradient-gold">heard, equal, and unfiltered.</span>
               </h2>
               <p className="text-[hsl(45,100%,96%)]/75 leading-relaxed max-w-xl">
                 One World is free for every voter, everywhere. Your donation funds phone verification, content curation, and the infrastructure that keeps results tamper-proof — no ads, no investors, no agenda.
