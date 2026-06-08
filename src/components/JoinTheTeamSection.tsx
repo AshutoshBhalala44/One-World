@@ -136,7 +136,7 @@ export const JoinTheTeamSection = () => {
               <span className="text-xs font-semibold tracking-wide text-gold uppercase">Join the team</span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-[hsl(45,100%,96%)] mb-3">
-              Help build the world's <span className="text-gradient-gold">most transparent voice platform.</span>
+              Join a small team building <span className="text-gradient-gold">something the world has never had.</span>
             </h2>
             <p className="text-[hsl(45,100%,96%)]/75 leading-relaxed">
               We're a small team with a big mission. Send us your resume and a short note on how you'd make an impact at One World — we read every submission.
