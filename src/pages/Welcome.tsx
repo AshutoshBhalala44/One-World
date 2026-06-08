@@ -19,7 +19,7 @@ const faqs = [
   { q: "What is One World?", a: "One World is a transparent global voice platform where verified people from 190+ countries answer Daily and Global Topics. Every result is broken down by country in real time — no aggregations hiding the truth." },
   { q: "How do you prevent bots and duplicate votes?", a: "Each account is tied to a verified phone number, enforcing one vote per person. Votes are stored anonymously, but identity verification keeps the results impossible to game." },
   { q: "Why do I have to complete the Global Topic first?", a: "The Global Topic is the platform's gate. By weighing in on the week's defining question, you unlock access to all Daily Topics and ensure every active voter has gone on the record for the week." },
-  { q: "Where do the questions come from?", a: "Daily Topics and Global Topics are curated for balance and reviewed by admins before publishing. You can also suggest your own from the Submit tab — top suggestions become real topics." },
+  { q: "Where do the questions come from?", a: "Daily Topics and Global Topics are curated for balance and reviewed by industry professionals before publishing. You can also suggest your own from the Submit tab — top suggestions become real topics." },
   { q: "Is my vote private?", a: "Yes. Your individual vote is never tied to your phone number publicly. Only your country is associated with the result so we can show country-level breakdowns." },
   { q: "Is One World free?", a: "Yes — voting is completely free for everyone, everywhere." },
 ];
