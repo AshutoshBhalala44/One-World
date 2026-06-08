@@ -224,6 +224,12 @@ export function JobApplicationsAdmin() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button asChild size="sm" variant="outline" className="gap-1.5">
+                      <Link to={`/admin/applications/${app.id}`}>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Details
+                      </Link>
+                    </Button>
                     <Select
                       value={app.status}
                       onValueChange={(v) => updateStatus(app.id, v as Status)}
