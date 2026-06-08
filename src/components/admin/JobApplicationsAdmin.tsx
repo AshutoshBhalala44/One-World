@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, FileText, Download, RefreshCw, Trash2, Save } from "lucide-react";
+import { Loader2, FileText, Download, RefreshCw, Trash2, Save, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -223,6 +224,12 @@ export function JobApplicationsAdmin() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button asChild size="sm" variant="outline" className="gap-1.5">
+                      <Link to={`/admin/applications/${app.id}`}>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Details
+                      </Link>
+                    </Button>
                     <Select
                       value={app.status}
                       onValueChange={(v) => updateStatus(app.id, v as Status)}

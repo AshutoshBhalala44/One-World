@@ -56,6 +56,56 @@ export type Database = {
         }
         Relationships: []
       }
+      job_application_reviews: {
+        Row: {
+          application_id: string
+          created_at: string
+          id: string
+          new_status:
+            | Database["public"]["Enums"]["job_application_status"]
+            | null
+          note: string | null
+          previous_status:
+            | Database["public"]["Enums"]["job_application_status"]
+            | null
+          reviewer_id: string | null
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          id?: string
+          new_status?:
+            | Database["public"]["Enums"]["job_application_status"]
+            | null
+          note?: string | null
+          previous_status?:
+            | Database["public"]["Enums"]["job_application_status"]
+            | null
+          reviewer_id?: string | null
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          id?: string
+          new_status?:
+            | Database["public"]["Enums"]["job_application_status"]
+            | null
+          note?: string | null
+          previous_status?:
+            | Database["public"]["Enums"]["job_application_status"]
+            | null
+          reviewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_application_reviews_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           admin_notes: string | null
