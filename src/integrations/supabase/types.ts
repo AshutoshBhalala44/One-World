@@ -56,6 +56,39 @@ export type Database = {
         }
         Relationships: []
       }
+      job_applications: {
+        Row: {
+          created_at: string
+          description: string
+          email: string
+          id: string
+          name: string
+          resume_filename: string | null
+          resume_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          email: string
+          id?: string
+          name: string
+          resume_filename?: string | null
+          resume_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          email?: string
+          id?: string
+          name?: string
+          resume_filename?: string | null
+          resume_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       otp_codes: {
         Row: {
           code: string
