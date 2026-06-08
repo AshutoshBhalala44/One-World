@@ -174,7 +174,7 @@ const Welcome = () => {
                 Keep every voice <span className="text-gradient-gold">heard, free, and unfiltered.</span>
               </h2>
               <p className="text-[hsl(45,100%,96%)]/75 leading-relaxed max-w-xl">
-                One World is free for every voter, everywhere. Your donation funds phone verification, AI curation, and the infrastructure that keeps results tamper-proof — no ads, no investors, no agenda.
+                One World is free for every voter, everywhere. Your donation funds phone verification, content curation, and the infrastructure that keeps results tamper-proof — no ads, no investors, no agenda.
               </p>
             </div>
             <div className="flex flex-col gap-3 md:min-w-[260px]">
