@@ -35,6 +35,7 @@ function getCurrentAdminWeekStart(): string {
 }
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { JobApplicationsAdmin } from "@/components/admin/JobApplicationsAdmin";
 
 interface PollWithOptions {
   id: string;
@@ -798,6 +799,7 @@ export default function Admin() {
             <TabsTrigger value="weekly">🏆 Global</TabsTrigger>
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
+            <TabsTrigger value="applications">💼 Applications</TabsTrigger>
           </TabsList>
 
           <TabsContent value="polls">
@@ -1567,6 +1569,10 @@ export default function Admin() {
                 )}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="applications">
+            <JobApplicationsAdmin />
           </TabsContent>
         </Tabs>
       </main>
