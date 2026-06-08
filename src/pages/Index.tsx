@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 const Index = () => {
   const [weeklyUnlocked, setWeeklyUnlocked] = useState<boolean | null>(null);
   const [initialScrollDone, setInitialScrollDone] = useState(false);
+  const [activeTab, setActiveTab] = useState("today");
   const weeklyRef = useRef<HTMLDivElement>(null);
   const dailyRef = useRef<HTMLDivElement>(null);
 
