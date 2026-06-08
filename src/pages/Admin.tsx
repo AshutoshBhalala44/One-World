@@ -1570,6 +1570,10 @@ export default function Admin() {
               </div>
             </div>
           </TabsContent>
+
+          <TabsContent value="applications">
+            <JobApplicationsAdmin />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
