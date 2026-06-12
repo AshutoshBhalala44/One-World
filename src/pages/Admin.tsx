@@ -1576,6 +1576,10 @@ export default function Admin() {
           <TabsContent value="applications">
             <JobApplicationsAdmin />
           </TabsContent>
+
+          <TabsContent value="feedback">
+            <FeedbackAdmin />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
