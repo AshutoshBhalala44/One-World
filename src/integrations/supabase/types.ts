@@ -56,6 +56,30 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          message: string
+          user_id: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          message: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       job_application_reviews: {
         Row: {
           application_id: string
