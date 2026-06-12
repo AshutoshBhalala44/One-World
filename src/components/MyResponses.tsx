@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, History, Search, Check, X } from "lucide-react";
+import { Loader2, History, Search, Check, X, Globe, CalendarDays } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { CountryBreakdownChart } from "./CountryBreakdownChart";
@@ -23,10 +23,20 @@ interface PastPoll {
   option_id: string | null;
   options: { id: string; label: string }[];
   totalVotes: number;
+  type: "daily" | "global";
 }
 
 type SortOption = "newest" | "oldest" | "most_voted";
 type FilterOption = "all" | "answered" | "unanswered";
+type TopicType = "daily" | "global";
+
+function getCurrentWeekStart(): string {
+  const now = new Date();
+  const utcDay = now.getUTCDay();
+  const diff = utcDay === 0 ? 6 : utcDay - 1;
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff));
+  return monday.toISOString().split("T")[0];
+}
 
 export function MyResponses() {
   const { user } = useAuth();
@@ -36,6 +46,7 @@ export function MyResponses() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
   const [filter, setFilter] = useState<FilterOption>("all");
+  const [topicType, setTopicType] = useState<TopicType>("daily");
 
   useEffect(() => {
     if (!user) {
@@ -43,67 +54,68 @@ export function MyResponses() {
       return;
     }
     fetchPastPolls();
-  }, [user]);
+  }, [user, topicType]);
 
   async function fetchPastPolls() {
     setLoading(true);
     try {
       const today = new Date().toISOString().split("T")[0];
+      const weekStart = getCurrentWeekStart();
+      const isDaily = topicType === "daily";
 
-      // 1. Fetch all past polls
-      const { data: allPolls } = await (supabase
-        .from("polls")
-        .select("id, question, category, active_date")
-        .lt("active_date", today) as any)
-        .neq("status", "rejected")
-        .order("active_date", { ascending: false });
+      let mergedPolls: PastPoll[] = [];
 
-      const pollsData = allPolls || [];
-      const pollIds = pollsData.map((p: any) => p.id);
+      // ── Daily polls ──
+      if (isDaily) {
+        const { data: allPolls } = await (supabase
+          .from("polls")
+          .select("id, question, category, active_date")
+          .lt("active_date", today) as any)
+          .neq("status", "rejected")
+          .order("active_date", { ascending: false });
 
-      if (pollIds.length === 0) {
-        setPolls([]);
-        setLoading(false);
-        return;
-      }
+        const pollsData = allPolls || [];
+        const pollIds = pollsData.map((p: any) => p.id);
 
-      // 2. Fetch user's votes for these polls
-      const { data: userVotes } = await supabase
-        .from("votes")
-        .select("poll_id, option_id")
-        .eq("user_id", user!.id)
-        .in("poll_id", pollIds);
+        if (pollIds.length === 0) {
+          setPolls([]);
+          setLoading(false);
+          return;
+        }
 
-      const voteMap = (userVotes || []).reduce((acc: Record<string, string>, v: any) => {
-        acc[v.poll_id] = v.option_id;
-        return acc;
-      }, {} as Record<string, string>);
+        const { data: userVotes } = await supabase
+          .from("votes")
+          .select("poll_id, option_id")
+          .eq("user_id", user!.id)
+          .in("poll_id", pollIds);
 
-      // 3. Fetch all options for these polls
-      const { data: allOptions } = await supabase
-        .from("poll_options")
-        .select("id, label, poll_id, sort_order")
-        .in("poll_id", pollIds)
-        .order("sort_order", { ascending: true });
-
-      const optionsByPoll = (allOptions || []).reduce((acc: any, opt: any) => {
-        if (!acc[opt.poll_id]) acc[opt.poll_id] = [];
-        acc[opt.poll_id].push({ id: opt.id, label: opt.label });
-        return acc;
-      }, {} as Record<string, { id: string; label: string }[]>);
-
-      // 4. Fetch vote counts
-      const { data: voteCounts } = await supabase.rpc("get_poll_vote_counts");
-      const totalsByPoll = (voteCounts || []).reduce(
-        (acc: Record<string, number>, row: any) => {
-          acc[row.poll_id] = (acc[row.poll_id] || 0) + Number(row.vote_count);
+        const voteMap = (userVotes || []).reduce((acc: Record<string, string>, v: any) => {
+          acc[v.poll_id] = v.option_id;
           return acc;
-        },
-        {} as Record<string, number>
-      );
+        }, {} as Record<string, string>);
 
-      setPolls(
-        pollsData.map((p: any) => ({
+        const { data: allOptions } = await supabase
+          .from("poll_options")
+          .select("id, label, poll_id, sort_order")
+          .in("poll_id", pollIds)
+          .order("sort_order", { ascending: true });
+
+        const optionsByPoll = (allOptions || []).reduce((acc: any, opt: any) => {
+          if (!acc[opt.poll_id]) acc[opt.poll_id] = [];
+          acc[opt.poll_id].push({ id: opt.id, label: opt.label });
+          return acc;
+        }, {} as Record<string, { id: string; label: string }[]>);
+
+        const { data: voteCounts } = await supabase.rpc("get_poll_vote_counts");
+        const totalsByPoll = (voteCounts || []).reduce(
+          (acc: Record<string, number>, row: any) => {
+            acc[row.poll_id] = (acc[row.poll_id] || 0) + Number(row.vote_count);
+            return acc;
+          },
+          {} as Record<string, number>
+        );
+
+        mergedPolls = pollsData.map((p: any) => ({
           id: p.id,
           poll_id: p.id,
           question: p.question,
@@ -112,8 +124,91 @@ export function MyResponses() {
           option_id: voteMap[p.id] || null,
           options: optionsByPoll[p.id] || [],
           totalVotes: totalsByPoll[p.id] || 0,
-        }))
-      );
+          type: "daily" as const,
+        }));
+      }
+
+      // ── Global / Weekly polls ──
+      if (!isDaily) {
+        // Fetch all non-rejected weekly polls whose week has already started
+        const { data: allWeekly } = await (supabase
+          .from("weekly_polls")
+          .select("id, question, category, week_start_date, end_date")
+          .lte("week_start_date", today) as any)
+          .neq("status", "rejected")
+          .order("week_start_date", { ascending: false });
+
+        let weeklyData = (allWeekly || []) as any[];
+
+        // Exclude the currently active weekly poll
+        const activeIndex = weeklyData.findIndex((w: any) => {
+          if (w.end_date) return w.end_date >= today;
+          return w.week_start_date === weekStart;
+        });
+        if (activeIndex !== -1) {
+          weeklyData = weeklyData.filter((_, i) => i !== activeIndex);
+        }
+
+        const weeklyIds = weeklyData.map((w: any) => w.id);
+
+        if (weeklyIds.length === 0) {
+          setPolls([]);
+          setLoading(false);
+          return;
+        }
+
+        const { data: userWeeklyVotes } = await supabase
+          .from("weekly_votes")
+          .select("weekly_poll_id, option_id")
+          .eq("user_id", user!.id)
+          .in("weekly_poll_id", weeklyIds);
+
+        const weeklyVoteMap = (userWeeklyVotes || []).reduce(
+          (acc: Record<string, string>, v: any) => {
+            acc[v.weekly_poll_id] = v.option_id;
+            return acc;
+          },
+          {} as Record<string, string>
+        );
+
+        const { data: weeklyOptions } = await supabase
+          .from("weekly_poll_options")
+          .select("id, label, weekly_poll_id, sort_order")
+          .in("weekly_poll_id", weeklyIds)
+          .order("sort_order", { ascending: true });
+
+        const weeklyOptionsByPoll = (weeklyOptions || []).reduce(
+          (acc: any, opt: any) => {
+            if (!acc[opt.weekly_poll_id]) acc[opt.weekly_poll_id] = [];
+            acc[opt.weekly_poll_id].push({ id: opt.id, label: opt.label });
+            return acc;
+          },
+          {} as Record<string, { id: string; label: string }[]>
+        );
+
+        const { data: weeklyVoteCounts } = await supabase.rpc("get_weekly_vote_counts");
+        const weeklyTotalsByPoll = (weeklyVoteCounts || []).reduce(
+          (acc: Record<string, number>, row: any) => {
+            acc[row.weekly_poll_id] = (acc[row.weekly_poll_id] || 0) + Number(row.vote_count);
+            return acc;
+          },
+          {} as Record<string, number>
+        );
+
+        mergedPolls = weeklyData.map((w: any) => ({
+          id: w.id,
+          poll_id: w.id,
+          question: w.question,
+          category: w.category,
+          active_date: w.week_start_date,
+          option_id: weeklyVoteMap[w.id] || null,
+          options: weeklyOptionsByPoll[w.id] || [],
+          totalVotes: weeklyTotalsByPoll[w.id] || 0,
+          type: "global" as const,
+        }));
+      }
+
+      setPolls(mergedPolls);
     } catch (err) {
       console.error("Error fetching past polls:", err);
     } finally {
@@ -182,17 +277,50 @@ export function MyResponses() {
     );
   }
 
+  const emptyMessage =
+    topicType === "global"
+      ? "No previous Global Topics yet."
+      : "No previous topics yet. Vote on today's topic!";
+
   if (polls.length === 0) {
     return (
       <div className="text-center py-20 text-muted-foreground">
         <History className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
-        <p className="text-lg">No previous topics yet. Vote on today's topic!</p>
+        <p className="text-lg">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
+      {/* Topic type toggle */}
+      <div className="flex justify-center">
+        <div className="inline-flex rounded-xl bg-muted p-1 gap-1">
+          <button
+            onClick={() => setTopicType("daily")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              topicType === "daily"
+                ? "bg-accent text-accent-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            Daily
+          </button>
+          <button
+            onClick={() => setTopicType("global")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              topicType === "global"
+                ? "bg-accent text-accent-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Globe className="w-4 h-4" />
+            Global
+          </button>
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -229,9 +357,9 @@ export function MyResponses() {
         <div className="text-center py-12 text-muted-foreground">
           <p>
             {filter === "unanswered"
-              ? "No unanswered topics. You've answered them all!"
+              ? `No unanswered ${topicType} topics. You've answered them all!`
               : filter === "answered"
-              ? "No answered topics yet."
+              ? `No answered ${topicType} topics yet.`
               : "No topics match your search."}
           </p>
         </div>
@@ -247,9 +375,20 @@ export function MyResponses() {
               className="rounded-xl bg-card shadow-card p-5 border border-border"
             >
               <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
-                  {poll.category}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+                    {poll.category}
+                  </span>
+                  <span
+                    className={`text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded-full ${
+                      poll.type === "global"
+                        ? "bg-purple-500/15 text-purple-400"
+                        : "bg-blue-500/15 text-blue-400"
+                    }`}
+                  >
+                    {poll.type === "global" ? "Global" : "Daily"}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   {isAnswered ? (
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-full">
