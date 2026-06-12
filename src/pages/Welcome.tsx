@@ -82,10 +82,10 @@ const Welcome = () => {
       <PaymentTestModeBanner />
       <Helmet>
         <title>One World — What the World Actually Thinks</title>
-        <meta name="description" content="Built to show what the world actually thinks — not what algorithms want you to believe. Verified voters from 190+ countries answer Daily Topics and Global Topics with real-time, country-level results." />
+        <meta name="description" content="Our vision is to have a world where you don't only know what your neighbors, family, friends, and colleagues think. Instead, you know what every person in every corner of the world thinks, since we are all part of One World. Verified voters from 190+ countries answer Daily Topics and Global Topics with real-time, country-level results." />
         <link rel="canonical" href="https://one-world.lovable.app/welcome" />
         <meta property="og:title" content="One World — What the World Actually Thinks" />
-        <meta property="og:description" content="Built to show what the world actually thinks — not what algorithms want you to believe." />
+        <meta property="og:description" content="Our vision is to have a world where you don't only know what your neighbors, family, friends, and colleagues think. Instead, you know what every person in every corner of the world thinks, since we are all part of One World." />
         <meta property="og:url" content="https://one-world.lovable.app/welcome" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
@@ -121,7 +121,7 @@ const Welcome = () => {
               <span className="text-gradient-gold">No manipulation.</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl opacity-80 leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto font-body">
-              Built to show what the world actually thinks — not what algorithms want you to believe. See where the world truly stands on the issues that matter.
+              Our vision is to have a world where you don't only know what your neighbors, family, friends, and colleagues think. Instead, you know what every person in every corner of the world thinks, since we are all part of One World.
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 text-xs sm:text-sm opacity-70 mb-10">
               <span className="flex items-center gap-1.5">🌍 190+ countries</span>
