@@ -801,6 +801,7 @@ export default function Admin() {
             <TabsTrigger value="schedule">📅 Schedule</TabsTrigger>
             <TabsTrigger value="admins">👤 Admins</TabsTrigger>
             <TabsTrigger value="applications">💼 Applications</TabsTrigger>
+            <TabsTrigger value="feedback">💬 Feedback</TabsTrigger>
           </TabsList>
 
           <TabsContent value="polls">
