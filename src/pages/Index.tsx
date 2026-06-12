@@ -72,7 +72,18 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="submit" className="mt-0">
-            <SubmitQuestion />
+            <Tabs defaultValue="topic" className="w-full max-w-2xl mx-auto">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="topic">Suggest Topic</TabsTrigger>
+                <TabsTrigger value="feedback">Send Feedback</TabsTrigger>
+              </TabsList>
+              <TabsContent value="topic" className="mt-0">
+                <SubmitQuestion />
+              </TabsContent>
+              <TabsContent value="feedback" className="mt-0">
+                <FeedbackForm />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
