@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { DailyPoll } from "@/components/DailyPoll";
 import { MyResponses } from "@/components/MyResponses";
 import { SubmitQuestion } from "@/components/SubmitQuestion";
+import { FeedbackForm } from "@/components/FeedbackForm";
 import { WeeklyChallenge, DailyLocked } from "@/components/WeeklyChallenge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Vote, History, Lightbulb } from "lucide-react";
