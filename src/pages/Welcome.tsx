@@ -90,7 +90,7 @@ const Welcome = () => {
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
       <Header />
-      <main>
+      <main className="snap-page">
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-hero-gradient text-[hsl(45,100%,96%)]">
@@ -152,6 +152,75 @@ const Welcome = () => {
               </>
             )}
           </motion.div>
+        </div>
+      </section>
+      <DonationCheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        amountInCents={checkoutCents}
+        userId={user?.id}
+        customerEmail={user?.email}
+      />
+
+
+      {/* How it works */}
+      <section className="container mx-auto px-4 py-16 sm:py-24">
+        <div className="text-center mb-12">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">How it works</h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">Three steps to add your voice to the global record.</p>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {[
+            { icon: Phone, title: "Verify your phone", body: "One vote per person. Quick, private OTP — no spam." },
+            { icon: Trophy, title: "Complete the Global Topic", body: "Unlock the platform by weighing in on the week's defining question." },
+            { icon: Vote, title: "Vote in Daily Topics", body: "Join fresh, curated questions every day and watch results roll in live." },
+          ].map((step, i) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-card border border-border rounded-2xl p-6 shadow-card"
+            >
+              <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-4">
+                <step.icon className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="font-display text-xl font-semibold mb-2 text-foreground">{step.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.body}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Why One World */}
+      <section className="bg-card/30 border-y border-border py-16 sm:py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">Why One World</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">Built for honesty in a world of noise.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {[
+            { icon: Globe2, title: "Country-by-country breakdowns", body: "See exactly how each nation voted — no aggregations hiding the truth." },
+            { icon: ShieldCheck, title: "One vote per person", body: "Phone-verified identity keeps the results impossible to game." },
+            { icon: Sparkles, title: "Expert-curated Topics", body: "Fresh, balanced questions every day, sourced and reviewed transparently." },
+            { icon: BarChart3, title: "Real-time global results", body: "Watch the world respond live, with full visibility into every percentage." },
+            ].map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="bg-background border border-border rounded-2xl p-6"
+              >
+                <f.icon className="w-7 h-7 text-accent mb-4" />
+                <h3 className="font-display text-lg font-semibold mb-2 text-foreground">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -233,75 +302,6 @@ const Welcome = () => {
             </div>
           </div>
         </motion.div>
-      </section>
-
-      <DonationCheckoutDialog
-        open={checkoutOpen}
-        onOpenChange={setCheckoutOpen}
-        amountInCents={checkoutCents}
-        userId={user?.id}
-        customerEmail={user?.email}
-      />
-
-      {/* How it works */}
-      <section className="container mx-auto px-4 py-16 sm:py-24">
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">How it works</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">Three steps to add your voice to the global record.</p>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {[
-            { icon: Phone, title: "Verify your phone", body: "One vote per person. Quick, private OTP — no spam." },
-            { icon: Trophy, title: "Complete the Global Topic", body: "Unlock the platform by weighing in on the week's defining question." },
-            { icon: Vote, title: "Vote in Daily Topics", body: "Join fresh, curated questions every day and watch results roll in live." },
-          ].map((step, i) => (
-            <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-card border border-border rounded-2xl p-6 shadow-card"
-            >
-              <div className="w-12 h-12 rounded-xl bg-accent/15 flex items-center justify-center mb-4">
-                <step.icon className="w-6 h-6 text-accent" />
-              </div>
-              <h3 className="font-display text-xl font-semibold mb-2 text-foreground">{step.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{step.body}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Why One World */}
-      <section className="bg-card/30 border-y border-border py-16 sm:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">Why One World</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Built for honesty in a world of noise.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {[
-            { icon: Globe2, title: "Country-by-country breakdowns", body: "See exactly how each nation voted — no aggregations hiding the truth." },
-            { icon: ShieldCheck, title: "One vote per person", body: "Phone-verified identity keeps the results impossible to game." },
-            { icon: Sparkles, title: "Expert-curated Topics", body: "Fresh, balanced questions every day, sourced and reviewed transparently." },
-            { icon: BarChart3, title: "Real-time global results", body: "Watch the world respond live, with full visibility into every percentage." },
-            ].map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="bg-background border border-border rounded-2xl p-6"
-              >
-                <f.icon className="w-7 h-7 text-accent mb-4" />
-                <h3 className="font-display text-lg font-semibold mb-2 text-foreground">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* Join the team */}
