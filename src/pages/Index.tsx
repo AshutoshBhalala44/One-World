@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/Header";
 import { DailyPoll } from "@/components/DailyPoll";
@@ -6,34 +6,13 @@ import { MyResponses } from "@/components/MyResponses";
 import { SubmitQuestion } from "@/components/SubmitQuestion";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { WeeklyChallenge, DailyLocked } from "@/components/WeeklyChallenge";
+import { FlipCard } from "@/components/FlipCard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Vote, History, Lightbulb } from "lucide-react";
-import { motion } from "framer-motion";
 
 const Index = () => {
   const [weeklyUnlocked, setWeeklyUnlocked] = useState<boolean | null>(null);
-  const [initialScrollDone, setInitialScrollDone] = useState(false);
-  const [activeTab, setActiveTab] = useState("today");
-  const weeklyRef = useRef<HTMLDivElement>(null);
-  const dailyRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to the active question once weekly state is known
-  useEffect(() => {
-    if (initialScrollDone) return;
-    if (weeklyUnlocked === null) return; // wait until fetch completes
-
-    const timer = setTimeout(() => {
-      if (!weeklyUnlocked && weeklyRef.current) {
-        weeklyRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-        setInitialScrollDone(true);
-      } else if (weeklyUnlocked && dailyRef.current) {
-        dailyRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-        setInitialScrollDone(true);
-      }
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [weeklyUnlocked, initialScrollDone]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,23 +28,18 @@ const Index = () => {
 
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6 pb-28 sm:pb-32">
         <h1 className="sr-only">Global Topics Dashboard</h1>
-        {activeTab === "today" && <WeeklyChallenge onUnlocked={setWeeklyUnlocked} scrollRef={weeklyRef} />}
 
-        <Tabs
-          defaultValue="today"
-          className="w-full"
-          onValueChange={(val) => {
-            setActiveTab(val);
-            if (val === "today" && dailyRef.current) {
-              setTimeout(() => {
-                dailyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }, 50);
-            }
-          }}
-        >
+        <Tabs defaultValue="today" className="w-full">
+
           <TabsContent value="today" className="mt-0">
-            {weeklyUnlocked ? <DailyPoll scrollRef={dailyRef} /> : <DailyLocked />}
+            <FlipCard
+              frontLabel="Global"
+              backLabel="Daily"
+              front={<WeeklyChallenge onUnlocked={setWeeklyUnlocked} />}
+              back={weeklyUnlocked ? <DailyPoll /> : <DailyLocked />}
+            />
           </TabsContent>
+
 
           <TabsContent value="responses" className="mt-0">
             <MyResponses />
