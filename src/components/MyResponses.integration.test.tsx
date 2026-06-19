@@ -110,9 +110,21 @@ function setDailyFixture() {
 
 function setGlobalFixture() {
   tableData = {
-    polls: [],
+    // Provide a daily poll too so the topic-type toggle is rendered
+    polls: [
+      {
+        id: "p1",
+        question: "Daily filler question?",
+        category: "tech",
+        active_date: todayMinus(2),
+        status: "approved",
+      },
+    ],
     votes: [],
-    poll_options: [],
+    poll_options: [
+      { id: "o1", label: "Yes", poll_id: "p1", sort_order: 1 },
+      { id: "o2", label: "No", poll_id: "p1", sort_order: 2 },
+    ],
     weekly_polls: [
       {
         id: "w1",
@@ -130,7 +142,7 @@ function setGlobalFixture() {
     ],
   };
   rpcData = {
-    get_poll_vote_counts: [],
+    get_poll_vote_counts: [{ poll_id: "p1", option_id: "o1", vote_count: 10 }],
     get_weekly_vote_counts: [
       { weekly_poll_id: "w1", option_id: "wo1", vote_count: 100 },
     ],
