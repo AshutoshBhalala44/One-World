@@ -162,7 +162,7 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
         <Skeleton className="w-8 h-3 rounded-sm" />
         <Skeleton className="w-8 h-3 rounded-sm" />
       </div>
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: 4 }).map((_, i) => (
         <SkeletonBarRow key={i} isMobile={isMobile} />
       ))}
       <div className="flex flex-col gap-2 mt-4 w-full items-center sm:items-stretch">
