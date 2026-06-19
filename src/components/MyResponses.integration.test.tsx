@@ -6,11 +6,19 @@ import React from "react";
 // ── Mock framer-motion (avoid animation gating) ──
 vi.mock("framer-motion", () => {
   const R = require("react") as typeof import("react");
-  const pass = (tag: string) =>
-    R.forwardRef<HTMLElement, any>((props, ref) => {
-      const { initial, animate, exit, transition, whileHover, whileTap, layout, ...rest } = props;
-      return R.createElement(tag, { ref, ...rest });
-    });
+  const cache = new Map<string, any>();
+  const pass = (tag: string) => {
+    if (!cache.has(tag)) {
+      cache.set(
+        tag,
+        R.forwardRef<HTMLElement, any>((props, ref) => {
+          const { initial, animate, exit, transition, whileHover, whileTap, layout, ...rest } = props;
+          return R.createElement(tag, { ref, ...rest });
+        })
+      );
+    }
+    return cache.get(tag);
+  };
   return {
     motion: new Proxy({}, { get: (_t, p: string) => pass(p) }),
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
