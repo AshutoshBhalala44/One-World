@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Search, X, Globe } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -11,6 +11,7 @@ import {
   Legend,
 } from "recharts";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CountryData {
   country: string;
