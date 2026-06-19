@@ -444,7 +444,8 @@ export function MyResponses() {
               {poll.options && poll.options.length > 0 && (
                 <CountryBreakdownChart
                   options={poll.options}
-                  isLoading={false}
+                  isLoading={breakdownLoading}
+                  breakdowns={poll.totalVotes === 0 ? [] : undefined}
                 />
               )}
             </motion.div>
