@@ -1,4 +1,4 @@
-import { test, expect, chromium, type BrowserContext } from "@playwright/test";
+import { test, expect, type BrowserContext, type BrowserType } from "@playwright/test";
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
@@ -84,8 +84,13 @@ async function isSignedInOnHome(context: BrowserContext, baseURL: string) {
   return { onAuthRoute, stored, signInVisible, baseURL };
 }
 
-test("user stays signed in after closing and reopening the browser", async () => {
-  const browser = await chromium.launch();
+test("user stays signed in after closing and reopening the browser", async ({ playwright }, testInfo) => {
+  const browserName = (testInfo.project.use.browserName ?? "chromium") as
+    | "chromium"
+    | "webkit"
+    | "firefox";
+  const browserType: BrowserType = playwright[browserName];
+  const browser = await browserType.launch();
 
   // --- Step 1: "sign in" by seeding a session, then save storage state.
   const seedContext = await browser.newContext();
@@ -118,7 +123,7 @@ test("user stays signed in after closing and reopening the browser", async () =>
 
   // --- Step 3: reopen a fresh browser with the saved storage state
   // and confirm the session survives.
-  const reopened = await chromium.launch();
+  const reopened = await browserType.launch();
   const restoredContext = await reopened.newContext({
     storageState: storageStatePath,
   });
