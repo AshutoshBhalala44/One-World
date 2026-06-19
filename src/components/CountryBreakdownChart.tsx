@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import { ChevronDown, ChevronUp, Search, X, Globe } from "lucide-react";
 import {
   BarChart,
@@ -140,7 +141,7 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
+const SkeletonBarRow = memo(function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
       <Skeleton shimmer className="w-6 h-4 rounded-sm shrink-0" />
@@ -153,9 +154,11 @@ function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
       </div>
     </div>
   );
-}
+});
 
-function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
+const SKELETON_ROWS = [0, 1, 2, 3];
+
+const ChartSkeleton = memo(function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 pb-2 border-b border-border/30 mb-2">
@@ -165,11 +168,11 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
         <Skeleton shimmer className="w-8 h-3 rounded-sm" />
         <Skeleton shimmer className="w-8 h-3 rounded-sm" />
       </div>
-      {Array.from({ length: 4 }).map((_, i) => (
+      {SKELETON_ROWS.map((i) => (
         <SkeletonBarRow key={i} isMobile={isMobile} />
       ))}
       <div className="flex flex-col gap-2 mt-4 w-full items-center sm:items-stretch">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {SKELETON_ROWS.map((i) => (
           <div key={i} className="flex items-start gap-2.5 w-full justify-center sm:justify-start">
             <Skeleton shimmer className="w-4 h-4 mt-0.5 flex-shrink-0 rounded-sm" />
             <Skeleton shimmer className="w-48 h-4 rounded-sm" />
@@ -178,16 +181,17 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
       </div>
     </div>
   );
-}
+});
 
-function EmptyState({ message }: { message: string }) {
+const EmptyState = memo(function EmptyState({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 text-center">
       <Globe className="w-10 h-10 text-muted-foreground/30 mb-3" />
       <p className="text-sm text-muted-foreground max-w-[240px]">{message}</p>
     </div>
   );
-}
+});
+
 
 export function CountryBreakdownChart({
   options,
@@ -230,13 +234,14 @@ export function CountryBreakdownChart({
   } | null>(null);
 
   const resolvedBreakdowns = useMemo(() => {
+    if (isLoading) return [] as CountryData[];
     if (breakdowns !== undefined) return breakdowns;
     return generateCountryData(DEFAULT_COUNTRIES, options);
-  }, [breakdowns, options]);
+  }, [isLoading, breakdowns, options]);
 
   const defaultBreakdowns = useMemo(
-    () => pickTopCountries(resolvedBreakdowns),
-    [resolvedBreakdowns]
+    () => (isLoading ? [] : pickTopCountries(resolvedBreakdowns)),
+    [isLoading, resolvedBreakdowns]
   );
 
   const searchResults = useMemo(() => {
@@ -254,28 +259,41 @@ export function CountryBreakdownChart({
     return generateCountryData([selectedCountry], options)[0];
   }, [selectedCountry, options]);
 
-  const chartData = defaultBreakdowns.map((bd) => {
-    const row: Record<string, any> = { name: `${bd.flag} ${bd.code}`, fullName: `${bd.flag} ${bd.country}` };
-    options.forEach((opt) => {
-      row[opt.label] = bd.results[opt.id] || 0;
-    });
-    return row;
-  });
+  const chartData = useMemo(
+    () =>
+      defaultBreakdowns.map((bd) => {
+        const row: Record<string, any> = {
+          name: `${bd.flag} ${bd.code}`,
+          fullName: `${bd.flag} ${bd.country}`,
+        };
+        options.forEach((opt) => {
+          row[opt.label] = bd.results[opt.id] || 0;
+        });
+        return row;
+      }),
+    [defaultBreakdowns, options]
+  );
 
-  const selectedChartData = selectedBreakdown
-    ? [
-        (() => {
-          const row: Record<string, any> = {
-            name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
-            fullName: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
-          };
-          options.forEach((opt) => {
-            row[opt.label] = selectedBreakdown.results[opt.id] || 0;
-          });
-          return row;
-        })(),
-      ]
-    : null;
+  const selectedChartData = useMemo(() => {
+    if (!selectedBreakdown) return null;
+    const row: Record<string, any> = {
+      name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
+      fullName: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
+    };
+    options.forEach((opt) => {
+      row[opt.label] = selectedBreakdown.results[opt.id] || 0;
+    });
+    return [row];
+  }, [selectedBreakdown, options]);
+
+  const chartKey = useMemo(
+    () =>
+      `chart:${options.map((o) => o.id).join("|")}:${defaultBreakdowns
+        .map((b) => b.code)
+        .join("|")}`,
+    [options, defaultBreakdowns]
+  );
+
 
   return (
     <motion.div
@@ -329,7 +347,7 @@ export function CountryBreakdownChart({
                   </motion.div>
                 ) : (
                   <motion.div
-                    key={`chart:${options.map((o) => o.id).join("|")}:${defaultBreakdowns.map((b) => b.code).join("|")}`}
+                    key={chartKey}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
