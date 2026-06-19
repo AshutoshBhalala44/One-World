@@ -231,7 +231,10 @@ export function CountryBreakdownChart({
     return generateCountryData(DEFAULT_COUNTRIES, options);
   }, [breakdowns, options]);
 
-  const defaultBreakdowns = resolvedBreakdowns.slice(0, 6);
+  const defaultBreakdowns = useMemo(
+    () => pickTopCountries(resolvedBreakdowns),
+    [resolvedBreakdowns]
+  );
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
