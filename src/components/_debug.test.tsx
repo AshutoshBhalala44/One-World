@@ -44,7 +44,7 @@ vi.mock("@/integrations/supabase/client", () => ({
   },
 }));
 
-import { MyResponses } from "../../dev-server/src/components/MyResponses";
+import { MyResponses } from "./MyResponses";
 
 describe("debug", ()=>{
   it("dbg", async ()=>{
