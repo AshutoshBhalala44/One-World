@@ -1,6 +1,18 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useRef, useState } from "react";
 import { motion, PanInfo } from "framer-motion";
 import { Globe2, Vote } from "lucide-react";
+
+/**
+ * Context exposing whether the surrounding flip-card face is currently
+ * facing the user. Descendants (e.g. expandable panels) can react to
+ * `isActive` becoming false to collapse themselves so their content
+ * doesn't show through the other side of the card on mobile.
+ */
+const FlipFaceContext = createContext<{ isActive: boolean }>({ isActive: true });
+
+export function useFlipFace() {
+  return useContext(FlipFaceContext);
+}
 
 interface FlipCardProps {
   front: ReactNode;
@@ -123,7 +135,9 @@ export function FlipCard({
               pointerEvents: flipped ? "none" : "auto",
             }}
           >
-            {front}
+            <FlipFaceContext.Provider value={{ isActive: !flipped }}>
+              {front}
+            </FlipFaceContext.Provider>
           </div>
 
           {/* Back face */}
@@ -142,7 +156,9 @@ export function FlipCard({
               pointerEvents: flipped ? "auto" : "none",
             }}
           >
-            {back}
+            <FlipFaceContext.Provider value={{ isActive: flipped }}>
+              {back}
+            </FlipFaceContext.Provider>
           </div>
         </motion.div>
       </motion.div>
