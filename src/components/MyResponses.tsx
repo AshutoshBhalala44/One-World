@@ -438,7 +438,7 @@ export function MyResponses() {
                   })}
                 </div>
               )}
-              {isAnswered && poll.options && poll.options.length > 0 && (
+              {poll.options && poll.options.length > 0 && (
                 <CountryBreakdownChart options={poll.options} />
               )}
             </motion.div>
