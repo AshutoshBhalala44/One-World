@@ -242,9 +242,9 @@ export function CountryBreakdownChart({
     return ALL_COUNTRIES.filter(
       (c) =>
         c.country.toLowerCase().includes(q) &&
-        !DEFAULT_COUNTRIES.some((dc) => dc.country === c.country)
+        !defaultBreakdowns.some((dc) => dc.country === c.country)
     ).slice(0, 5);
-  }, [searchQuery]);
+  }, [searchQuery, defaultBreakdowns]);
 
   const selectedBreakdown = useMemo(() => {
     if (!selectedCountry) return null;
