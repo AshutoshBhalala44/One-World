@@ -100,10 +100,10 @@ export function FlipCard({
         >
           <button
             role="tab"
-            aria-selected={!flipped}
-            onClick={() => setFlipped(false)}
+            aria-selected={!activeFlipped}
+            onClick={() => requestFlip(false)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-              !flipped
+              !activeFlipped
                 ? "bg-accent text-accent-foreground shadow"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -113,10 +113,10 @@ export function FlipCard({
           </button>
           <button
             role="tab"
-            aria-selected={flipped}
-            onClick={() => setFlipped(true)}
+            aria-selected={activeFlipped}
+            onClick={() => requestFlip(true)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-              flipped
+              activeFlipped
                 ? "bg-accent text-accent-foreground shadow"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -163,7 +163,7 @@ export function FlipCard({
               pointerEvents: flipped ? "none" : "auto",
             }}
           >
-            <FlipFaceContext.Provider value={{ isActive: !flipped }}>
+            <FlipFaceContext.Provider value={{ isActive: !activeFlipped }}>
               {front}
             </FlipFaceContext.Provider>
           </div>
@@ -184,7 +184,7 @@ export function FlipCard({
               pointerEvents: flipped ? "auto" : "none",
             }}
           >
-            <FlipFaceContext.Provider value={{ isActive: flipped }}>
+            <FlipFaceContext.Provider value={{ isActive: activeFlipped }}>
               {back}
             </FlipFaceContext.Provider>
           </div>
