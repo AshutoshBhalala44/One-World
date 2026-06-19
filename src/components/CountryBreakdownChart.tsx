@@ -143,13 +143,13 @@ function CustomTooltip({ active, payload, label }: any) {
 function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
-      <Skeleton className="w-6 h-4 rounded-sm shrink-0" />
-      <Skeleton className={`${isMobile ? "w-8" : "w-12"} h-4 rounded-sm shrink-0`} />
+      <Skeleton shimmer className="w-6 h-4 rounded-sm shrink-0" />
+      <Skeleton shimmer className={`${isMobile ? "w-8" : "w-12"} h-4 rounded-sm shrink-0`} />
       <div className="flex-1 flex gap-0.5 h-4 ml-2">
-        <Skeleton className="h-full rounded-l-sm w-[35%]" />
-        <Skeleton className="h-full w-[25%]" />
-        <Skeleton className="h-full w-[25%]" />
-        <Skeleton className="h-full rounded-r-sm w-[15%]" />
+        <Skeleton shimmer className="h-full rounded-l-sm w-[35%]" />
+        <Skeleton shimmer className="h-full w-[25%]" />
+        <Skeleton shimmer className="h-full w-[25%]" />
+        <Skeleton shimmer className="h-full rounded-r-sm w-[15%]" />
       </div>
     </div>
   );
@@ -159,11 +159,11 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 pb-2 border-b border-border/30 mb-2">
-        <Skeleton className="w-8 h-3 rounded-sm" />
-        <Skeleton className="w-8 h-3 rounded-sm ml-auto" />
-        <Skeleton className="w-8 h-3 rounded-sm" />
-        <Skeleton className="w-8 h-3 rounded-sm" />
-        <Skeleton className="w-8 h-3 rounded-sm" />
+        <Skeleton shimmer className="w-8 h-3 rounded-sm" />
+        <Skeleton shimmer className="w-8 h-3 rounded-sm ml-auto" />
+        <Skeleton shimmer className="w-8 h-3 rounded-sm" />
+        <Skeleton shimmer className="w-8 h-3 rounded-sm" />
+        <Skeleton shimmer className="w-8 h-3 rounded-sm" />
       </div>
       {Array.from({ length: 4 }).map((_, i) => (
         <SkeletonBarRow key={i} isMobile={isMobile} />
@@ -171,8 +171,8 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
       <div className="flex flex-col gap-2 mt-4 w-full items-center sm:items-stretch">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="flex items-start gap-2.5 w-full justify-center sm:justify-start">
-            <Skeleton className="w-4 h-4 mt-0.5 flex-shrink-0 rounded-sm" />
-            <Skeleton className="w-48 h-4 rounded-sm" />
+            <Skeleton shimmer className="w-4 h-4 mt-0.5 flex-shrink-0 rounded-sm" />
+            <Skeleton shimmer className="w-48 h-4 rounded-sm" />
           </div>
         ))}
       </div>
