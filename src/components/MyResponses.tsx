@@ -43,6 +43,7 @@ export function MyResponses() {
   const navigate = useNavigate();
   const [polls, setPolls] = useState<PastPoll[]>([]);
   const [loading, setLoading] = useState(true);
+  const [breakdownLoading, setBreakdownLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
   const [filter, setFilter] = useState<FilterOption>("all");
