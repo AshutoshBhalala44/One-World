@@ -369,9 +369,10 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               <XAxis
                                 type="number"
                                 domain={[0, 100]}
+                                ticks={xAxisTicks}
                                 tickFormatter={(v) => `${v}%`}
                                 tick={{
-                                  fontSize: 10,
+                                  fontSize: xAxisFontSize,
                                   fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
@@ -394,8 +395,8 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                                   fill: CURSOR_COLOR,
                                 }}
                                 wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
-                                allowEscapeViewBox={{ x: false, y: false }}
-                                offset={12}
+                                allowEscapeViewBox={{ x: true, y: true }}
+                                offset={isMobile ? 16 : 12}
                               />
                               {options.map((opt, i) => (
                                 <Bar
