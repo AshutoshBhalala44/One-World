@@ -65,6 +65,22 @@ const ALL_COUNTRIES: { country: string; flag: string; code: string }[] = [
 ];
 
 const DEFAULT_COUNTRIES = ALL_COUNTRIES.slice(0, 6);
+const MAX_DEFAULT_COUNTRIES = 4;
+
+function totalVotes(results: Record<string, number>): number {
+  let sum = 0;
+  for (const v of Object.values(results)) sum += v || 0;
+  return sum;
+}
+
+function pickTopCountries(breakdowns: CountryData[]): CountryData[] {
+  const usa = breakdowns.find((b) => b.code === "USA");
+  const rest = breakdowns
+    .filter((b) => b.code !== "USA")
+    .sort((a, b) => totalVotes(b.results) - totalVotes(a.results))
+    .slice(0, usa ? MAX_DEFAULT_COUNTRIES - 1 : MAX_DEFAULT_COUNTRIES);
+  return usa ? [usa, ...rest] : rest;
+}
 
 function generateCountryData(
   countries: { country: string; flag: string; code: string }[],
@@ -146,7 +162,7 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
         <Skeleton className="w-8 h-3 rounded-sm" />
         <Skeleton className="w-8 h-3 rounded-sm" />
       </div>
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: 4 }).map((_, i) => (
         <SkeletonBarRow key={i} isMobile={isMobile} />
       ))}
       <div className="flex flex-col gap-2 mt-4 w-full items-center sm:items-stretch">
@@ -215,7 +231,10 @@ export function CountryBreakdownChart({
     return generateCountryData(DEFAULT_COUNTRIES, options);
   }, [breakdowns, options]);
 
-  const defaultBreakdowns = resolvedBreakdowns.slice(0, 6);
+  const defaultBreakdowns = useMemo(
+    () => pickTopCountries(resolvedBreakdowns),
+    [resolvedBreakdowns]
+  );
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -223,9 +242,9 @@ export function CountryBreakdownChart({
     return ALL_COUNTRIES.filter(
       (c) =>
         c.country.toLowerCase().includes(q) &&
-        !DEFAULT_COUNTRIES.some((dc) => dc.country === c.country)
+        !defaultBreakdowns.some((dc) => dc.country === c.country)
     ).slice(0, 5);
-  }, [searchQuery]);
+  }, [searchQuery, defaultBreakdowns]);
 
   const selectedBreakdown = useMemo(() => {
     if (!selectedCountry) return null;
