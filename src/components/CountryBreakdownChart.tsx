@@ -347,7 +347,7 @@ export function CountryBreakdownChart({
                   </motion.div>
                 ) : (
                   <motion.div
-                    key={`chart:${options.map((o) => o.id).join("|")}:${defaultBreakdowns.map((b) => b.code).join("|")}`}
+                    key={chartKey}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
