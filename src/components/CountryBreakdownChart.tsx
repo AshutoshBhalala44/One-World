@@ -210,20 +210,21 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
               {/* Default chart */}
               <div
                 className="w-full"
-                style={{ height: defaultBreakdowns.length * 56 + 60 }}
+                style={{ height: defaultBreakdowns.length * rowHeight + 60 }}
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
                     layout="vertical"
                     margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
-                    barCategoryGap="20%"
+                    barCategoryGap={isMobile ? "28%" : "20%"}
                   >
                     <XAxis
                       type="number"
                       domain={[0, 100]}
+                      ticks={xAxisTicks}
                       tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: 10, fill: AXIS_TEXT_COLOR }}
+                      tick={{ fontSize: xAxisFontSize, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
