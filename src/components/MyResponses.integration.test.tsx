@@ -39,10 +39,11 @@ vi.mock("recharts", () => {
   };
 });
 
-// ── Mock AuthContext ──
-vi.mock("@/contexts/AuthContext", () => ({
-  useAuth: () => ({ user: { id: "user-1" } }),
-}));
+// ── Mock AuthContext (stable user reference to avoid effect loops) ──
+vi.mock("@/contexts/AuthContext", () => {
+  const user = { id: "user-1" };
+  return { useAuth: () => ({ user }) };
+});
 
 // ── Mock supabase client with chainable builder ──
 type TableData = Record<string, any[]>;
