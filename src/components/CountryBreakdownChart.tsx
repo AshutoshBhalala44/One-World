@@ -306,83 +306,117 @@ export function CountryBreakdownChart({
             className="overflow-hidden"
           >
             <div className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
-              {isLoading ? (
-                <ChartSkeleton isMobile={isMobile} />
-              ) : breakdowns !== undefined && breakdowns.length === 0 ? (
-                <EmptyState message={emptyMessage} />
-              ) : (
-                <>
-                  {/* Default chart */}
-                  <div
-                    className="w-full"
-                    style={{ height: defaultBreakdowns.length * rowHeight + 60 }}
+              <AnimatePresence mode="wait" initial={false}>
+                {isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={chartData}
-                        layout="vertical"
-                        margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
-                        barCategoryGap={isMobile ? "28%" : "20%"}
-                      >
-                        <XAxis
-                          type="number"
-                          domain={[0, 100]}
-                          ticks={xAxisTicks}
-                          tickFormatter={(v) => `${v}%`}
-                          tick={{ fontSize: xAxisFontSize, fill: AXIS_TEXT_COLOR }}
-                          axisLine={false}
-                          tickLine={false}
-                        />
-                        <YAxis
-                          type="category"
-                          dataKey="name"
-                          width={yAxisWidth}
-                          tick={{ fontSize: yAxisFontSize, fill: AXIS_TEXT_COLOR }}
-                          axisLine={false}
-                          tickLine={false}
-                        />
-                        <Tooltip
-                          content={<CustomTooltip />}
-                          cursor={{ fill: CURSOR_COLOR }}
-                          wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
-                          allowEscapeViewBox={{ x: true, y: true }}
-                          offset={isMobile ? 16 : 12}
-                        />
-                        {options.map((opt, i) => (
-                          <Bar
-                            key={opt.id}
-                            dataKey={opt.label}
-                            stackId="a"
-                            fill={CHART_COLORS[i % CHART_COLORS.length]}
-                            radius={
-                              i === 0
-                                ? [0, 0, 0, 0]
-                                : i === options.length - 1
-                                ? [0, 4, 4, 0]
-                                : [0, 0, 0, 0]
-                            }
+                    <ChartSkeleton isMobile={isMobile} />
+                  </motion.div>
+                ) : breakdowns !== undefined && breakdowns.length === 0 ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0, scale: 0.97 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <EmptyState message={emptyMessage} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={`chart:${options.map((o) => o.id).join("|")}:${defaultBreakdowns.map((b) => b.code).join("|")}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    {/* Default chart */}
+                    <div
+                      className="w-full"
+                      style={{ height: defaultBreakdowns.length * rowHeight + 60 }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={chartData}
+                          layout="vertical"
+                          margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
+                          barCategoryGap={isMobile ? "28%" : "20%"}
+                        >
+                          <XAxis
+                            type="number"
+                            domain={[0, 100]}
+                            ticks={xAxisTicks}
+                            tickFormatter={(v) => `${v}%`}
+                            tick={{ fontSize: xAxisFontSize, fill: AXIS_TEXT_COLOR }}
+                            axisLine={false}
+                            tickLine={false}
                           />
-                        ))}
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                          <YAxis
+                            type="category"
+                            dataKey="name"
+                            width={yAxisWidth}
+                            tick={{ fontSize: yAxisFontSize, fill: AXIS_TEXT_COLOR }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <Tooltip
+                            content={<CustomTooltip />}
+                            cursor={{ fill: CURSOR_COLOR }}
+                            wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
+                            allowEscapeViewBox={{ x: true, y: true }}
+                            offset={isMobile ? 16 : 12}
+                          />
+                          {options.map((opt, i) => (
+                            <Bar
+                              key={opt.id}
+                              dataKey={opt.label}
+                              stackId="a"
+                              fill={CHART_COLORS[i % CHART_COLORS.length]}
+                              isAnimationActive
+                              animationDuration={600}
+                              animationEasing="ease-out"
+                              radius={
+                                i === 0
+                                  ? [0, 0, 0, 0]
+                                  : i === options.length - 1
+                                  ? [0, 4, 4, 0]
+                                  : [0, 0, 0, 0]
+                              }
+                            />
+                          ))}
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
 
-                  {/* Legend */}
-                  <div className="flex flex-col gap-2 mt-4 mb-1 w-full items-center sm:items-stretch">
-                    {options.map((opt, i) => (
-                      <div key={opt.id} className="flex items-start gap-2.5 w-full justify-center sm:justify-start text-center sm:text-left">
-                        <div
-                          className="w-4 h-4 mt-0.5 flex-shrink-0"
-                          style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
-                        />
-                        <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 sm:flex-1">
-                          {opt.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
+                    {/* Legend */}
+                    <div className="flex flex-col gap-2 mt-4 mb-1 w-full items-center sm:items-stretch">
+                      {options.map((opt, i) => (
+                        <motion.div
+                          key={opt.id}
+                          initial={{ opacity: 0, x: -6 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.25, delay: 0.15 + i * 0.05, ease: "easeOut" }}
+                          className="flex items-start gap-2.5 w-full justify-center sm:justify-start text-center sm:text-left"
+                        >
+                          <div
+                            className="w-4 h-4 mt-0.5 flex-shrink-0"
+                            style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                          />
+                          <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 sm:flex-1">
+                            {opt.label}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
 
               {/* Search section - hide when loading or empty */}
               {!isLoading && !(breakdowns !== undefined && breakdowns.length === 0) && (
