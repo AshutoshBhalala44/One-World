@@ -57,6 +57,12 @@ export function MyResponses() {
     fetchPastPolls();
   }, [user, topicType]);
 
+  useEffect(() => {
+    return () => {
+      setBreakdownLoading(false);
+    };
+  }, []);
+
   async function fetchPastPolls() {
     setLoading(true);
     try {
