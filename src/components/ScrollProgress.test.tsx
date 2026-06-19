@@ -88,9 +88,11 @@ describe("ScrollProgress synchronization", () => {
     });
 
     // Run rAF synchronously so updates are deterministic.
+    // Run rAF synchronously and return 0 so the component's "already scheduled"
+    // guard (`if (rafId) return`) does not block subsequent scroll events.
     vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
       cb(performance.now());
-      return 1;
+      return 0;
     });
     vi.stubGlobal("cancelAnimationFrame", () => {});
   });
