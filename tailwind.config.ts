@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Playfair Display", "serif"],
-        body: ["DM Sans", "sans-serif"],
+        display: ["Times New Roman", "Times", "serif"],
+        body: ["Times New Roman", "Times", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
