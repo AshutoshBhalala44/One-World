@@ -73,12 +73,15 @@ function totalVotes(results: Record<string, number>): number {
   return sum;
 }
 
-function pickTopCountries(breakdowns: CountryData[]): CountryData[] {
+export function pickTopCountries(
+  breakdowns: CountryData[],
+  max: number = MAX_DEFAULT_COUNTRIES
+): CountryData[] {
   const usa = breakdowns.find((b) => b.code === "USA");
   const rest = breakdowns
     .filter((b) => b.code !== "USA")
     .sort((a, b) => totalVotes(b.results) - totalVotes(a.results))
-    .slice(0, usa ? MAX_DEFAULT_COUNTRIES - 1 : MAX_DEFAULT_COUNTRIES);
+    .slice(0, usa ? max - 1 : max);
   return usa ? [usa, ...rest] : rest;
 }
 
