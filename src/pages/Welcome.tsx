@@ -93,8 +93,9 @@ const Welcome = () => {
       <Header />
       <main className="snap-page">
 
+      <ScrollProgress />
       {/* Hero */}
-      <section className="relative overflow-hidden bg-hero-gradient text-[hsl(45,100%,96%)]">
+      <section data-section="hero" className="relative overflow-hidden bg-hero-gradient text-[hsl(45,100%,96%)]">
         <div className="absolute inset-0 opacity-30">
           <img
             src={heroImage}
