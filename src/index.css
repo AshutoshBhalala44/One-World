@@ -125,10 +125,29 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    line-height: 1.65;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+  }
+
+  h1 {
+    font-weight: 700;
+  }
+
+  h2, h3, h4 {
+    font-weight: 600;
+  }
+
+  p {
+    line-height: 1.65;
+  }
+
+  button, input, textarea, select {
+    font-family: var(--font-body);
   }
 }
 
