@@ -22,5 +22,11 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      // Safari/WebKit profile — verifies session persistence under
+      // Safari's stricter storage semantics (e.g. ITP).
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
 });
