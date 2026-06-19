@@ -143,13 +143,13 @@ function CustomTooltip({ active, payload, label }: any) {
 function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
-      <Skeleton className="w-6 h-4 rounded-sm shrink-0" />
-      <Skeleton className={`${isMobile ? "w-8" : "w-12"} h-4 rounded-sm shrink-0`} />
+      <Skeleton shimmer className="w-6 h-4 rounded-sm shrink-0" />
+      <Skeleton shimmer className={`${isMobile ? "w-8" : "w-12"} h-4 rounded-sm shrink-0`} />
       <div className="flex-1 flex gap-0.5 h-4 ml-2">
-        <Skeleton className="h-full rounded-l-sm w-[35%]" />
-        <Skeleton className="h-full w-[25%]" />
-        <Skeleton className="h-full w-[25%]" />
-        <Skeleton className="h-full rounded-r-sm w-[15%]" />
+        <Skeleton shimmer className="h-full rounded-l-sm w-[35%]" />
+        <Skeleton shimmer className="h-full w-[25%]" />
+        <Skeleton shimmer className="h-full w-[25%]" />
+        <Skeleton shimmer className="h-full rounded-r-sm w-[15%]" />
       </div>
     </div>
   );
