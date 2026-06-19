@@ -154,87 +154,6 @@ const Welcome = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* Support our mission */}
-      <section className="container mx-auto px-4 py-16 sm:py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative max-w-4xl mx-auto rounded-3xl overflow-hidden border border-gold/30 bg-gradient-to-br from-navy-deep via-navy to-navy-deep p-8 sm:p-12 shadow-2xl"
-        >
-          <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_30%_20%,hsl(45,100%,60%/0.4),transparent_60%)]" />
-          <div className="relative grid md:grid-cols-[1fr_auto] gap-8 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 border border-gold/30 mb-4">
-                <Heart className="w-3.5 h-3.5 text-gold" />
-                <span className="text-xs font-semibold tracking-wide text-gold uppercase">Support our mission</span>
-              </div>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-[hsl(45,100%,96%)] mb-3">
-                Keep every voice <span className="text-gradient-gold">heard, equal, and unfiltered.</span>
-              </h2>
-              <p className="text-[hsl(45,100%,96%)]/75 leading-relaxed max-w-xl">
-                One World is free for every voter, everywhere. Your donation funds phone verification, content curation, and the infrastructure that keeps results tamper-proof — no ads, no investors, no agenda.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 md:min-w-[260px]">
-              <div className="grid grid-cols-3 gap-2">
-                {PRESET_AMOUNTS.map((amount) => {
-                  const active = selectedPreset === amount && !customAmount.trim();
-                  return (
-                    <button
-                      key={amount}
-                      type="button"
-                      onClick={() => {
-                        setSelectedPreset(amount);
-                        setCustomAmount("");
-                      }}
-                      aria-pressed={active}
-                      className={`px-3 py-3 rounded-xl border transition-colors font-display font-semibold ${
-                        active
-                          ? "border-gold bg-gold text-navy-deep"
-                          : "border-gold/40 bg-gold/5 hover:bg-gold/15 text-[hsl(45,100%,96%)]"
-                      }`}
-                    >
-                      ${amount}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(45,100%,96%)]/60 font-display">$</span>
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  min={1}
-                  step="1"
-                  placeholder="Custom amount"
-                  value={customAmount}
-                  onChange={(e) => {
-                    setCustomAmount(e.target.value);
-                    if (e.target.value.trim()) setSelectedPreset(null);
-                  }}
-                  className="pl-7 bg-[hsl(45,100%,96%)]/5 border-gold/30 text-[hsl(45,100%,96%)] placeholder:text-[hsl(45,100%,96%)]/40 focus-visible:ring-gold/40"
-                  aria-label="Custom donation amount in US dollars"
-                />
-              </div>
-              <Button
-                size="lg"
-                onClick={handleDonate}
-                className="bg-gold text-navy-deep hover:bg-gold/90 font-semibold gap-2 h-12 rounded-full shadow-lg"
-              >
-                <Heart className="w-4 h-4 fill-navy-deep" />
-                Donate
-              </Button>
-              <p className="text-[10px] text-[hsl(45,100%,96%)]/50 text-center">
-                Secure checkout powered by Stripe
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-
       <DonationCheckoutDialog
         open={checkoutOpen}
         onOpenChange={setCheckoutOpen}
@@ -242,6 +161,7 @@ const Welcome = () => {
         userId={user?.id}
         customerEmail={user?.email}
       />
+
 
       {/* How it works */}
       <section className="container mx-auto px-4 py-16 sm:py-24">
