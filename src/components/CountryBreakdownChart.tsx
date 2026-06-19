@@ -101,29 +101,34 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const fullName = payload[0]?.payload?.fullName ?? label;
   return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-xs max-w-[220px] break-words">
-      <p className="font-semibold text-foreground mb-1">{fullName}</p>
-      {payload.map((entry: any) => (
-        <div key={entry.name} className="flex items-center gap-2">
-          <div
-            className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-muted-foreground">{entry.name}:</span>
-          <span className="font-semibold text-foreground tabular-nums">
-            {entry.value}%
-          </span>
-        </div>
-      ))}
+    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-xs break-words w-[min(240px,calc(100vw-2rem))]">
+      <p className="font-semibold text-foreground mb-1.5 leading-tight">{fullName}</p>
+      <div className="space-y-1">
+        {payload.map((entry: any) => (
+          <div key={entry.name} className="flex items-center gap-2">
+            <div
+              className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground truncate flex-1 min-w-0">{entry.name}</span>
+            <span className="font-semibold text-foreground tabular-nums flex-shrink-0">
+              {entry.value}%
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 export function CountryBreakdownChart({ options, autoExpand = false }: { options: OptionInfo[]; autoExpand?: boolean }) {
   const isMobile = useIsMobile();
-  const yAxisWidth = isMobile ? 70 : 120;
-  const yAxisFontSize = isMobile ? 13 : 15;
-  const chartRightMargin = isMobile ? 24 : 15;
+  const yAxisWidth = isMobile ? 64 : 120;
+  const yAxisFontSize = isMobile ? 12 : 15;
+  const xAxisFontSize = isMobile ? 11 : 10;
+  const xAxisTicks = isMobile ? [0, 50, 100] : [0, 25, 50, 75, 100];
+  const rowHeight = isMobile ? 44 : 56;
+  const chartRightMargin = isMobile ? 16 : 15;
   const [expanded, setExpanded] = useState(autoExpand);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -205,20 +210,21 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
               {/* Default chart */}
               <div
                 className="w-full"
-                style={{ height: defaultBreakdowns.length * 56 + 60 }}
+                style={{ height: defaultBreakdowns.length * rowHeight + 60 }}
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
                     layout="vertical"
                     margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
-                    barCategoryGap="20%"
+                    barCategoryGap={isMobile ? "28%" : "20%"}
                   >
                     <XAxis
                       type="number"
                       domain={[0, 100]}
+                      ticks={xAxisTicks}
                       tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: 10, fill: AXIS_TEXT_COLOR }}
+                      tick={{ fontSize: xAxisFontSize, fill: AXIS_TEXT_COLOR }}
                       axisLine={false}
                       tickLine={false}
                     />
@@ -234,8 +240,8 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                       content={<CustomTooltip />}
                       cursor={{ fill: CURSOR_COLOR }}
                       wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
-                      allowEscapeViewBox={{ x: false, y: false }}
-                      offset={12}
+                      allowEscapeViewBox={{ x: true, y: true }}
+                      offset={isMobile ? 16 : 12}
                     />
                     {options.map((opt, i) => (
                       <Bar
@@ -363,9 +369,10 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                               <XAxis
                                 type="number"
                                 domain={[0, 100]}
+                                ticks={xAxisTicks}
                                 tickFormatter={(v) => `${v}%`}
                                 tick={{
-                                  fontSize: 10,
+                                  fontSize: xAxisFontSize,
                                   fill: AXIS_TEXT_COLOR,
                                 }}
                                 axisLine={false}
@@ -388,8 +395,8 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
                                   fill: CURSOR_COLOR,
                                 }}
                                 wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
-                                allowEscapeViewBox={{ x: false, y: false }}
-                                offset={12}
+                                allowEscapeViewBox={{ x: true, y: true }}
+                                offset={isMobile ? 16 : 12}
                               />
                               {options.map((opt, i) => (
                                 <Bar
