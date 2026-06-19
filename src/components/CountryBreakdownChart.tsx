@@ -65,6 +65,22 @@ const ALL_COUNTRIES: { country: string; flag: string; code: string }[] = [
 ];
 
 const DEFAULT_COUNTRIES = ALL_COUNTRIES.slice(0, 6);
+const MAX_DEFAULT_COUNTRIES = 4;
+
+function totalVotes(results: Record<string, number>): number {
+  let sum = 0;
+  for (const v of Object.values(results)) sum += v || 0;
+  return sum;
+}
+
+function pickTopCountries(breakdowns: CountryData[]): CountryData[] {
+  const usa = breakdowns.find((b) => b.code === "USA");
+  const rest = breakdowns
+    .filter((b) => b.code !== "USA")
+    .sort((a, b) => totalVotes(b.results) - totalVotes(a.results))
+    .slice(0, usa ? MAX_DEFAULT_COUNTRIES - 1 : MAX_DEFAULT_COUNTRIES);
+  return usa ? [usa, ...rest] : rest;
+}
 
 function generateCountryData(
   countries: { country: string; flag: string; code: string }[],
