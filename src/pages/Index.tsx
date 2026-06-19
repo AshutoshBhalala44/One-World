@@ -12,7 +12,7 @@ import { Vote, History, Lightbulb } from "lucide-react";
 
 const Index = () => {
   const [weeklyUnlocked, setWeeklyUnlocked] = useState<boolean | null>(null);
-  const [activeTab, setActiveTab] = useState("today");
+
 
   return (
     <div className="min-h-screen bg-background">
