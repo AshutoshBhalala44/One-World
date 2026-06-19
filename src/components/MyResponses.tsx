@@ -210,6 +210,8 @@ export function MyResponses() {
       }
 
       setPolls(mergedPolls);
+      setBreakdownLoading(true);
+      setTimeout(() => setBreakdownLoading(false), 800);
     } catch (err) {
       console.error("Error fetching past polls:", err);
     } finally {
