@@ -31,10 +31,37 @@ export function FlipCard({
   frontLabel = "Global",
   backLabel = "Daily",
 }: FlipCardProps) {
+  // `activeFlipped` drives which face is "active" (i.e. should keep its
+  // breakdowns open) and updates *immediately* on user intent.
+  // `flipped` drives the actual 3D rotation, and is updated after a short
+  // delay so any expandable content on the current face has time to
+  // collapse before the card spins — preventing the breakdown from
+  // showing through the back of the card mid-flip.
+  const [activeFlipped, setActiveFlipped] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const frontRef = useRef<HTMLDivElement>(null);
   const backRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | "auto">("auto");
+  const flipTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Matches the breakdown collapse duration (0.3s) in CountryBreakdownChart.
+  const COLLAPSE_BEFORE_FLIP_MS = 320;
+
+  const requestFlip = (next: boolean) => {
+    if (next === activeFlipped) return;
+    setActiveFlipped(next);
+    if (flipTimeout.current) clearTimeout(flipTimeout.current);
+    flipTimeout.current = setTimeout(() => {
+      setFlipped(next);
+      flipTimeout.current = null;
+    }, COLLAPSE_BEFORE_FLIP_MS);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (flipTimeout.current) clearTimeout(flipTimeout.current);
+    };
+  }, []);
 
   // Track the active face's height so the container animates smoothly
   // and the inactive (absolutely positioned) face never clips.
@@ -57,9 +84,10 @@ export function FlipCard({
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
-    if (swipe < -60 || velocity < -400) setFlipped(true);
-    else if (swipe > 60 || velocity > 400) setFlipped(false);
+    if (swipe < -60 || velocity < -400) requestFlip(true);
+    else if (swipe > 60 || velocity > 400) requestFlip(false);
   };
+
 
   return (
     <div className="w-full">
@@ -72,10 +100,10 @@ export function FlipCard({
         >
           <button
             role="tab"
-            aria-selected={!flipped}
-            onClick={() => setFlipped(false)}
+            aria-selected={!activeFlipped}
+            onClick={() => requestFlip(false)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-              !flipped
+              !activeFlipped
                 ? "bg-accent text-accent-foreground shadow"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -85,10 +113,10 @@ export function FlipCard({
           </button>
           <button
             role="tab"
-            aria-selected={flipped}
-            onClick={() => setFlipped(true)}
+            aria-selected={activeFlipped}
+            onClick={() => requestFlip(true)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-              flipped
+              activeFlipped
                 ? "bg-accent text-accent-foreground shadow"
                 : "text-muted-foreground hover:text-foreground"
             }`}
@@ -135,7 +163,7 @@ export function FlipCard({
               pointerEvents: flipped ? "none" : "auto",
             }}
           >
-            <FlipFaceContext.Provider value={{ isActive: !flipped }}>
+            <FlipFaceContext.Provider value={{ isActive: !activeFlipped }}>
               {front}
             </FlipFaceContext.Provider>
           </div>
@@ -156,7 +184,7 @@ export function FlipCard({
               pointerEvents: flipped ? "auto" : "none",
             }}
           >
-            <FlipFaceContext.Provider value={{ isActive: flipped }}>
+            <FlipFaceContext.Provider value={{ isActive: activeFlipped }}>
               {back}
             </FlipFaceContext.Provider>
           </div>
