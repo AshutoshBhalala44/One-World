@@ -120,7 +120,7 @@ export const JoinTheTeamSection = () => {
   };
 
   return (
-    <section className="container mx-auto px-4 py-16 sm:py-24">
+    <section data-section="team" className="container mx-auto px-4 py-16 sm:py-24">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

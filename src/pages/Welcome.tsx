@@ -166,7 +166,7 @@ const Welcome = () => {
 
 
       {/* How it works */}
-      <section className="container mx-auto px-4 py-16 sm:py-24">
+      <section data-section="how-it-works" className="container mx-auto px-4 py-16 sm:py-24">
         <div className="text-center mb-12">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">How it works</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">Three steps to add your voice to the global record.</p>
@@ -196,7 +196,7 @@ const Welcome = () => {
       </section>
 
       {/* Why One World */}
-      <section className="bg-card/30 border-y border-border py-16 sm:py-24">
+      <section data-section="why" className="bg-card/30 border-y border-border py-16 sm:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">Why One World</h2>
@@ -227,7 +227,7 @@ const Welcome = () => {
       </section>
 
       {/* Support our mission */}
-      <section className="container mx-auto px-4 py-16 sm:py-24">
+      <section data-section="donate" className="container mx-auto px-4 py-16 sm:py-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -310,7 +310,7 @@ const Welcome = () => {
       <JoinTheTeamSection />
 
       {/* FAQ */}
-      <section className="bg-card/30 border-y border-border py-16 sm:py-24">
+      <section data-section="faq" className="bg-card/30 border-y border-border py-16 sm:py-24">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">Frequently asked questions</h2>
