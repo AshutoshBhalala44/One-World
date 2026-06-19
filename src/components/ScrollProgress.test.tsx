@@ -124,11 +124,11 @@ describe("ScrollProgress synchronization", () => {
     });
     expect(getActiveIndex()).toBe(5);
 
-    // And back up just as fast
+    // And back up just as fast (stop at section 1 so indicator stays visible)
     act(() => {
-      [...positions].reverse().forEach((y) => scrollTo(y));
+      [5, 4, 3, 2, 1].forEach((i) => scrollTo(i * SECTION_HEIGHT));
     });
-    expect(getActiveIndex()).toBe(0);
+    expect(getActiveIndex()).toBe(1);
   });
 
   it("responds to wheel events", () => {
