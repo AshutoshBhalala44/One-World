@@ -8,12 +8,11 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface CountryData {
+export interface CountryData {
   country: string;
   flag: string;
   code: string;
@@ -122,7 +121,68 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-export function CountryBreakdownChart({ options, autoExpand = false }: { options: OptionInfo[]; autoExpand?: boolean }) {
+function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
+  return (
+    <div className="flex items-center gap-2 py-1.5">
+      <Skeleton className="w-6 h-4 rounded-sm shrink-0" />
+      <Skeleton className={`${isMobile ? "w-8" : "w-12"} h-4 rounded-sm shrink-0`} />
+      <div className="flex-1 flex gap-0.5 h-4 ml-2">
+        <Skeleton className="h-full rounded-l-sm w-[35%]" />
+        <Skeleton className="h-full w-[25%]" />
+        <Skeleton className="h-full w-[25%]" />
+        <Skeleton className="h-full rounded-r-sm w-[15%]" />
+      </div>
+    </div>
+  );
+}
+
+function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 pb-2 border-b border-border/30 mb-2">
+        <Skeleton className="w-8 h-3 rounded-sm" />
+        <Skeleton className="w-8 h-3 rounded-sm ml-auto" />
+        <Skeleton className="w-8 h-3 rounded-sm" />
+        <Skeleton className="w-8 h-3 rounded-sm" />
+        <Skeleton className="w-8 h-3 rounded-sm" />
+      </div>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <SkeletonBarRow key={i} isMobile={isMobile} />
+      ))}
+      <div className="flex flex-col gap-2 mt-4 w-full items-center sm:items-stretch">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="flex items-start gap-2.5 w-full justify-center sm:justify-start">
+            <Skeleton className="w-4 h-4 mt-0.5 flex-shrink-0 rounded-sm" />
+            <Skeleton className="w-48 h-4 rounded-sm" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <Globe className="w-10 h-10 text-muted-foreground/30 mb-3" />
+      <p className="text-sm text-muted-foreground max-w-[240px]">{message}</p>
+    </div>
+  );
+}
+
+export function CountryBreakdownChart({
+  options,
+  autoExpand = false,
+  isLoading = false,
+  breakdowns,
+  emptyMessage = "Country breakdown data is not available for this topic.",
+}: {
+  options: OptionInfo[];
+  autoExpand?: boolean;
+  isLoading?: boolean;
+  breakdowns?: CountryData[];
+  emptyMessage?: string;
+}) {
   const isMobile = useIsMobile();
   const yAxisWidth = isMobile ? 64 : 120;
   const yAxisFontSize = isMobile ? 12 : 15;
@@ -139,7 +199,12 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
     code: string;
   } | null>(null);
 
-  const defaultBreakdowns = generateCountryData(DEFAULT_COUNTRIES, options);
+  const resolvedBreakdowns = useMemo(() => {
+    if (breakdowns !== undefined) return breakdowns;
+    return generateCountryData(DEFAULT_COUNTRIES, options);
+  }, [breakdowns, options]);
+
+  const defaultBreakdowns = resolvedBreakdowns.slice(0, 6);
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -208,218 +273,228 @@ export function CountryBreakdownChart({ options, autoExpand = false }: { options
             className="overflow-hidden"
           >
             <div className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
-              {/* Default chart */}
-              <div
-                className="w-full"
-                style={{ height: defaultBreakdowns.length * rowHeight + 60 }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    layout="vertical"
-                    margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
-                    barCategoryGap={isMobile ? "28%" : "20%"}
+              {isLoading ? (
+                <ChartSkeleton isMobile={isMobile} />
+              ) : breakdowns !== undefined && breakdowns.length === 0 ? (
+                <EmptyState message={emptyMessage} />
+              ) : (
+                <>
+                  {/* Default chart */}
+                  <div
+                    className="w-full"
+                    style={{ height: defaultBreakdowns.length * rowHeight + 60 }}
                   >
-                    <XAxis
-                      type="number"
-                      domain={[0, 100]}
-                      ticks={xAxisTicks}
-                      tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: xAxisFontSize, fill: AXIS_TEXT_COLOR }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      width={yAxisWidth}
-                      tick={{ fontSize: yAxisFontSize, fill: AXIS_TEXT_COLOR }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      cursor={{ fill: CURSOR_COLOR }}
-                      wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
-                      allowEscapeViewBox={{ x: true, y: true }}
-                      offset={isMobile ? 16 : 12}
-                    />
-                    {options.map((opt, i) => (
-                      <Bar
-                        key={opt.id}
-                        dataKey={opt.label}
-                        stackId="a"
-                        fill={CHART_COLORS[i % CHART_COLORS.length]}
-                        radius={
-                          i === 0
-                            ? [0, 0, 0, 0]
-                            : i === options.length - 1
-                            ? [0, 4, 4, 0]
-                            : [0, 0, 0, 0]
-                        }
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Legend */}
-              <div className="flex flex-col gap-2 mt-4 mb-1 w-full items-center sm:items-stretch">
-                {options.map((opt, i) => (
-                  <div key={opt.id} className="flex items-start gap-2.5 w-full justify-center sm:justify-start text-center sm:text-left">
-                    <div
-                      className="w-4 h-4 mt-0.5 flex-shrink-0"
-                      style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
-                    />
-                    <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 sm:flex-1">
-                      {opt.label}
-                    </span>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={chartData}
+                        layout="vertical"
+                        margin={{ top: 5, right: chartRightMargin, left: 0, bottom: 5 }}
+                        barCategoryGap={isMobile ? "28%" : "20%"}
+                      >
+                        <XAxis
+                          type="number"
+                          domain={[0, 100]}
+                          ticks={xAxisTicks}
+                          tickFormatter={(v) => `${v}%`}
+                          tick={{ fontSize: xAxisFontSize, fill: AXIS_TEXT_COLOR }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          width={yAxisWidth}
+                          tick={{ fontSize: yAxisFontSize, fill: AXIS_TEXT_COLOR }}
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <Tooltip
+                          content={<CustomTooltip />}
+                          cursor={{ fill: CURSOR_COLOR }}
+                          wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
+                          allowEscapeViewBox={{ x: true, y: true }}
+                          offset={isMobile ? 16 : 12}
+                        />
+                        {options.map((opt, i) => (
+                          <Bar
+                            key={opt.id}
+                            dataKey={opt.label}
+                            stackId="a"
+                            fill={CHART_COLORS[i % CHART_COLORS.length]}
+                            radius={
+                              i === 0
+                                ? [0, 0, 0, 0]
+                                : i === options.length - 1
+                                ? [0, 4, 4, 0]
+                                : [0, 0, 0, 0]
+                            }
+                          />
+                        ))}
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
-                ))}
-              </div>
 
-              {/* Search section */}
-              <div className="mt-4 border-t border-border/50 pt-3">
-                {!searchOpen ? (
-                  <button
-                    onClick={() => setSearchOpen(true)}
-                    className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors mx-auto"
-                  >
-                    <Search className="w-3.5 h-3.5" />
-                    Search for a specific country
-                  </button>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-2"
-                  >
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value);
-                          setSelectedCountry(null);
-                        }}
-                        placeholder="Type a country name..."
-                        className="w-full pl-9 pr-9 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50"
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => {
-                          setSearchOpen(false);
-                          setSearchQuery("");
-                          setSelectedCountry(null);
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* Search results dropdown */}
-                    {searchQuery.trim() && !selectedCountry && (
-                      <div className="rounded-lg border border-border bg-card shadow-md overflow-hidden">
-                        {searchResults.length > 0 ? (
-                          searchResults.map((c) => (
-                            <button
-                              key={c.country}
-                              onClick={() => {
-                                setSelectedCountry(c);
-                                setSearchQuery(c.country);
-                              }}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-secondary/60 transition-colors text-left"
-                            >
-                              <span className="text-base">{c.flag}</span>
-                              {c.country}
-                            </button>
-                          ))
-                        ) : (
-                          <p className="px-3 py-2 text-xs text-muted-foreground">
-                            No countries found
-                          </p>
-                        )}
+                  {/* Legend */}
+                  <div className="flex flex-col gap-2 mt-4 mb-1 w-full items-center sm:items-stretch">
+                    {options.map((opt, i) => (
+                      <div key={opt.id} className="flex items-start gap-2.5 w-full justify-center sm:justify-start text-center sm:text-left">
+                        <div
+                          className="w-4 h-4 mt-0.5 flex-shrink-0"
+                          style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                        />
+                        <span className="text-sm text-muted-foreground leading-snug break-words min-w-0 sm:flex-1">
+                          {opt.label}
+                        </span>
                       </div>
-                    )}
+                    ))}
+                  </div>
+                </>
+              )}
 
-                    {/* Selected country result */}
-                    {selectedCountry && selectedChartData && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="rounded-lg bg-background/60 border border-border/50 p-3"
-                      >
-                        <p className="text-xs font-medium text-muted-foreground mb-2">
-                          Results for {selectedCountry.flag}{" "}
-                          {selectedCountry.country}
-                        </p>
-                        <div className="w-full" style={{ height: 80 }}>
-                          <ResponsiveContainer width="100%" height="100%">
-                            <BarChart
-                              data={selectedChartData}
-                              layout="vertical"
-                              margin={{
-                                top: 0,
-                                right: chartRightMargin,
-                                left: 0,
-                                bottom: 0,
-                              }}
-                            >
-                              <XAxis
-                                type="number"
-                                domain={[0, 100]}
-                                ticks={xAxisTicks}
-                                tickFormatter={(v) => `${v}%`}
-                                tick={{
-                                  fontSize: xAxisFontSize,
-                                  fill: AXIS_TEXT_COLOR,
+              {/* Search section - hide when loading or empty */}
+              {!isLoading && !(breakdowns !== undefined && breakdowns.length === 0) && (
+                <div className="mt-4 border-t border-border/50 pt-3">
+                  {!searchOpen ? (
+                    <button
+                      onClick={() => setSearchOpen(true)}
+                      className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors mx-auto"
+                    >
+                      <Search className="w-3.5 h-3.5" />
+                      Search for a specific country
+                    </button>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-2"
+                    >
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setSelectedCountry(null);
+                          }}
+                          placeholder="Type a country name..."
+                          className="w-full pl-9 pr-9 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => {
+                            setSearchOpen(false);
+                            setSearchQuery("");
+                            setSelectedCountry(null);
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Search results dropdown */}
+                      {searchQuery.trim() && !selectedCountry && (
+                        <div className="rounded-lg border border-border bg-card shadow-md overflow-hidden">
+                          {searchResults.length > 0 ? (
+                            searchResults.map((c) => (
+                              <button
+                                key={c.country}
+                                onClick={() => {
+                                  setSelectedCountry(c);
+                                  setSearchQuery(c.country);
                                 }}
-                                axisLine={false}
-                                tickLine={false}
-                              />
-                              <YAxis
-                                type="category"
-                                dataKey="name"
-                                width={yAxisWidth}
-                                tick={{
-                                  fontSize: yAxisFontSize,
-                                  fill: AXIS_TEXT_COLOR,
-                                }}
-                                axisLine={false}
-                                tickLine={false}
-                              />
-                              <Tooltip
-                                content={<CustomTooltip />}
-                                cursor={{
-                                  fill: CURSOR_COLOR,
-                                }}
-                                wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
-                                allowEscapeViewBox={{ x: true, y: true }}
-                                offset={isMobile ? 16 : 12}
-                              />
-                              {options.map((opt, i) => (
-                                <Bar
-                                  key={opt.id}
-                                  dataKey={opt.label}
-                                  stackId="a"
-                                  fill={CHART_COLORS[i % CHART_COLORS.length]}
-                                  radius={
-                                    i === options.length - 1
-                                      ? [0, 4, 4, 0]
-                                      : [0, 0, 0, 0]
-                                  }
-                                />
-                              ))}
-                            </BarChart>
-                          </ResponsiveContainer>
+                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-foreground hover:bg-secondary/60 transition-colors text-left"
+                              >
+                                <span className="text-base">{c.flag}</span>
+                                {c.country}
+                              </button>
+                            ))
+                          ) : (
+                            <p className="px-3 py-2 text-xs text-muted-foreground">
+                              No countries found
+                            </p>
+                          )}
                         </div>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                )}
-              </div>
+                      )}
+
+                      {/* Selected country result */}
+                      {selectedCountry && selectedChartData && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="rounded-lg bg-background/60 border border-border/50 p-3"
+                        >
+                          <p className="text-xs font-medium text-muted-foreground mb-2">
+                            Results for {selectedCountry.flag}{" "}
+                            {selectedCountry.country}
+                          </p>
+                          <div className="w-full" style={{ height: 80 }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart
+                                data={selectedChartData}
+                                layout="vertical"
+                                margin={{
+                                  top: 0,
+                                  right: chartRightMargin,
+                                  left: 0,
+                                  bottom: 0,
+                                }}
+                              >
+                                <XAxis
+                                  type="number"
+                                  domain={[0, 100]}
+                                  ticks={xAxisTicks}
+                                  tickFormatter={(v) => `${v}%`}
+                                  tick={{
+                                    fontSize: xAxisFontSize,
+                                    fill: AXIS_TEXT_COLOR,
+                                  }}
+                                  axisLine={false}
+                                  tickLine={false}
+                                />
+                                <YAxis
+                                  type="category"
+                                  dataKey="name"
+                                  width={yAxisWidth}
+                                  tick={{
+                                    fontSize: yAxisFontSize,
+                                    fill: AXIS_TEXT_COLOR,
+                                  }}
+                                  axisLine={false}
+                                  tickLine={false}
+                                />
+                                <Tooltip
+                                  content={<CustomTooltip />}
+                                  cursor={{
+                                    fill: CURSOR_COLOR,
+                                  }}
+                                  wrapperStyle={{ zIndex: 50, pointerEvents: "none" }}
+                                  allowEscapeViewBox={{ x: true, y: true }}
+                                  offset={isMobile ? 16 : 12}
+                                />
+                                {options.map((opt, i) => (
+                                  <Bar
+                                    key={opt.id}
+                                    dataKey={opt.label}
+                                    stackId="a"
+                                    fill={CHART_COLORS[i % CHART_COLORS.length]}
+                                    radius={
+                                      i === options.length - 1
+                                        ? [0, 4, 4, 0]
+                                        : [0, 0, 0, 0]
+                                    }
+                                  />
+                                ))}
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
