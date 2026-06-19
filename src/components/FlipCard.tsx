@@ -43,18 +43,25 @@ export function FlipCard({
   const backRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState<number | "auto">("auto");
   const flipTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isFlipping = useRef(false);
 
   // Matches the breakdown collapse duration (0.3s) in CountryBreakdownChart.
   const COLLAPSE_BEFORE_FLIP_MS = 320;
+  // Rotation transition duration (0.7s) + collapse buffer.
+  const FLIP_LOCK_MS = 1020;
 
   const requestFlip = (next: boolean) => {
     if (next === activeFlipped) return;
+    if (isFlipping.current) return;
+    isFlipping.current = true;
     setActiveFlipped(next);
     if (flipTimeout.current) clearTimeout(flipTimeout.current);
     flipTimeout.current = setTimeout(() => {
       setFlipped(next);
-      flipTimeout.current = null;
     }, COLLAPSE_BEFORE_FLIP_MS);
+    setTimeout(() => {
+      isFlipping.current = false;
+    }, FLIP_LOCK_MS);
   };
 
   useEffect(() => {
