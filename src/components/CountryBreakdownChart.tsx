@@ -234,13 +234,14 @@ export function CountryBreakdownChart({
   } | null>(null);
 
   const resolvedBreakdowns = useMemo(() => {
+    if (isLoading) return [] as CountryData[];
     if (breakdowns !== undefined) return breakdowns;
     return generateCountryData(DEFAULT_COUNTRIES, options);
-  }, [breakdowns, options]);
+  }, [isLoading, breakdowns, options]);
 
   const defaultBreakdowns = useMemo(
-    () => pickTopCountries(resolvedBreakdowns),
-    [resolvedBreakdowns]
+    () => (isLoading ? [] : pickTopCountries(resolvedBreakdowns)),
+    [isLoading, resolvedBreakdowns]
   );
 
   const searchResults = useMemo(() => {
@@ -258,28 +259,41 @@ export function CountryBreakdownChart({
     return generateCountryData([selectedCountry], options)[0];
   }, [selectedCountry, options]);
 
-  const chartData = defaultBreakdowns.map((bd) => {
-    const row: Record<string, any> = { name: `${bd.flag} ${bd.code}`, fullName: `${bd.flag} ${bd.country}` };
-    options.forEach((opt) => {
-      row[opt.label] = bd.results[opt.id] || 0;
-    });
-    return row;
-  });
+  const chartData = useMemo(
+    () =>
+      defaultBreakdowns.map((bd) => {
+        const row: Record<string, any> = {
+          name: `${bd.flag} ${bd.code}`,
+          fullName: `${bd.flag} ${bd.country}`,
+        };
+        options.forEach((opt) => {
+          row[opt.label] = bd.results[opt.id] || 0;
+        });
+        return row;
+      }),
+    [defaultBreakdowns, options]
+  );
 
-  const selectedChartData = selectedBreakdown
-    ? [
-        (() => {
-          const row: Record<string, any> = {
-            name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
-            fullName: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
-          };
-          options.forEach((opt) => {
-            row[opt.label] = selectedBreakdown.results[opt.id] || 0;
-          });
-          return row;
-        })(),
-      ]
-    : null;
+  const selectedChartData = useMemo(() => {
+    if (!selectedBreakdown) return null;
+    const row: Record<string, any> = {
+      name: `${selectedBreakdown.flag} ${selectedBreakdown.code}`,
+      fullName: `${selectedBreakdown.flag} ${selectedBreakdown.country}`,
+    };
+    options.forEach((opt) => {
+      row[opt.label] = selectedBreakdown.results[opt.id] || 0;
+    });
+    return [row];
+  }, [selectedBreakdown, options]);
+
+  const chartKey = useMemo(
+    () =>
+      `chart:${options.map((o) => o.id).join("|")}:${defaultBreakdowns
+        .map((b) => b.code)
+        .join("|")}`,
+    [options, defaultBreakdowns]
+  );
+
 
   return (
     <motion.div
