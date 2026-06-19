@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import { ChevronDown, ChevronUp, Search, X, Globe } from "lucide-react";
 import {
   BarChart,
