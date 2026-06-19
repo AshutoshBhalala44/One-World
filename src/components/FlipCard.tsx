@@ -89,6 +89,7 @@ export function FlipCard({
   }, [flipped]);
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
+    if (isFlipping.current) return;
     const swipe = info.offset.x;
     const velocity = info.velocity.x;
     if (swipe < -60 || velocity < -400) requestFlip(true);
