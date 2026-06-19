@@ -33,48 +33,73 @@ export function ScrollProgress() {
   }, []);
 
   useEffect(() => {
-    const sectionElements = SECTIONS.map((s) =>
-      document.querySelector(`[data-section="${s.id}"]`)
-    ).filter(Boolean) as Element[];
+    const getSectionEls = () =>
+      SECTIONS.map((s) => document.querySelector(`[data-section="${s.id}"]`)).filter(
+        Boolean
+      ) as HTMLElement[];
 
+    let sectionElements = getSectionEls();
     if (sectionElements.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("data-section");
-            const idx = SECTIONS.findIndex((s) => s.id === id);
-            if (idx !== -1) {
-              const scrollY = window.scrollY;
-              setDirection(scrollY > lastScrollY.current ? "down" : "up");
-              lastScrollY.current = scrollY;
-              setActiveIndex(idx);
-            }
-          }
-        });
-      },
-      {
-        root: null,
-        rootMargin: "-40% 0px -40% 0px",
-        threshold: 0,
+    let rafId = 0;
+    let lastY = window.scrollY;
+
+    const update = () => {
+      rafId = 0;
+      const scrollY = window.scrollY;
+      const viewportCenter = scrollY + window.innerHeight / 2;
+
+      // Pick the section whose center is closest to the viewport center.
+      let closestIdx = 0;
+      let closestDist = Infinity;
+      for (let i = 0; i < sectionElements.length; i++) {
+        const rect = sectionElements[i].getBoundingClientRect();
+        const center = scrollY + rect.top + rect.height / 2;
+        const dist = Math.abs(center - viewportCenter);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIdx = i;
+        }
       }
-    );
 
-    sectionElements.forEach((el) => observer.observe(el));
+      if (scrollY !== lastY) {
+        setDirection(scrollY > lastY ? "down" : "up");
+        lastScrollY.current = scrollY;
+        lastY = scrollY;
+      }
 
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
+      setActiveIndex((prev) => (prev === closestIdx ? prev : closestIdx));
+
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setIsVisible(docHeight > 200 && scrollTop > 80);
+      setIsVisible(docHeight > 200 && scrollY > 80);
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const onScroll = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(update);
+    };
+
+    const onResize = () => {
+      sectionElements = getSectionEls();
+      onScroll();
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("touchmove", onScroll, { passive: true });
+    window.addEventListener("wheel", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+
+    // Recompute once fonts/images settle.
+    const settleTimeout = window.setTimeout(onResize, 400);
 
     return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.clearTimeout(settleTimeout);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("touchmove", onScroll);
+      window.removeEventListener("wheel", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
