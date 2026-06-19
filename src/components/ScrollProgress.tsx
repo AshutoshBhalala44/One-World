@@ -5,7 +5,6 @@ interface SectionInfo {
   id: string;
   label: string;
 }
-3:00 pm
 
 const SECTIONS: SectionInfo[] = [
   { id: "hero", label: "Welcome" },
