@@ -439,7 +439,10 @@ export function MyResponses() {
                 </div>
               )}
               {poll.options && poll.options.length > 0 && (
-                <CountryBreakdownChart options={poll.options} />
+                <CountryBreakdownChart
+                  options={poll.options}
+                  isLoading={false}
+                />
               )}
             </motion.div>
           );
