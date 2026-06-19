@@ -1,5 +1,6 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useFlipFace } from "./FlipCard";
 
 import { ChevronDown, ChevronUp, Search, X, Globe } from "lucide-react";
 import {
@@ -225,6 +226,18 @@ export function CountryBreakdownChart({
     }
     onExpandedChange?.(value);
   };
+
+  // If we're inside a FlipCard face, collapse the breakdown whenever this
+  // face flips out of view. Otherwise its content can bleed through and be
+  // read backwards from the opposite side on mobile.
+  const { isActive: faceIsActive } = useFlipFace();
+  useEffect(() => {
+    if (!faceIsActive && expanded) {
+      setExpanded(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [faceIsActive]);
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<{
