@@ -141,7 +141,7 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
+const SkeletonBarRow = memo(function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
       <Skeleton shimmer className="w-6 h-4 rounded-sm shrink-0" />
@@ -154,9 +154,11 @@ function SkeletonBarRow({ isMobile }: { isMobile: boolean }) {
       </div>
     </div>
   );
-}
+});
 
-function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
+const SKELETON_ROWS = [0, 1, 2, 3];
+
+const ChartSkeleton = memo(function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center gap-2 pb-2 border-b border-border/30 mb-2">
@@ -166,11 +168,11 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
         <Skeleton shimmer className="w-8 h-3 rounded-sm" />
         <Skeleton shimmer className="w-8 h-3 rounded-sm" />
       </div>
-      {Array.from({ length: 4 }).map((_, i) => (
+      {SKELETON_ROWS.map((i) => (
         <SkeletonBarRow key={i} isMobile={isMobile} />
       ))}
       <div className="flex flex-col gap-2 mt-4 w-full items-center sm:items-stretch">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {SKELETON_ROWS.map((i) => (
           <div key={i} className="flex items-start gap-2.5 w-full justify-center sm:justify-start">
             <Skeleton shimmer className="w-4 h-4 mt-0.5 flex-shrink-0 rounded-sm" />
             <Skeleton shimmer className="w-48 h-4 rounded-sm" />
@@ -179,16 +181,17 @@ function ChartSkeleton({ isMobile }: { isMobile: boolean }) {
       </div>
     </div>
   );
-}
+});
 
-function EmptyState({ message }: { message: string }) {
+const EmptyState = memo(function EmptyState({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 text-center">
       <Globe className="w-10 h-10 text-muted-foreground/30 mb-3" />
       <p className="text-sm text-muted-foreground max-w-[240px]">{message}</p>
     </div>
   );
-}
+});
+
 
 export function CountryBreakdownChart({
   options,
