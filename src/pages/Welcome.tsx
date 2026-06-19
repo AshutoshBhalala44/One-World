@@ -90,7 +90,7 @@ const Welcome = () => {
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
       <Header />
-      <main>
+      <main className="snap-page">
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-hero-gradient text-[hsl(45,100%,96%)]">
