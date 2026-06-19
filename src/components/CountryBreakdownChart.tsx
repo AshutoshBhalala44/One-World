@@ -176,12 +176,16 @@ export function CountryBreakdownChart({
   isLoading = false,
   breakdowns,
   emptyMessage = "Country breakdown data is not available for this topic.",
+  expanded: controlledExpanded,
+  onExpandedChange,
 }: {
   options: OptionInfo[];
   autoExpand?: boolean;
   isLoading?: boolean;
   breakdowns?: CountryData[];
   emptyMessage?: string;
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
 }) {
   const isMobile = useIsMobile();
   const yAxisWidth = isMobile ? 64 : 120;
@@ -190,7 +194,14 @@ export function CountryBreakdownChart({
   const xAxisTicks = isMobile ? [0, 50, 100] : [0, 25, 50, 75, 100];
   const rowHeight = isMobile ? 44 : 56;
   const chartRightMargin = isMobile ? 16 : 15;
-  const [expanded, setExpanded] = useState(autoExpand);
+  const [internalExpanded, setInternalExpanded] = useState(autoExpand);
+  const expanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
+  const setExpanded = (value: boolean) => {
+    if (controlledExpanded === undefined) {
+      setInternalExpanded(value);
+    }
+    onExpandedChange?.(value);
+  };
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState<{
