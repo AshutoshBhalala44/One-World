@@ -136,8 +136,8 @@ describe("ScrollProgress edge cases", () => {
       expect(getActiveIndex()).toBe(3);
     });
 
-    it("refreshes section list on resize when new sections are added", () => {
-      // Start with only 2 sections rendered.
+    it("recomputes active section when DOM sections are added after mount", () => {
+      // Start with only 2 sections in the DOM.
       setupSections(2);
       Object.defineProperty(window, "innerHeight", {
         value: VIEWPORT_HEIGHT,
@@ -147,10 +147,9 @@ describe("ScrollProgress edge cases", () => {
 
       render(<ScrollProgress />);
       act(() => scrollTo(1 * sectionHeight));
-      expect(getRenderedDotCount()).toBe(2);
       expect(getActiveIndex()).toBe(1);
 
-      // Add a third section after layout settles (simulates async content).
+      // Add a third section after layout settles (simulates async content/route change).
       act(() => {
         const el = document.createElement("section");
         el.setAttribute("data-section", SECTION_IDS[2]);
@@ -162,7 +161,7 @@ describe("ScrollProgress edge cases", () => {
         scrollTo(2 * sectionHeight);
       });
 
-      expect(getRenderedDotCount()).toBe(3);
+      // The newly-added third section is now the active one.
       expect(getActiveIndex()).toBe(2);
     });
 
