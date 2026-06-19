@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, History, Search, Check, X, Globe, CalendarDays } from "lucide-react";
@@ -43,6 +43,8 @@ export function MyResponses() {
   const navigate = useNavigate();
   const [polls, setPolls] = useState<PastPoll[]>([]);
   const [loading, setLoading] = useState(true);
+  const [breakdownLoading, setBreakdownLoading] = useState(false);
+  const breakdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
   const [filter, setFilter] = useState<FilterOption>("all");
@@ -55,6 +57,14 @@ export function MyResponses() {
     }
     fetchPastPolls();
   }, [user, topicType]);
+
+  useEffect(() => {
+    return () => {
+      if (breakdownTimeoutRef.current) {
+        clearTimeout(breakdownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   async function fetchPastPolls() {
     setLoading(true);
@@ -209,6 +219,12 @@ export function MyResponses() {
       }
 
       setPolls(mergedPolls);
+      setBreakdownLoading(true);
+      if (breakdownTimeoutRef.current) clearTimeout(breakdownTimeoutRef.current);
+      breakdownTimeoutRef.current = setTimeout(() => {
+        setBreakdownLoading(false);
+        breakdownTimeoutRef.current = null;
+      }, 800);
     } catch (err) {
       console.error("Error fetching past polls:", err);
     } finally {
@@ -439,7 +455,11 @@ export function MyResponses() {
                 </div>
               )}
               {poll.options && poll.options.length > 0 && (
-                <CountryBreakdownChart options={poll.options} />
+                <CountryBreakdownChart
+                  options={poll.options}
+                  isLoading={breakdownLoading}
+                  breakdowns={poll.totalVotes === 0 ? [] : undefined}
+                />
               )}
             </motion.div>
           );
