@@ -29,11 +29,8 @@ const Index = () => {
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-6 pb-28 sm:pb-32">
         <h1 className="sr-only">Global Topics Dashboard</h1>
 
-        <Tabs
-          defaultValue="today"
-          className="w-full"
-          onValueChange={(val) => setActiveTab(val)}
-        >
+        <Tabs defaultValue="today" className="w-full">
+
           <TabsContent value="today" className="mt-0">
             <FlipCard
               frontLabel="Global"
