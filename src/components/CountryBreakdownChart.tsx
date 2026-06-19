@@ -123,9 +123,12 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export function CountryBreakdownChart({ options, autoExpand = false }: { options: OptionInfo[]; autoExpand?: boolean }) {
   const isMobile = useIsMobile();
-  const yAxisWidth = isMobile ? 70 : 120;
-  const yAxisFontSize = isMobile ? 13 : 15;
-  const chartRightMargin = isMobile ? 24 : 15;
+  const yAxisWidth = isMobile ? 64 : 120;
+  const yAxisFontSize = isMobile ? 12 : 15;
+  const xAxisFontSize = isMobile ? 11 : 10;
+  const xAxisTicks = isMobile ? [0, 50, 100] : [0, 25, 50, 75, 100];
+  const rowHeight = isMobile ? 44 : 56;
+  const chartRightMargin = isMobile ? 16 : 15;
   const [expanded, setExpanded] = useState(autoExpand);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
