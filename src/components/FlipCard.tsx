@@ -141,7 +141,7 @@ export function FlipCard({
 
       {/* 3D scene */}
       <motion.div
-        className="relative w-full"
+        className="relative w-full overflow-hidden"
         style={{ perspective: 1800 }}
         animate={{ height }}
         transition={{ duration: 0.35, ease: "easeInOut" }}
