@@ -94,9 +94,7 @@ describe("FlipCard — no upside-down bleed-through of unanswered Global face", 
   afterEach(() => {
     cleanup();
     vi.useRealTimers();
-    // Restore default offsetHeight (delete override).
-    // @ts-expect-error test cleanup
-    delete (HTMLElement.prototype as any).offsetHeight;
+    delete (HTMLElement.prototype as unknown as Record<string, unknown>).offsetHeight;
   });
 
   it("clips the 3D scene to the active face height via overflow-hidden", () => {
