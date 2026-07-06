@@ -47,6 +47,11 @@ const Welcome = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutCents, setCheckoutCents] = useState<number>(0);
 
+  // Fluid section snapping — small swipe/wheel gestures fly to the next
+  // section in either direction. Disabled while the donation dialog is open
+  // so its inputs don't fight the gesture handler.
+  useSectionSnap({ enabled: !checkoutOpen, threshold: 30, cooldownMs: 650 });
+
   const handleDonate = () => {
     if (!isPaymentsConfigured()) {
       toast.error("Payments are not configured for this build.");
