@@ -90,10 +90,10 @@ export function FlipCard({
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (isFlipping.current) return;
-    const swipe = info.offset.x;
-    const velocity = info.velocity.x;
-    if (swipe < -60 || velocity < -400) requestFlip(true);
-    else if (swipe > 60 || velocity > 400) requestFlip(false);
+    const swipe = Math.abs(info.offset.x);
+    const velocity = Math.abs(info.velocity.x);
+    // Either direction toggles the card so users can flip intuitively.
+    if (swipe > 60 || velocity > 400) requestFlip(!activeFlipped);
   };
 
 
