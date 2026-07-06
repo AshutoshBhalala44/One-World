@@ -8,6 +8,7 @@ import { SwipeToSignIn } from "@/components/SwipeToSignIn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSectionSnap } from "@/hooks/useSectionSnap";
 import { Phone, Trophy, Vote, Globe2, ShieldCheck, BarChart3, Sparkles, ArrowRight, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -45,6 +46,11 @@ const Welcome = () => {
   const [customAmount, setCustomAmount] = useState<string>("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutCents, setCheckoutCents] = useState<number>(0);
+
+  // Fluid section snapping — small swipe/wheel gestures fly to the next
+  // section in either direction. Disabled while the donation dialog is open
+  // so its inputs don't fight the gesture handler.
+  useSectionSnap({ enabled: !checkoutOpen, threshold: 30, cooldownMs: 650 });
 
   const handleDonate = () => {
     if (!isPaymentsConfigured()) {
