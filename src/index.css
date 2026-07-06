@@ -126,14 +126,10 @@
     scroll-behavior: smooth;
   }
 
-  /* Section snap scrolling — opt-in via .snap-page on a descendant */
-  html:has(.snap-page) {
-    scroll-snap-type: y proximity;
-  }
-
-  .snap-page section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+  /* Section snapping is handled by useSectionSnap (JS controller) so gestures
+     work uniformly in both directions on all browsers and handle tall
+     sections gracefully. Keep scroll-margin so anchor jumps clear the header. */
+  [data-section] {
     scroll-margin-top: 4rem;
   }
 
