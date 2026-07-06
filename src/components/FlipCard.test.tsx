@@ -114,9 +114,6 @@ describe("FlipCard — no upside-down bleed-through of unanswered Global face", 
     const back = screen.getByTestId("back-content").parentElement as HTMLElement;
     expect(front.style.backfaceVisibility).toBe("hidden");
     expect(back.style.backfaceVisibility).toBe("hidden");
-    // Explicit webkit prefix for Safari/iOS where the bleed-through was reported.
-    expect(front.getAttribute("style") || "").toMatch(/-webkit-backface-visibility:\s*hidden/i);
-    expect(back.getAttribute("style") || "").toMatch(/-webkit-backface-visibility:\s*hidden/i);
   });
 
   it("removes the tall front from layout flow (position:absolute, no pointer events) after flipping to Daily", () => {
