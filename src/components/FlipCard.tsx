@@ -90,10 +90,36 @@ export function FlipCard({
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (isFlipping.current) return;
-    const swipe = Math.abs(info.offset.x);
-    const velocity = Math.abs(info.velocity.x);
+    const dx = info.offset.x;
+    const dy = info.offset.y;
+    const vx = info.velocity.x;
+    const vy = info.velocity.y;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const absVx = Math.abs(vx);
+    const absVy = Math.abs(vy);
+
+    // Require the gesture to be meaningfully horizontal — reject mostly-vertical
+    // scrolls and diagonals where vertical motion dominates.
+    const horizontalDominant =
+      absDx >= absDy * 1.2 || (absVx >= absVy * 1.2 && absVx > 200);
+    if (!horizontalDominant) return;
+
+    // Accept either a short-but-fast flick (velocity-driven) or a longer drag
+    // (distance-driven). Thresholds are intentionally low so subtle intentional
+    // swipes register, while the horizontal-dominance check above filters noise.
+    const DISTANCE_THRESHOLD = 40;
+    const VELOCITY_THRESHOLD = 300;
+    if (absDx < DISTANCE_THRESHOLD && absVx < VELOCITY_THRESHOLD) return;
+
+    // Use velocity direction when the flick is fast, otherwise fall back to
+    // net offset direction — this avoids misreads when a fast swipe ends with
+    // a small opposing offset (finger lift-off jitter).
+    const direction = absVx > VELOCITY_THRESHOLD ? Math.sign(vx) : Math.sign(dx);
+    if (direction === 0) return;
+
     // Either direction toggles the card so users can flip intuitively.
-    if (swipe > 60 || velocity > 400) requestFlip(!activeFlipped);
+    requestFlip(!activeFlipped);
   };
 
 
