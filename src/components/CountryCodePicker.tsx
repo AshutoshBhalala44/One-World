@@ -344,6 +344,16 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
       .map(({ country }) => country);
   }, [search]);
 
+  const suggestions = useMemo(
+    () => (filtered.length === 0 && search.trim() ? suggestCountries(search) : []),
+    [filtered.length, search]
+  );
+
+  const handlePick = (country: Country) => {
+    onSelect(country);
+    setOpen(false);
+  };
+
 
   useEffect(() => {
     if (open) {
