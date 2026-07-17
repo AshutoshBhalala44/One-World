@@ -26,14 +26,14 @@ interface VoteCount {
 }
 
 const optionColors = [
-  "from-[#7A1E24]/25 to-[#7A1E24]/5",
+  "from-[#0d7a5f]/25 to-[#0d7a5f]/5",
   "from-amber-500/20 to-amber-500/5",
   "from-teal-500/20 to-teal-500/5",
   "from-rose-500/20 to-rose-500/5",
 ];
 
 const optionAccents = [
-  "border-[#7A1E24]/50",
+  "border-[#0d7a5f]/50",
   "border-amber-500/40",
   "border-teal-500/40",
   "border-rose-500/40",
@@ -264,7 +264,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
       className="rounded-xl overflow-hidden max-w-2xl mx-auto mb-8"
     >
       {/* Header banner */}
-      <div className="bg-gradient-to-r from-[#12141A] via-[#1E2230] to-[#3A1218] p-4 sm:p-5 border-b border-[#7A1E24]/40">
+      <div className="bg-gradient-to-r from-[#12141A] via-[#1E2230] to-[#052e2b] p-4 sm:p-5 border-b border-[#0d7a5f]/40">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <Trophy className="w-5 h-5 text-white" />
@@ -338,7 +338,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
                   hasVoted
                     ? `cursor-default ${isSelected ? optionAccents[i % optionAccents.length] : "border-border/50"}`
                     : `cursor-pointer border-border hover:${optionAccents[i % optionAccents.length]} hover:shadow-md active:scale-[0.99]`
-                } ${isSelected ? "ring-1 ring-[#7A1E24]/40" : ""}`}
+                } ${isSelected ? "ring-1 ring-[#0d7a5f]/40" : ""}`}
               >
                 {hasVoted && (
                   <motion.div
@@ -352,13 +352,13 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
                 <div className="relative flex items-center justify-between px-4 py-3.5">
                   <div className="flex items-center gap-3">
                     {!hasVoted && (
-                      <div className="w-5 h-5 rounded-full border-2 border-[#7A1E24]/60 flex-shrink-0" />
+                      <div className="w-5 h-5 rounded-full border-2 border-[#0d7a5f]/60 flex-shrink-0" />
                     )}
                     {hasVoted && isSelected && (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="w-5 h-5 rounded-full bg-[#7A1E24] flex-shrink-0 flex items-center justify-center"
+                        className="w-5 h-5 rounded-full bg-[#0d7a5f] flex-shrink-0 flex items-center justify-center"
                       >
                         <div className="w-2.5 h-2.5 rounded-full bg-white" />
                       </motion.div>

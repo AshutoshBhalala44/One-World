@@ -398,7 +398,7 @@ export function MyResponses() {
                   <span
                     className={`text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded-full ${
                       poll.type === "global"
-                        ? "bg-[#7A1E24]/20 text-[#E8A5AA]"
+                        ? "bg-[#0d7a5f]/20 text-[#A8E0CC]"
                         : "bg-blue-500/15 text-blue-400"
                     }`}
                   >
