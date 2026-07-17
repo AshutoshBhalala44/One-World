@@ -273,7 +273,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
             <h2 className="text-white font-display text-lg sm:text-xl font-bold">
               Global Topic
             </h2>
-            <p className="text-white/70 text-xs sm:text-sm">
+            <p className="text-white/85 text-xs sm:text-sm">
               {hasVoted
                 ? "Answered Global Topic -- Daily Topic Unlocked"
                 : "Answer this to unlock daily topics"}
@@ -281,15 +281,15 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
           </div>
           {!hasVoted && (
             <div className="ml-auto">
-              <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
+              <Sparkles className="w-5 h-5 text-amber-200 animate-pulse" aria-hidden="true" />
             </div>
           )}
         </div>
 
         {/* Countdown timer */}
         <div className="mt-3 flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-white/60" />
-          <span className="text-white/60 text-[10px] sm:text-xs uppercase tracking-wider font-medium">
+          <Clock className="w-3.5 h-3.5 text-white/80" aria-hidden="true" />
+          <span className="text-white/85 text-[10px] sm:text-xs uppercase tracking-wider font-medium">
             Next topic in
           </span>
           <div className="flex gap-1.5 ml-auto">
@@ -300,10 +300,10 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
               { val: countdown.seconds, label: "S" },
             ].map(({ val, label }) => (
               <div key={label} className="flex items-center gap-0.5">
-                <span className="bg-white/15 backdrop-blur-sm text-white font-mono text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded">
+                <span className="bg-black/40 backdrop-blur-sm text-white font-mono text-xs sm:text-sm font-bold px-1.5 py-0.5 rounded">
                   {String(val).padStart(2, "0")}
                 </span>
-                <span className="text-white/50 text-[9px] font-medium">{label}</span>
+                <span className="text-white/85 text-[10px] font-medium">{label}</span>
               </div>
             ))}
           </div>
