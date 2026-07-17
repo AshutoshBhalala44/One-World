@@ -334,15 +334,7 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const filtered = useMemo(() => {
-    const q = normalize(search);
-    if (!q) return countries;
-    // Split query on whitespace so multi-word / partial searches all match
-    const tokens = q.split(" ").filter(Boolean);
-    return searchIndex
-      .filter(({ haystack }) => tokens.every((t) => haystack.includes(t)))
-      .map(({ country }) => country);
-  }, [search]);
+  const filtered = useMemo(() => searchCountries(search), [search]);
 
   const suggestions = useMemo(
     () => (filtered.length === 0 && search.trim() ? suggestCountries(search) : []),
