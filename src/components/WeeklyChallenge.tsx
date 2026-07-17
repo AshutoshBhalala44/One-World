@@ -338,7 +338,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
                   hasVoted
                     ? `cursor-default ${isSelected ? optionAccents[i % optionAccents.length] : "border-border/50"}`
                     : `cursor-pointer border-border hover:${optionAccents[i % optionAccents.length]} hover:shadow-md active:scale-[0.99]`
-                } ${isSelected ? "ring-1 ring-purple-500/30" : ""}`}
+                } ${isSelected ? "ring-1 ring-[#7A1E24]/40" : ""}`}
               >
                 {hasVoted && (
                   <motion.div
