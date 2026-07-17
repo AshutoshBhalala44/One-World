@@ -281,6 +281,11 @@ const searchIndex: { country: Country; haystack: string }[] = countries.map((c) 
   return { country: c, haystack: parts.map(normalize).join(" | ") };
 });
 
+interface CountryCodePickerProps {
+  selected: Country;
+  onSelect: (country: Country) => void;
+}
+
 export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
