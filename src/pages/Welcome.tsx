@@ -131,11 +131,14 @@ const Welcome = () => {
             <p className="text-base sm:text-lg md:text-xl opacity-80 leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto font-body">
               Our vision is to have a world where you don't only know what your neighbors, family, friends, and colleagues think. Instead, you know what every person in every corner of the world thinks, since we are all part of One World.
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-4 text-xs sm:text-sm opacity-70 mb-10">
-              <span className="flex items-center gap-1.5">🌍 190+ countries</span>
-              <span className="flex items-center gap-1.5">📊 Real-time results</span>
-              <span className="flex items-center gap-1.5">🔒 Tamper-proof</span>
-            </div>
+            <figure className="mx-auto max-w-xl mb-10">
+              <blockquote className="text-sm sm:text-base italic leading-relaxed text-[hsl(45,100%,96%)]/75 border-l-2 border-gold/50 pl-4 text-left">
+                Built by a small team who believe the world deserves to hear itself think.
+              </blockquote>
+              <figcaption className="mt-2 text-xs tracking-wide text-gold/80 text-left pl-4">
+                — One World
+              </figcaption>
+            </figure>
 
             {user ? (
               <div className="flex flex-col items-center gap-3">
