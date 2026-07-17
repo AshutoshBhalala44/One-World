@@ -26,14 +26,14 @@ interface VoteCount {
 }
 
 const optionColors = [
-  "from-purple-500/20 to-purple-500/5",
+  "from-[#7A1E24]/25 to-[#7A1E24]/5",
   "from-amber-500/20 to-amber-500/5",
   "from-teal-500/20 to-teal-500/5",
   "from-rose-500/20 to-rose-500/5",
 ];
 
 const optionAccents = [
-  "border-purple-500/40",
+  "border-[#7A1E24]/50",
   "border-amber-500/40",
   "border-teal-500/40",
   "border-rose-500/40",
