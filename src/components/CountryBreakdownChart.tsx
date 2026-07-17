@@ -27,7 +27,7 @@ interface OptionInfo {
 }
 
 const CHART_COLORS = [
-  "hsl(222, 55%, 30%)",   // deep navy (matches app theme)
+  "hsl(255, 92%, 76%)",   // soft violet
   "hsl(40, 95%, 55%)",    // gold/amber
   "hsl(172, 42%, 52%)",   // muted teal
   "hsl(340, 75%, 60%)",   // rose/pink
