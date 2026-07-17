@@ -352,13 +352,13 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
                 <div className="relative flex items-center justify-between px-4 py-3.5">
                   <div className="flex items-center gap-3">
                     {!hasVoted && (
-                      <div className="w-5 h-5 rounded-full border-2 border-purple-400/50 flex-shrink-0" />
+                      <div className="w-5 h-5 rounded-full border-2 border-[#7A1E24]/60 flex-shrink-0" />
                     )}
                     {hasVoted && isSelected && (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="w-5 h-5 rounded-full bg-purple-500 flex-shrink-0 flex items-center justify-center"
+                        className="w-5 h-5 rounded-full bg-[#7A1E24] flex-shrink-0 flex items-center justify-center"
                       >
                         <div className="w-2.5 h-2.5 rounded-full bg-white" />
                       </motion.div>
