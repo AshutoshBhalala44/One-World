@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, SearchX } from "lucide-react";
 
 export interface Country {
   name: string;
@@ -281,6 +281,48 @@ const searchIndex: { country: Country; haystack: string }[] = countries.map((c) 
   return { country: c, haystack: parts.map(normalize).join(" | ") };
 });
 
+// Levenshtein distance for fuzzy suggestions (small strings, cheap)
+const editDistance = (a: string, b: string): number => {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const prev = new Array(b.length + 1).fill(0).map((_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let curr = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      const next = Math.min(curr + 1, prev[j] + 1, prev[j - 1] + cost);
+      prev[j - 1] = curr;
+      curr = next;
+    }
+    prev[b.length] = curr;
+  }
+  return prev[b.length];
+};
+
+const suggestCountries = (query: string, limit = 3): Country[] => {
+  const q = normalize(query);
+  if (!q) return [];
+  const scored = countries.map((c) => {
+    const nameN = normalize(c.name);
+    // Best distance across name + aliases
+    const candidates = [nameN, ...(countryAliases[c.code] ?? []).map(normalize)];
+    let best = Infinity;
+    for (const cand of candidates) {
+      // Compare against query trimmed to candidate length window for fairer scoring
+      const dist = editDistance(q, cand);
+      const normalized = dist / Math.max(q.length, cand.length);
+      if (normalized < best) best = normalized;
+    }
+    return { country: c, score: best };
+  });
+  return scored
+    .filter((s) => s.score < 0.6) // only reasonably close matches
+    .sort((a, b) => a.score - b.score)
+    .slice(0, limit)
+    .map((s) => s.country);
+};
+
 interface CountryCodePickerProps {
   selected: Country;
   onSelect: (country: Country) => void;
@@ -301,6 +343,16 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
       .filter(({ haystack }) => tokens.every((t) => haystack.includes(t)))
       .map(({ country }) => country);
   }, [search]);
+
+  const suggestions = useMemo(
+    () => (filtered.length === 0 && search.trim() ? suggestCountries(search) : []),
+    [filtered.length, search]
+  );
+
+  const handlePick = (country: Country) => {
+    onSelect(country);
+    setOpen(false);
+  };
 
 
   useEffect(() => {
@@ -349,18 +401,43 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
           </div>
           <div className="overflow-y-auto flex-1">
             {filtered.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                No countries found
+              <div className="px-4 py-5 text-center">
+                <SearchX className="w-8 h-8 mx-auto mb-2 text-muted-foreground/70" aria-hidden="true" />
+                <p className="text-sm font-medium text-foreground">
+                  No matches for &ldquo;{search.trim()}&rdquo;
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                  Try the full country name, its 2-letter code (e.g. <span className="font-medium text-foreground">DE</span>),
+                  or its dial code (e.g. <span className="font-medium text-foreground">+49</span>).
+                </p>
+                {suggestions.length > 0 && (
+                  <div className="mt-3 text-left">
+                    <p className="px-1 mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                      Did you mean
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      {suggestions.map((country) => (
+                        <button
+                          key={country.code}
+                          type="button"
+                          onClick={() => handlePick(country)}
+                          className="w-full flex items-center gap-3 px-2 py-1.5 rounded-md text-sm hover:bg-secondary/70 transition-colors"
+                        >
+                          <span className="text-lg leading-none">{country.flag}</span>
+                          <span className="flex-1 text-left text-foreground">{country.name}</span>
+                          <span className="text-muted-foreground font-medium">{country.dial}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               filtered.map((country) => (
                 <button
                   key={country.code}
                   type="button"
-                  onClick={() => {
-                    onSelect(country);
-                    setOpen(false);
-                  }}
+                  onClick={() => handlePick(country)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-secondary/70 transition-colors ${
                     selected.code === country.code ? "bg-secondary" : ""
                   }`}
