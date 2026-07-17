@@ -216,6 +216,71 @@ const countries: Country[] = [
   ...rawCountries.slice(1).sort((a, b) => a.name.localeCompare(b.name)),
 ];
 
+// Normalize: lowercase, strip diacritics/accents, collapse punctuation & whitespace
+const normalize = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9+]+/g, " ")
+    .trim();
+
+// Alternative spellings / common names / historical names / native names
+const countryAliases: Record<string, string[]> = {
+  US: ["usa", "u s a", "united states of america", "america", "the states"],
+  GB: ["uk", "u k", "britain", "great britain", "england", "scotland", "wales", "northern ireland"],
+  CI: ["ivory coast"],
+  CD: ["drc", "democratic republic of the congo", "zaire"],
+  CG: ["republic of the congo"],
+  KP: ["dprk", "democratic peoples republic of korea"],
+  KR: ["rok", "republic of korea", "korea"],
+  MM: ["burma"],
+  CZ: ["czechia"],
+  SZ: ["swaziland"],
+  MK: ["macedonia"],
+  TL: ["east timor"],
+  CV: ["cabo verde"],
+  NL: ["holland", "the netherlands"],
+  AE: ["uae", "emirates"],
+  RU: ["russian federation"],
+  IR: ["persia", "islamic republic of iran"],
+  SY: ["syrian arab republic"],
+  LA: ["lao", "laos peoples democratic republic"],
+  VN: ["viet nam"],
+  VA: ["holy see"],
+  PS: ["palestinian territories", "state of palestine"],
+  TW: ["republic of china", "chinese taipei"],
+  HK: ["hong kong sar"],
+  MO: ["macau", "macao sar"],
+  DE: ["deutschland"],
+  ES: ["espana"],
+  FR: ["french republic"],
+  IT: ["italia"],
+  JP: ["nippon", "nihon"],
+  CN: ["peoples republic of china", "prc", "mainland china"],
+  MX: ["mexico", "estados unidos mexicanos"],
+  BR: ["brasil"],
+  TR: ["turkiye"],
+  EG: ["misr"],
+  SA: ["ksa", "kingdom of saudi arabia"],
+  XK: ["republic of kosovo"],
+  BA: ["bosnia"],
+  DO: ["dr"],
+  TT: ["trinidad"],
+  AG: ["antigua"],
+  VC: ["saint vincent", "st vincent"],
+  KN: ["saint kitts", "st kitts"],
+  LC: ["st lucia"],
+  ST: ["sao tome"],
+  FM: ["federated states of micronesia"],
+};
+
+const searchIndex: { country: Country; haystack: string }[] = countries.map((c) => {
+  const aliases = countryAliases[c.code] ?? [];
+  const parts = [c.name, c.code, c.dial, c.dial.replace(/[^0-9]/g, ""), ...aliases];
+  return { country: c, haystack: parts.map(normalize).join(" | ") };
+});
+
 interface CountryCodePickerProps {
   selected: Country;
   onSelect: (country: Country) => void;
@@ -228,15 +293,15 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
   const searchRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
-    if (!search) return countries;
-    const q = search.toLowerCase();
-    return countries.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.dial.includes(q) ||
-        c.code.toLowerCase().includes(q)
-    );
+    const q = normalize(search);
+    if (!q) return countries;
+    // Split query on whitespace so multi-word / partial searches all match
+    const tokens = q.split(" ").filter(Boolean);
+    return searchIndex
+      .filter(({ haystack }) => tokens.every((t) => haystack.includes(t)))
+      .map(({ country }) => country);
   }, [search]);
+
 
   useEffect(() => {
     if (open) {
