@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, SearchX } from "lucide-react";
 
 export interface Country {
   name: string;
