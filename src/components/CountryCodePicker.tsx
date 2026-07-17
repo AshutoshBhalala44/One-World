@@ -309,7 +309,7 @@ const editDistance = (a: string, b: string): number => {
   return prev[b.length];
 };
 
-const suggestCountries = (query: string, limit = 3): Country[] => {
+export const suggestCountries = (query: string, limit = 3): Country[] => {
   const q = normalize(query);
   if (!q) return [];
   const scored = countries.map((c) => {
