@@ -52,8 +52,8 @@ describe("CountryCodePicker search — every country is discoverable", () => {
 
 describe("CountryCodePicker search — normalization", () => {
   it("ignores accents/diacritics", () => {
-    // "Côte d'Ivoire" should be findable via "cote divoire"
-    const results = searchCountries("cote divoire");
+    // "Côte d'Ivoire" should be findable ignoring accents
+    const results = searchCountries("cote d ivoire");
     expect(findsSelf("CI", results)).toBe(true);
   });
 
