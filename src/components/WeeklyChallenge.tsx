@@ -264,7 +264,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
       className="rounded-xl overflow-hidden max-w-2xl mx-auto mb-8"
     >
       {/* Header banner */}
-      <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 p-4 sm:p-5">
+      <div className="bg-gradient-to-r from-[#12141A] via-[#1E2230] to-[#3A1218] p-4 sm:p-5 border-b border-[#7A1E24]/40">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <Trophy className="w-5 h-5 text-white" />
