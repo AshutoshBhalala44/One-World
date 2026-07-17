@@ -281,6 +281,48 @@ const searchIndex: { country: Country; haystack: string }[] = countries.map((c) 
   return { country: c, haystack: parts.map(normalize).join(" | ") };
 });
 
+// Levenshtein distance for fuzzy suggestions (small strings, cheap)
+const editDistance = (a: string, b: string): number => {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const prev = new Array(b.length + 1).fill(0).map((_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    let curr = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      const next = Math.min(curr + 1, prev[j] + 1, prev[j - 1] + cost);
+      prev[j - 1] = curr;
+      curr = next;
+    }
+    prev[b.length] = curr;
+  }
+  return prev[b.length];
+};
+
+const suggestCountries = (query: string, limit = 3): Country[] => {
+  const q = normalize(query);
+  if (!q) return [];
+  const scored = countries.map((c) => {
+    const nameN = normalize(c.name);
+    // Best distance across name + aliases
+    const candidates = [nameN, ...(countryAliases[c.code] ?? []).map(normalize)];
+    let best = Infinity;
+    for (const cand of candidates) {
+      // Compare against query trimmed to candidate length window for fairer scoring
+      const dist = editDistance(q, cand);
+      const normalized = dist / Math.max(q.length, cand.length);
+      if (normalized < best) best = normalized;
+    }
+    return { country: c, score: best };
+  });
+  return scored
+    .filter((s) => s.score < 0.6) // only reasonably close matches
+    .sort((a, b) => a.score - b.score)
+    .slice(0, limit)
+    .map((s) => s.country);
+};
+
 interface CountryCodePickerProps {
   selected: Country;
   onSelect: (country: Country) => void;
