@@ -115,8 +115,11 @@ function generateCountryData(
   });
 }
 
-const AXIS_TEXT_COLOR = "hsl(220, 15%, 65%)";
-const CURSOR_COLOR = "hsl(220, 20%, 50%, 0.15)";
+// Use semantic tokens so axis/cursor stay WCAG AA in both light and dark
+// themes. muted-foreground is tuned to clear 4.5:1 against card/secondary
+// backgrounds in every scheme; hardcoded greys previously failed in light mode.
+const AXIS_TEXT_COLOR = "hsl(var(--muted-foreground))";
+const CURSOR_COLOR = "hsl(var(--foreground) / 0.08)";
 
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
