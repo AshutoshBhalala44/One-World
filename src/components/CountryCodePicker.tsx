@@ -401,18 +401,43 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
           </div>
           <div className="overflow-y-auto flex-1">
             {filtered.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground text-center">
-                No countries found
+              <div className="px-4 py-5 text-center">
+                <SearchX className="w-8 h-8 mx-auto mb-2 text-muted-foreground/70" aria-hidden="true" />
+                <p className="text-sm font-medium text-foreground">
+                  No matches for &ldquo;{search.trim()}&rdquo;
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                  Try the full country name, its 2-letter code (e.g. <span className="font-medium text-foreground">DE</span>),
+                  or its dial code (e.g. <span className="font-medium text-foreground">+49</span>).
+                </p>
+                {suggestions.length > 0 && (
+                  <div className="mt-3 text-left">
+                    <p className="px-1 mb-1 text-[11px] uppercase tracking-wide text-muted-foreground">
+                      Did you mean
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      {suggestions.map((country) => (
+                        <button
+                          key={country.code}
+                          type="button"
+                          onClick={() => handlePick(country)}
+                          className="w-full flex items-center gap-3 px-2 py-1.5 rounded-md text-sm hover:bg-secondary/70 transition-colors"
+                        >
+                          <span className="text-lg leading-none">{country.flag}</span>
+                          <span className="flex-1 text-left text-foreground">{country.name}</span>
+                          <span className="text-muted-foreground font-medium">{country.dial}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               filtered.map((country) => (
                 <button
                   key={country.code}
                   type="button"
-                  onClick={() => {
-                    onSelect(country);
-                    setOpen(false);
-                  }}
+                  onClick={() => handlePick(country)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm hover:bg-secondary/70 transition-colors ${
                     selected.code === country.code ? "bg-secondary" : ""
                   }`}
