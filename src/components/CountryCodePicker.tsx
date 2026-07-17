@@ -281,6 +281,15 @@ const searchIndex: { country: Country; haystack: string }[] = countries.map((c) 
   return { country: c, haystack: parts.map(normalize).join(" | ") };
 });
 
+export const searchCountries = (query: string): Country[] => {
+  const q = normalize(query);
+  if (!q) return countries;
+  const tokens = q.split(" ").filter(Boolean);
+  return searchIndex
+    .filter(({ haystack }) => tokens.every((t) => haystack.includes(t)))
+    .map(({ country }) => country);
+};
+
 // Levenshtein distance for fuzzy suggestions (small strings, cheap)
 const editDistance = (a: string, b: string): number => {
   if (a === b) return 0;
@@ -300,7 +309,7 @@ const editDistance = (a: string, b: string): number => {
   return prev[b.length];
 };
 
-const suggestCountries = (query: string, limit = 3): Country[] => {
+export const suggestCountries = (query: string, limit = 3): Country[] => {
   const q = normalize(query);
   if (!q) return [];
   const scored = countries.map((c) => {
@@ -334,15 +343,7 @@ export function CountryCodePicker({ selected, onSelect }: CountryCodePickerProps
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const filtered = useMemo(() => {
-    const q = normalize(search);
-    if (!q) return countries;
-    // Split query on whitespace so multi-word / partial searches all match
-    const tokens = q.split(" ").filter(Boolean);
-    return searchIndex
-      .filter(({ haystack }) => tokens.every((t) => haystack.includes(t)))
-      .map(({ country }) => country);
-  }, [search]);
+  const filtered = useMemo(() => searchCountries(search), [search]);
 
   const suggestions = useMemo(
     () => (filtered.length === 0 && search.trim() ? suggestCountries(search) : []),
