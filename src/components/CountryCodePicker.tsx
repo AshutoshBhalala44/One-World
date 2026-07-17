@@ -281,6 +281,15 @@ const searchIndex: { country: Country; haystack: string }[] = countries.map((c) 
   return { country: c, haystack: parts.map(normalize).join(" | ") };
 });
 
+export const searchCountries = (query: string): Country[] => {
+  const q = normalize(query);
+  if (!q) return countries;
+  const tokens = q.split(" ").filter(Boolean);
+  return searchIndex
+    .filter(({ haystack }) => tokens.every((t) => haystack.includes(t)))
+    .map(({ country }) => country);
+};
+
 // Levenshtein distance for fuzzy suggestions (small strings, cheap)
 const editDistance = (a: string, b: string): number => {
   if (a === b) return 0;
