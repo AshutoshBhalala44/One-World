@@ -458,7 +458,6 @@ export function MyResponses() {
                 <CountryBreakdownChart
                   options={poll.options}
                   isLoading={breakdownLoading}
-                  breakdowns={poll.totalVotes === 0 ? [] : undefined}
                 />
               )}
             </motion.div>
