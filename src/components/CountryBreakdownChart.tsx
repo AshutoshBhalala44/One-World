@@ -230,6 +230,27 @@ export function CountryBreakdownChart({
     onExpandedChange?.(value);
   };
 
+  // Ref to the outer container so we can scroll it into view when opened.
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prevExpandedRef = useRef(expanded);
+
+  // Mirror the welcome-page "section flow": when the breakdown is opened,
+  // smoothly glide it into full view so the chart lands where the user can
+  // see it — instead of expanding hidden below the fold. Only fires on a
+  // real expand (false → true), never on the auto-collapse from a flip.
+  useEffect(() => {
+    if (expanded && !prevExpandedRef.current) {
+      const t = window.setTimeout(() => {
+        containerRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 180);
+      return () => window.clearTimeout(t);
+    }
+    prevExpandedRef.current = expanded;
+  }, [expanded]);
+
   // If we're inside a FlipCard face, collapse the breakdown whenever this
   // face flips out of view. Otherwise its content can bleed through and be
   // read backwards from the opposite side on mobile.
