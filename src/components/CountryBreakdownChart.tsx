@@ -334,10 +334,11 @@ export function CountryBreakdownChart({
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.5 }}
-      className="mt-6"
+      className="mt-6 scroll-mt-4"
     >
       <button
         onClick={() => setExpanded(!expanded)}
