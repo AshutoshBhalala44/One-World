@@ -25,7 +25,7 @@ export function Header() {
   const onWelcome = location.pathname === "/welcome";
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
+    <header data-app-header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <button onClick={() => navigate("/")} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
           <img src={logo} alt="One World logo" className="w-9 h-9 rounded-lg object-cover" />
