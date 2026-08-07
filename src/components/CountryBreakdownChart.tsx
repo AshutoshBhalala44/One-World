@@ -302,9 +302,12 @@ export function CountryBreakdownChart({
       if (!header || !panel || !panel.isConnected) return true;
       const vh = window.innerHeight;
       const pad = 16;
+      // Mobile has a fixed bottom nav bar overlaying the page — keep the
+      // panel clear of it so the legend isn't hidden underneath.
+      const bottomPad = window.innerWidth < 768 ? 96 : 24;
       const hRect = header.getBoundingClientRect();
       const pRect = panel.getBoundingClientRect();
-      if (pRect.top >= 0 && pRect.bottom <= vh) return true; // already framed
+      if (pRect.top >= 0 && pRect.bottom <= vh - bottomPad) return true;
       const headerTop = hRect.top + window.scrollY;
       const panelBottom = pRect.bottom + window.scrollY;
       const blockHeight = panelBottom - headerTop;
@@ -312,7 +315,9 @@ export function CountryBreakdownChart({
       // If the toggle + panel fit on screen, align the bottom so everything is
       // visible; otherwise pin the top and let the user scroll the remainder.
       const desired =
-        blockHeight <= vh - pad * 2 ? panelBottom - vh + pad : headerTop - pad;
+        blockHeight <= vh - pad - bottomPad
+          ? panelBottom - vh + bottomPad
+          : headerTop - pad;
       const maxScroll = document.documentElement.scrollHeight - vh;
 
       // Layout still settling — the page can't scroll far enough yet.
