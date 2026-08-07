@@ -128,9 +128,6 @@ const Welcome = () => {
               <br />
               <span className="text-gradient-gold">No manipulation.</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl opacity-80 leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto font-body">
-              Our vision is to have a world where you don't only know what your neighbors, family, friends, and colleagues think. Instead, you know what every person in every corner of the world thinks, since we are all part of One World.
-            </p>
             <figure className="mx-auto max-w-xl mb-10">
               <blockquote className="text-sm sm:text-base italic leading-relaxed text-[hsl(45,100%,96%)]/75 border-l-2 border-gold/50 pl-4 text-left">
                 Built by a small team who believe the world deserves to hear itself think.
