@@ -142,7 +142,12 @@ export function DailyPoll({ scrollRef }: DailyPollProps) {
 
       // Auto-scroll to country breakdown after render
       setTimeout(() => {
-        breakdownRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        const el = breakdownRef.current;
+        if (el) {
+          const top =
+            el.getBoundingClientRect().top + window.scrollY - getTopSafeOffset(16);
+          window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+        }
       }, 600);
     } catch (err: any) {
       if (err.code === "23505") {
