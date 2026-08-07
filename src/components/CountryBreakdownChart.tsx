@@ -247,8 +247,6 @@ export function CountryBreakdownChart({
   const [internalExpanded, setInternalExpanded] = useState(autoExpand);
   const expanded = controlledExpanded !== undefined ? controlledExpanded : internalExpanded;
   const setExpanded = (value: boolean) => {
-    // eslint-disable-next-line no-console
-    console.log("[BD] setExpanded", value, new Error().stack?.split("\n")[2]);
     if (controlledExpanded === undefined) {
       setInternalExpanded(value);
     }
@@ -319,8 +317,6 @@ export function CountryBreakdownChart({
   // read backwards from the opposite side on mobile.
   const { isActive: faceIsActive } = useFlipFace();
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log("[BD] faceIsActive", faceIsActive, "expanded", expanded);
     if (!faceIsActive && expanded) {
       suppressScrollRef.current = true;
       setExpanded(false);
