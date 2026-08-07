@@ -256,6 +256,7 @@ export function CountryBreakdownChart({
   // Ref to the outer container so we can scroll it into view when opened.
   const containerRef = useRef<HTMLDivElement>(null);
   const prevExpandedRef = useRef(expanded);
+  const suppressScrollRef = useRef(false);
 
   // Mirror the welcome-page "section flow": opening the breakdown glides it
   // into view, closing it glides back up to the question card. Uses a manual
@@ -265,12 +266,14 @@ export function CountryBreakdownChart({
     const wasExpanded = prevExpandedRef.current;
     prevExpandedRef.current = expanded;
     if (wasExpanded === expanded) return;
+    if (suppressScrollRef.current) {
+      suppressScrollRef.current = false;
+      return;
+    }
 
     const el = containerRef.current;
     if (!el) return;
 
-    // Only animate back up on a user-driven collapse, and only if the card
-    // is still on screen (skip the auto-collapse from a card flip).
     const target = expanded
       ? el
       : (el.closest("[data-question-card]") as HTMLElement | null) ?? el;
@@ -292,10 +295,12 @@ export function CountryBreakdownChart({
   const { isActive: faceIsActive } = useFlipFace();
   useEffect(() => {
     if (!faceIsActive && expanded) {
+      suppressScrollRef.current = true;
       setExpanded(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [faceIsActive]);
+
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
