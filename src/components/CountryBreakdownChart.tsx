@@ -234,22 +234,34 @@ export function CountryBreakdownChart({
   const containerRef = useRef<HTMLDivElement>(null);
   const prevExpandedRef = useRef(expanded);
 
-  // Mirror the welcome-page "section flow": when the breakdown is opened,
-  // smoothly glide it into full view so the chart lands where the user can
-  // see it — instead of expanding hidden below the fold. Only fires on a
-  // real expand (false → true), never on the auto-collapse from a flip.
+  // Mirror the welcome-page "section flow": opening the breakdown glides it
+  // into view, closing it glides back up to the question card. Uses a manual
+  // window-level eased scroll (scrollIntoView gets swallowed by the
+  // overflow-hidden card / flip-card ancestors).
   useEffect(() => {
-    if (expanded && !prevExpandedRef.current) {
-      const t = window.setTimeout(() => {
-        containerRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 180);
-      return () => window.clearTimeout(t);
-    }
+    const wasExpanded = prevExpandedRef.current;
     prevExpandedRef.current = expanded;
+    if (wasExpanded === expanded) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    // Only animate back up on a user-driven collapse, and only if the card
+    // is still on screen (skip the auto-collapse from a card flip).
+    const target = expanded
+      ? el
+      : (el.closest("[data-question-card]") as HTMLElement | null) ?? el;
+
+    const t = window.setTimeout(() => {
+      const node = expanded ? containerRef.current : target;
+      if (!node || !node.isConnected) return;
+      const top =
+        node.getBoundingClientRect().top + window.scrollY - (expanded ? 16 : 24);
+      smoothScrollWindowTo(top);
+    }, expanded ? 200 : 60);
+    return () => window.clearTimeout(t);
   }, [expanded]);
+
 
   // If we're inside a FlipCard face, collapse the breakdown whenever this
   // face flips out of view. Otherwise its content can bleed through and be
