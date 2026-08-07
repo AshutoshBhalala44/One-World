@@ -287,28 +287,34 @@ export function CountryBreakdownChart({
       return () => window.clearTimeout(t);
     }
 
-    // Wait for the height:auto expand animation (300ms) to settle so we can
-    // measure the real panel height, then frame it fully in the viewport.
-    const t = window.setTimeout(() => {
+    // Frame the whole panel. The card's own height animation (and the flip
+    // card container) keeps growing after the panel opens, so the document
+    // isn't tall enough to scroll fully on the first pass — re-frame a few
+    // times until the panel is entirely on screen.
+    const frame = () => {
       const header = containerRef.current;
       const panel = contentRef.current;
       if (!header || !panel || !panel.isConnected) return;
       const vh = window.innerHeight;
       const pad = 16;
-      const headerTop = header.getBoundingClientRect().top + window.scrollY;
-      const panelBottom = panel.getBoundingClientRect().bottom + window.scrollY;
+      const hRect = header.getBoundingClientRect();
+      const pRect = panel.getBoundingClientRect();
+      if (pRect.top >= 0 && pRect.bottom <= vh) return; // already fully visible
+      const headerTop = hRect.top + window.scrollY;
+      const panelBottom = pRect.bottom + window.scrollY;
       const blockHeight = panelBottom - headerTop;
 
       // If the toggle + panel fit on screen, align the bottom so everything is
       // visible; otherwise pin the top and let the user scroll the remainder.
       const top =
-        blockHeight <= vh - pad * 2
-          ? panelBottom - vh + pad
-          : headerTop - pad;
-      smoothScrollWindowTo(top);
-    }, 340);
-    return () => window.clearTimeout(t);
+        blockHeight <= vh - pad * 2 ? panelBottom - vh + pad : headerTop - pad;
+      smoothScrollWindowTo(top, 420);
+    };
+
+    const timers = [340, 780, 1150].map((d) => window.setTimeout(frame, d));
+    return () => timers.forEach((t) => window.clearTimeout(t));
   }, [expanded]);
+
 
 
 
