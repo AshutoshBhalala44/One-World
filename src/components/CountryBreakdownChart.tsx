@@ -255,13 +255,14 @@ export function CountryBreakdownChart({
 
   // Ref to the outer container so we can scroll it into view when opened.
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const prevExpandedRef = useRef(expanded);
   const suppressScrollRef = useRef(false);
 
-  // Mirror the welcome-page "section flow": opening the breakdown glides it
-  // into view, closing it glides back up to the question card. Uses a manual
-  // window-level eased scroll (scrollIntoView gets swallowed by the
-  // overflow-hidden card / flip-card ancestors).
+  // Mirror the welcome-page "section flow": opening the breakdown glides the
+  // WHOLE panel into view (bottom included, not just the header), closing it
+  // glides back up to the question card. Uses a manual window-level eased
+  // scroll (scrollIntoView gets swallowed by overflow-hidden ancestors).
   useEffect(() => {
     const wasExpanded = prevExpandedRef.current;
     prevExpandedRef.current = expanded;
@@ -274,19 +275,41 @@ export function CountryBreakdownChart({
     const el = containerRef.current;
     if (!el) return;
 
-    const target = expanded
-      ? el
-      : (el.closest("[data-question-card]") as HTMLElement | null) ?? el;
+    if (!expanded) {
+      const target =
+        (el.closest("[data-question-card]") as HTMLElement | null) ?? el;
+      const t = window.setTimeout(() => {
+        if (!target.isConnected) return;
+        smoothScrollWindowTo(
+          target.getBoundingClientRect().top + window.scrollY - 24
+        );
+      }, 60);
+      return () => window.clearTimeout(t);
+    }
 
+    // Wait for the height:auto expand animation (300ms) to settle so we can
+    // measure the real panel height, then frame it fully in the viewport.
     const t = window.setTimeout(() => {
-      const node = expanded ? containerRef.current : target;
-      if (!node || !node.isConnected) return;
+      const header = containerRef.current;
+      const panel = contentRef.current;
+      if (!header || !panel || !panel.isConnected) return;
+      const vh = window.innerHeight;
+      const pad = 16;
+      const headerTop = header.getBoundingClientRect().top + window.scrollY;
+      const panelBottom = panel.getBoundingClientRect().bottom + window.scrollY;
+      const blockHeight = panelBottom - headerTop;
+
+      // If the toggle + panel fit on screen, align the bottom so everything is
+      // visible; otherwise pin the top and let the user scroll the remainder.
       const top =
-        node.getBoundingClientRect().top + window.scrollY - (expanded ? 16 : 24);
+        blockHeight <= vh - pad * 2
+          ? panelBottom - vh + pad
+          : headerTop - pad;
       smoothScrollWindowTo(top);
-    }, expanded ? 200 : 60);
+    }, 340);
     return () => window.clearTimeout(t);
   }, [expanded]);
+
 
 
   // If we're inside a FlipCard face, collapse the breakdown whenever this
@@ -401,7 +424,7 @@ export function CountryBreakdownChart({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
+            <div ref={contentRef} className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
               <AnimatePresence mode="wait" initial={false}>
                 {isLoading ? (
                   <motion.div
