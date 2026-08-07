@@ -259,6 +259,7 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
   return (
     <motion.div
       ref={scrollRef as any}
+      data-question-card
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl overflow-hidden max-w-2xl mx-auto mb-8"

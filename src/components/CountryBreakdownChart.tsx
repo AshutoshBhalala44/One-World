@@ -196,6 +196,29 @@ const EmptyState = memo(function EmptyState({ message }: { message: string }) {
   );
 });
 
+/** Eased window scroll matching the welcome page's section-flow feel. */
+function smoothScrollWindowTo(top: number, duration = 520) {
+  if (typeof window === "undefined") return;
+  const start = window.scrollY;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const end = Math.max(0, Math.min(max, top));
+  const delta = end - start;
+  if (Math.abs(delta) < 2) return;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    window.scrollTo(0, end);
+    return;
+  }
+  const startTime = performance.now();
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = (now: number) => {
+    const p = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, start + delta * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 
 export function CountryBreakdownChart({
   options,
@@ -233,23 +256,38 @@ export function CountryBreakdownChart({
   // Ref to the outer container so we can scroll it into view when opened.
   const containerRef = useRef<HTMLDivElement>(null);
   const prevExpandedRef = useRef(expanded);
+  const suppressScrollRef = useRef(false);
 
-  // Mirror the welcome-page "section flow": when the breakdown is opened,
-  // smoothly glide it into full view so the chart lands where the user can
-  // see it — instead of expanding hidden below the fold. Only fires on a
-  // real expand (false → true), never on the auto-collapse from a flip.
+  // Mirror the welcome-page "section flow": opening the breakdown glides it
+  // into view, closing it glides back up to the question card. Uses a manual
+  // window-level eased scroll (scrollIntoView gets swallowed by the
+  // overflow-hidden card / flip-card ancestors).
   useEffect(() => {
-    if (expanded && !prevExpandedRef.current) {
-      const t = window.setTimeout(() => {
-        containerRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 180);
-      return () => window.clearTimeout(t);
-    }
+    const wasExpanded = prevExpandedRef.current;
     prevExpandedRef.current = expanded;
+    if (wasExpanded === expanded) return;
+    if (suppressScrollRef.current) {
+      suppressScrollRef.current = false;
+      return;
+    }
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const target = expanded
+      ? el
+      : (el.closest("[data-question-card]") as HTMLElement | null) ?? el;
+
+    const t = window.setTimeout(() => {
+      const node = expanded ? containerRef.current : target;
+      if (!node || !node.isConnected) return;
+      const top =
+        node.getBoundingClientRect().top + window.scrollY - (expanded ? 16 : 24);
+      smoothScrollWindowTo(top);
+    }, expanded ? 200 : 60);
+    return () => window.clearTimeout(t);
   }, [expanded]);
+
 
   // If we're inside a FlipCard face, collapse the breakdown whenever this
   // face flips out of view. Otherwise its content can bleed through and be
@@ -257,10 +295,12 @@ export function CountryBreakdownChart({
   const { isActive: faceIsActive } = useFlipFace();
   useEffect(() => {
     if (!faceIsActive && expanded) {
+      suppressScrollRef.current = true;
       setExpanded(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [faceIsActive]);
+
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
