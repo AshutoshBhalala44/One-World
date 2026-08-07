@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFlipFace } from "./FlipCard";
+import { getTopSafeOffset, getBottomSafeOffset } from "@/lib/scrollOffsets";
 
 import { ChevronDown, ChevronUp, Search, X, Globe } from "lucide-react";
 import {
