@@ -287,28 +287,59 @@ export function CountryBreakdownChart({
       return () => window.clearTimeout(t);
     }
 
-    // Wait for the height:auto expand animation (300ms) to settle so we can
-    // measure the real panel height, then frame it fully in the viewport.
-    const t = window.setTimeout(() => {
+    // Frame the whole panel. The card (and flip-card container) keeps growing
+    // for ~0.7s after the panel opens, so the document isn't tall enough to
+    // scroll all the way at first. Poll until the layout can accommodate the
+    // target scroll position, then perform ONE smooth glide.
+    let poll: number | null = null;
+    let elapsed = 0;
+    const STEP = 80;
+    const MAX_WAIT = 1400;
+
+    const tryFrame = () => {
       const header = containerRef.current;
       const panel = contentRef.current;
-      if (!header || !panel || !panel.isConnected) return;
+      if (!header || !panel || !panel.isConnected) return true;
       const vh = window.innerHeight;
       const pad = 16;
-      const headerTop = header.getBoundingClientRect().top + window.scrollY;
-      const panelBottom = panel.getBoundingClientRect().bottom + window.scrollY;
+      // Mobile has a fixed bottom nav bar overlaying the page — keep the
+      // panel clear of it so the legend isn't hidden underneath.
+      const bottomPad = window.innerWidth < 768 ? 96 : 24;
+      const hRect = header.getBoundingClientRect();
+      const pRect = panel.getBoundingClientRect();
+      if (pRect.top >= 0 && pRect.bottom <= vh - bottomPad) return true;
+      const headerTop = hRect.top + window.scrollY;
+      const panelBottom = pRect.bottom + window.scrollY;
       const blockHeight = panelBottom - headerTop;
 
       // If the toggle + panel fit on screen, align the bottom so everything is
       // visible; otherwise pin the top and let the user scroll the remainder.
-      const top =
-        blockHeight <= vh - pad * 2
-          ? panelBottom - vh + pad
+      const desired =
+        blockHeight <= vh - pad - bottomPad
+          ? panelBottom - vh + bottomPad
           : headerTop - pad;
-      smoothScrollWindowTo(top);
-    }, 340);
-    return () => window.clearTimeout(t);
+      const maxScroll = document.documentElement.scrollHeight - vh;
+
+      // Layout still settling — the page can't scroll far enough yet.
+      if (desired > maxScroll + 2 && elapsed < MAX_WAIT) return false;
+
+      smoothScrollWindowTo(desired, 480);
+      return true;
+    };
+
+    const start = window.setTimeout(function tick() {
+      if (tryFrame()) return;
+      elapsed += STEP;
+      poll = window.setTimeout(tick, STEP);
+    }, 320);
+
+    return () => {
+      window.clearTimeout(start);
+      if (poll) window.clearTimeout(poll);
+    };
   }, [expanded]);
+
+
 
 
 
