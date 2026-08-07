@@ -196,6 +196,29 @@ const EmptyState = memo(function EmptyState({ message }: { message: string }) {
   );
 });
 
+/** Eased window scroll matching the welcome page's section-flow feel. */
+function smoothScrollWindowTo(top: number, duration = 520) {
+  if (typeof window === "undefined") return;
+  const start = window.scrollY;
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const end = Math.max(0, Math.min(max, top));
+  const delta = end - start;
+  if (Math.abs(delta) < 2) return;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    window.scrollTo(0, end);
+    return;
+  }
+  const startTime = performance.now();
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = (now: number) => {
+    const p = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, start + delta * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 
 export function CountryBreakdownChart({
   options,
