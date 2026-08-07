@@ -51,3 +51,48 @@ export function getTopSafeOffset(gap = 16): number {
 export function getBottomSafeOffset(gap = 16): number {
   return getBottomNavOffset() + gap;
 }
+
+/**
+ * Keeps `--app-header-h` / `--app-bottom-nav-h` on <html> in sync with the
+ * live measured heights, so CSS (scroll-padding, scroll-margin) and JS scroll
+ * math use the same numbers at every breakpoint. Returns a cleanup function.
+ */
+export function observeChromeOffsets(): () => void {
+  if (typeof window === "undefined") return () => {};
+  const root = document.documentElement;
+
+  const sync = () => {
+    root.style.setProperty("--app-header-h", `${getHeaderOffset()}px`);
+    root.style.setProperty("--app-bottom-nav-h", `${getBottomNavOffset()}px`);
+  };
+
+  sync();
+
+  const ro = new ResizeObserver(sync);
+  const observed = new Set<Element>();
+  const attach = () => {
+    document
+      .querySelectorAll(`${HEADER_SELECTOR}, ${BOTTOM_NAV_SELECTOR}`)
+      .forEach((el) => {
+        if (!observed.has(el)) {
+          observed.add(el);
+          ro.observe(el);
+        }
+      });
+    sync();
+  };
+  attach();
+
+  // The header/bottom nav mount and unmount with routes.
+  const mo = new MutationObserver(attach);
+  mo.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener("resize", sync);
+  window.addEventListener("orientationchange", sync);
+
+  return () => {
+    ro.disconnect();
+    mo.disconnect();
+    window.removeEventListener("resize", sync);
+    window.removeEventListener("orientationchange", sync);
+  };
+}
