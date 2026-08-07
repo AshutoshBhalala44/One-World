@@ -28,7 +28,10 @@ export function ScrollProgress() {
     if (!sectionId) return;
     const el = document.querySelector(`[data-section="${sectionId}"]`);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Offset by the sticky header so the section heading isn't hidden.
+      const top =
+        el.getBoundingClientRect().top + window.scrollY - getTopSafeOffset(8);
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
     }
   }, []);
 
