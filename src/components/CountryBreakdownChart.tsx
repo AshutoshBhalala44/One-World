@@ -287,33 +287,53 @@ export function CountryBreakdownChart({
       return () => window.clearTimeout(t);
     }
 
-    // Frame the whole panel. The card's own height animation (and the flip
-    // card container) keeps growing after the panel opens, so the document
-    // isn't tall enough to scroll fully on the first pass — re-frame a few
-    // times until the panel is entirely on screen.
-    const frame = () => {
+    // Frame the whole panel. The card (and flip-card container) keeps growing
+    // for ~0.7s after the panel opens, so the document isn't tall enough to
+    // scroll all the way at first. Poll until the layout can accommodate the
+    // target scroll position, then perform ONE smooth glide.
+    let poll: number | null = null;
+    let elapsed = 0;
+    const STEP = 80;
+    const MAX_WAIT = 1400;
+
+    const tryFrame = () => {
       const header = containerRef.current;
       const panel = contentRef.current;
-      if (!header || !panel || !panel.isConnected) return;
+      if (!header || !panel || !panel.isConnected) return true;
       const vh = window.innerHeight;
       const pad = 16;
       const hRect = header.getBoundingClientRect();
       const pRect = panel.getBoundingClientRect();
-      if (pRect.top >= 0 && pRect.bottom <= vh) return; // already fully visible
+      if (pRect.top >= 0 && pRect.bottom <= vh) return true; // already framed
       const headerTop = hRect.top + window.scrollY;
       const panelBottom = pRect.bottom + window.scrollY;
       const blockHeight = panelBottom - headerTop;
 
       // If the toggle + panel fit on screen, align the bottom so everything is
       // visible; otherwise pin the top and let the user scroll the remainder.
-      const top =
+      const desired =
         blockHeight <= vh - pad * 2 ? panelBottom - vh + pad : headerTop - pad;
-      smoothScrollWindowTo(top, 420);
+      const maxScroll = document.documentElement.scrollHeight - vh;
+
+      // Layout still settling — the page can't scroll far enough yet.
+      if (desired > maxScroll + 2 && elapsed < MAX_WAIT) return false;
+
+      smoothScrollWindowTo(desired, 480);
+      return true;
     };
 
-    const timers = [340, 780, 1150].map((d) => window.setTimeout(frame, d));
-    return () => timers.forEach((t) => window.clearTimeout(t));
+    const start = window.setTimeout(function tick() {
+      if (tryFrame()) return;
+      elapsed += STEP;
+      poll = window.setTimeout(tick, STEP);
+    }, 320);
+
+    return () => {
+      window.clearTimeout(start);
+      if (poll) window.clearTimeout(poll);
+    };
   }, [expanded]);
+
 
 
 
