@@ -195,8 +195,8 @@ export function DailyPoll({ scrollRef }: DailyPollProps) {
     >
       <div className="p-6 sm:p-8">
         {userVote && (
-          <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-muted/50 text-sm">
-            <span className="font-medium text-emerald-500">You've already shared your voice</span>
+          <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm">
+            <span className="font-bold text-emerald-500">You've already shared your voice</span>
           </div>
         )}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
