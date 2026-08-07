@@ -14,6 +14,8 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { observeChromeOffsets } from "@/lib/scrollOffsets";
 
 const HomeGate = () => {
   const { user, loading } = useAuth();
@@ -23,10 +25,17 @@ const HomeGate = () => {
 
 const queryClient = new QueryClient();
 
+const ChromeOffsets = () => {
+  // Publish measured header / bottom-nav heights as CSS vars for scroll math.
+  useEffect(() => observeChromeOffsets(), []);
+  return null;
+};
+
 const App = () => (
   <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="oneworld-theme">
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <ChromeOffsets />
         <Toaster />
         <Sonner />
         <BrowserRouter>

@@ -124,13 +124,17 @@
 
   html {
     scroll-behavior: smooth;
+    /* Any native scroll (anchors, focus, scrollIntoView) clears the sticky
+       header. --app-header-h is measured at runtime; 4rem is the fallback. */
+    scroll-padding-top: calc(var(--app-header-h, 4rem) + 0.5rem);
+    scroll-padding-bottom: calc(var(--app-bottom-nav-h, 0px) + 1rem);
   }
 
   /* Section snapping is handled by useSectionSnap (JS controller) so gestures
      work uniformly in both directions on all browsers and handle tall
      sections gracefully. Keep scroll-margin so anchor jumps clear the header. */
   [data-section] {
-    scroll-margin-top: 4rem;
+    scroll-margin-top: calc(var(--app-header-h, 4rem) + 0.5rem);
   }
 
   body {

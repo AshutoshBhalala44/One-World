@@ -60,7 +60,7 @@ const Index = () => {
             </Tabs>
           </TabsContent>
 
-          <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+          <div data-app-bottom-nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
             <TabsList className="w-full h-16 sm:h-18 bg-transparent flex justify-around items-center px-2 sm:px-4 max-w-md mx-auto rounded-none border-0 gap-1">
               <TabsTrigger
                 value="today"

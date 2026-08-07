@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { getTopSafeOffset } from "@/lib/scrollOffsets";
 
 interface Options {
   /** CSS selector for the sections to snap between. */
@@ -80,7 +81,12 @@ export function useSectionSnap({
       if (!target) return;
       isSnapping = true;
       lastSnapAt = Date.now();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Offset by the sticky header so the section never lands under the nav.
+      const top =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        getTopSafeOffset(8);
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
       if (snapReleaseTimer) window.clearTimeout(snapReleaseTimer);
       snapReleaseTimer = window.setTimeout(() => {
         isSnapping = false;

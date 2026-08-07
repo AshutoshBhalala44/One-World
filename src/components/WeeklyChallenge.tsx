@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { getTopSafeOffset } from "@/lib/scrollOffsets";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -222,7 +223,12 @@ export function WeeklyChallenge({ onUnlocked, scrollRef }: WeeklyChallengeProps)
 
       // Auto-scroll to country breakdown after a brief delay for render
       setTimeout(() => {
-        breakdownRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        const el = breakdownRef.current;
+        if (el) {
+          const top =
+            el.getBoundingClientRect().top + window.scrollY - getTopSafeOffset(16);
+          window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+        }
       }, 600);
     } catch (err: any) {
       if (err.code === "23505") {
