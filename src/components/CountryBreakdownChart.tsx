@@ -424,7 +424,7 @@ export function CountryBreakdownChart({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
+            <div ref={contentRef} className="mt-4 rounded-lg bg-secondary/30 p-2 sm:p-4">
               <AnimatePresence mode="wait" initial={false}>
                 {isLoading ? (
                   <motion.div
