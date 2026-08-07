@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { getTopSafeOffset } from "@/lib/scrollOffsets";
 
 interface Options {
   /** CSS selector for the sections to snap between. */
